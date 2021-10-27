@@ -3,20 +3,16 @@
 /*当前UI界面状态*/
 SHOW_STATE UI_STATE = MAIN_STATE;
 
-
 OPTION Optionlist[] =
 {
     {"启停开关", CONTROL_PLCPOWER, PlcPowerUIshow},
     {"通信方式", CONTROL_COMMUNICA, CommunicaUIshow},
     {"密码修改", CONTROL_PASSWORD_CHANGE, PassWordChangeUIShow},
-    // {"波特率设置", CONTROL_BAUDSETTING, BaudSettingUIshow},
     {"波特率设置", CONTROL_BAUDSETTING, Baud_Setting},
     {"恢复出厂设置", CONTROL_RELOAD, ReloadSettingUIshow},
 };
 
 #define OptionlistSize (sizeof(Optionlist) / sizeof(OPTION))
-/*当前选项卡*/
-// OPTION *OptionNow = Optionlist;
 
 /*二级菜单*/
 OPTION Optionlist1[] =
@@ -28,8 +24,6 @@ OPTION Optionlist1[] =
 };
 
 #define OptionlistSize1 (sizeof(Optionlist1) / sizeof(OPTION))
-/*当前选项卡*/
-// OPTION *OptionNow1 = Optionlist1;
 
 /*当前多级菜单数量*/
 Menu_Show M_Show[] = 
@@ -790,7 +784,9 @@ void KeyBaud_Enter(void)
 /*波特率控件状态--Cancel*/
 void KeyBaud_Cancel(void)
 {   /*返回上级菜单界面*/
-    UI_STATE = CONTROL_BAUDSETTING;   
+    UI_STATE = CONTROL_STATE; 
+    /*赋值控件*/
+    ControlType = CONTROL_BAUDSETTING; 
     LcdShow(RefreshBaudDisp);
 
 #if USE_PRINTF_DEBUG

@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.0.0   USART                                                             10/27/2021 11:44:19 PAGE 1   
+C51 COMPILER V9.60.0.0   USART                                                             10/27/2021 17:42:57 PAGE 1   
 
 
 C51 COMPILER V9.60.0.0, COMPILATION OF MODULE USART
@@ -62,7 +62,7 @@ line level    source
   52          /*********************************************************
   53          * 函数名：void Uart1_ISR() interrupt 4 using 2
   54          * 功能：  串口1的定时中断服务函数
-C51 COMPILER V9.60.0.0   USART                                                             10/27/2021 11:44:19 PAGE 2   
+C51 COMPILER V9.60.0.0   USART                                                             10/27/2021 17:42:57 PAGE 2   
 
   55          * 参数：
   56          * 作者：  LHC
@@ -126,7 +126,7 @@ line level    source
  113   1          Uart_Base_MspInit(&Uart2);
  114   1      }
  115          
-C51 COMPILER V9.60.0.0   USART                                                             10/27/2021 11:44:19 PAGE 3   
+C51 COMPILER V9.60.0.0   USART                                                             10/27/2021 17:42:57 PAGE 3   
 
  116          /*********************************************************
  117          * 函数名：void Uart2_ISR() interrupt 8 using 2
@@ -190,7 +190,7 @@ line level    source
  174          * 参数：
  175          * 作者：  LHC
  176          * note：
-C51 COMPILER V9.60.0.0   USART                                                             10/27/2021 11:44:19 PAGE 4   
+C51 COMPILER V9.60.0.0   USART                                                             10/27/2021 17:42:57 PAGE 4   
 
  177          *               使用的是定时器3作为波特率发生器,RS485模块
  178          **********************************************************/
@@ -254,7 +254,7 @@ line level    source
  235          {                             /*发送中断*/
  236   1          if (S4CON & S4TI)
  237   1          {
-C51 COMPILER V9.60.0.0   USART                                                             10/27/2021 11:44:19 PAGE 5   
+C51 COMPILER V9.60.0.0   USART                                                             10/27/2021 17:42:57 PAGE 5   
 
  238   2              S4CON &= ~S4TI;
  239   2              /*发送完成，清除占用*/
@@ -318,7 +318,7 @@ line level    source
  296   2              IE2 |= uart_baseHandle->Interrupt_Enable; //串口2中断允许位
  297   2              IP2 &= uart_baseHandle->Uart_NVIC.Register_IP;
  298   2              IP2H &= uart_baseHandle->Uart_NVIC.Register_IPH;
-C51 COMPILER V9.60.0.0   USART                                                             10/27/2021 11:44:19 PAGE 6   
+C51 COMPILER V9.60.0.0   USART                                                             10/27/2021 17:42:57 PAGE 6   
 
  299   2          }
  300   1          else if (uart_baseHandle->Instance == UART3)
@@ -382,7 +382,7 @@ line level    source
  358   3                  S2BUF = *p++;
  359   3                  break;
  360   3              case UART3:
-C51 COMPILER V9.60.0.0   USART                                                             10/27/2021 11:44:19 PAGE 7   
+C51 COMPILER V9.60.0.0   USART                                                             10/27/2021 17:42:57 PAGE 7   
 
  361   3                  S3BUF = *p++;
  362   3                  break;

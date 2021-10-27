@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.0.0   CONTROL                                                           10/27/2021 11:44:19 PAGE 1   
+C51 COMPILER V9.60.0.0   CONTROL                                                           10/27/2021 17:42:56 PAGE 1   
 
 
 C51 COMPILER V9.60.0.0, COMPILATION OF MODULE CONTROL
@@ -62,7 +62,7 @@ line level    source
   52          
   53          void PowerInit(void)
   54          {       /*PLC初始运行状态*/
-C51 COMPILER V9.60.0.0   CONTROL                                                           10/27/2021 11:44:19 PAGE 2   
+C51 COMPILER V9.60.0.0   CONTROL                                                           10/27/2021 17:42:56 PAGE 2   
 
   55   1              RUNKEY = System_Parameter.PlcState; //默认为STOP
   56   1      }
@@ -126,7 +126,7 @@ line level    source
  114   1      }
  115          
  116          void InputOffect(SYSTEM_PARAMETER *Password)
-C51 COMPILER V9.60.0.0   CONTROL                                                           10/27/2021 11:44:19 PAGE 3   
+C51 COMPILER V9.60.0.0   CONTROL                                                           10/27/2021 17:42:56 PAGE 3   
 
  117          {
  118   1              Password->PSWNext.Index++;
@@ -190,7 +190,7 @@ line level    source
  176   1      }
  177          
  178          // void BaudSettingUIshow(void)
-C51 COMPILER V9.60.0.0   CONTROL                                                           10/27/2021 11:44:19 PAGE 4   
+C51 COMPILER V9.60.0.0   CONTROL                                                           10/27/2021 17:42:56 PAGE 4   
 
  179          // {
  180          //      // clear_screen();
@@ -254,7 +254,7 @@ line level    source
  238           * @retval      None
  239           */
  240          void ControlSave(void)
-C51 COMPILER V9.60.0.0   CONTROL                                                           10/27/2021 11:44:19 PAGE 5   
+C51 COMPILER V9.60.0.0   CONTROL                                                           10/27/2021 17:42:56 PAGE 5   
 
  241          {
  242   1              /*计算出当前有效数据的校验码并存储*/
