@@ -1,0 +1,590 @@
+C51 COMPILER V9.60.0.0   MDREGPOOL                                                         09/18/2021 18:02:50 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE MDREGPOOL
+OBJECT MODULE PLACED IN .\Objects\mdregpool.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE FreeModBus\Src\mdregpool.c LARGE OPTIMIZE(8,SPEED) BROWSE INCDIR(.\Inclu
+                    -de;.\FreeModBus\Inc) DEBUG OBJECTEXTEND PRINT(.\Listings\mdregpool.lst) OBJECT(.\Objects\mdregpool.obj)
+
+line level    source
+
+   1          #include "mdregpool.h"
+   2          #include <stdlib.h>
+   3          
+   4          #if(USER_MODBUS_LIB)
+   5          /* ================================================================== */
+   6          /*                        底层代码                                     */
+   7          /*              作用：实现动态增删任意地址寄存器，加速寄存器访问               */
+   8          /* ================================================================== */
+   9          
+  10          static mdU32 start_addr[] = {   COIL_OFFSET,
+  11                                          INPUT_COIL_OFFSET,
+  12                                          INPUT_REGISTER_OFFSET,
+  13                                          HOLD_REGISTER_OFFSET  };
+  14          
+  15          /*
+  16              mdCreateRegister
+  17                  @handler 句柄
+  18                  @reg    创建的寄存器
+  19                  @return 成功返回 mdTRUE，失败返回 mdFALSE
+  20              分配一个寄存器，初始化它，句柄的寄存器数量加一。如果当前寄存器数量超
+             -过设定的最大寄存器数量，则分配失败
+  21          */
+  22          static mdSTATUS mdCreateRegister(RegisterPoolHandle handler,RegisterHandle* reg){
+  23   1          mdSTATUS ret = mdFALSE;
+  24   1          (*reg) = NULL;
+  25   1          if (handler->curRegisterNumber < handler->maxRegisterNumber)
+  26   1          {
+  27   2              RegisterHandle reghandle = (RegisterHandle)malloc(sizeof(struct Register));
+  28   2              if (reghandle != NULL)
+  29   2              {
+  30   3                  reghandle->addr = 0;
+  31   3                  reghandle->dat = 0;
+  32   3                  reghandle->next = NULL;
+  33   3                  (*reg) = reghandle;
+  34   3                  handler->curRegisterNumber++;
+  35   3                  ret = mdTRUE;
+  36   3              }
+  37   2          }
+  38   1          return ret;
+  39   1      }
+  40          
+  41          /*
+  42              mdDestoryRegister
+  43                  @handler 句柄
+  44                  @reg    需要删除的寄存器
+  45                  @return
+  46              释放寄存器占用的空间，并且将句柄中的 curRegisterNumber 减一
+  47          */
+  48          static mdVOID mdDestoryRegister(RegisterPoolHandle handler,RegisterHandle* reg){
+  49   1          free(*reg);
+  50   1          handler->curRegisterNumber--;
+  51   1          (*reg) = NULL;
+  52   1      }
+  53          
+C51 COMPILER V9.60.0.0   MDREGPOOL                                                         09/18/2021 18:02:50 PAGE 2   
+
+  54          /*
+  55              mdFindRegisterByAddress
+  56                  @handler 句柄
+  57                  @addr   寄存器地址
+  58                  @reg    返回找到的寄存器
+  59                  @return 找到则返回 mdTRUE，且填充 reg，否则返回 mdFALSE，reg置为 NULL
+  60              根据寄存器地址寻找寄存器，若找到则返回 mdTRUE，且填充 reg，否则返回 mdFALS
+             -E，reg置为 NULL
+  61          */
+  62          static mdSTATUS mdFindRegisterByAddress(RegisterPoolHandle handler, mdU32 addr, RegisterHandle *reg){
+  63   1          mdSTATUS ret = mdFALSE;
+  64   1              mdU32 i = 0;
+  65   1              
+  66   1          for (i = 0; i < 4; i++)
+  67   1          {
+  68   2              if((addr >= start_addr[i]) && (addr < start_addr[i] + REGISTER_POOL_MAX_BUFFER)){
+  69   3                  (*reg) = handler->quickMap[i][addr-start_addr[i]];
+  70   3                  ret = mdTRUE;
+  71   3              }
+  72   2          }
+  73   1          if (ret == mdFALSE)
+  74   1          {
+  75   2              RegisterHandle p = handler->pool->next;
+  76   2              while (p != NULL)
+  77   2              {
+  78   3                  if (addr == p->addr)
+  79   3                  {
+  80   4                      (*reg) = p;
+  81   4                      ret = mdTRUE;
+  82   4                      break;
+  83   4                  }
+  84   3                  else if (addr < p->addr)
+  85   3                  {
+  86   4                      (*reg) = NULL;
+  87   4                      break;
+  88   4                  }
+  89   3                  else p=p->next;
+  90   3              }
+  91   2          }
+  92   1          return ret;
+  93   1      }
+  94          
+  95          
+  96          /*
+  97              mdInsertRegister
+  98                  @handler 句柄
+  99                  @reg    插入的寄存器
+ 100                  @return 插入成功返回 mdTRUE， 否则返回 mdFALSE
+ 101              遍历寄存器池，按照寄存器地址大小顺序插入适当的位置，如果已存在则返回
+             - mdFALSE
+ 102          */
+ 103          static mdSTATUS mdInsertRegister(RegisterPoolHandle handler,RegisterHandle* reg){
+ 104   1          mdSTATUS ret = mdFALSE;
+ 105   1          RegisterHandle p=handler->pool,q=p->next;
+ 106   1          while (q!=NULL && q->addr < (*reg)->addr){
+ 107   2              p = q;
+ 108   2              q = p->next;
+ 109   2          }
+ 110   1          if (q == NULL)
+ 111   1          {
+ 112   2              p->next = *reg;
+ 113   2              (*reg)->next = NULL;
+C51 COMPILER V9.60.0.0   MDREGPOOL                                                         09/18/2021 18:02:50 PAGE 3   
+
+ 114   2              ret = mdTRUE;
+ 115   2          }
+ 116   1          else if(q->addr == (*reg)->addr){
+ 117   2              ret = mdFALSE;
+ 118   2          }
+ 119   1          else{
+ 120   2              (*reg)->next = q;
+ 121   2              p->next = *reg;
+ 122   2              ret = mdTRUE;
+ 123   2          }
+ 124   1          return ret;
+ 125   1      }
+ 126          
+ 127          
+ 128          /* ================================================================== */
+ 129          /*                        第二层封装                                    */
+ 130          /*     作用：实现理论上(其实限制寄存器最大数量)寄存器数量无限多，             
+             -  */
+ 131          /*            忽略不用寄存器地址存储的困扰                                 */
+ 132          /* ================================================================== */
+ 133          
+ 134          #define mdToDouble(n) ((double)n)
+ 135          #define mdREG_ADDR(n) ((mdU32)(mdToDouble(n)/REGISTER_WIDTH))
+ 136          #define mdREG_OFFSET(n) (n%REGISTER_WIDTH)
+ 137          #define mdGetBit(reg,offset) ((reg>>offset)&1)
+ 138          #define ToBit(n) ((mdU32)n>0?mdHigh:mdLow)
+ 139          
+ 140          /*
+ 141              mdReadBit
+ 142                  @handler 句柄
+ 143                  @addr    位地址，如果寄存器位宽为16，则0~15都在第一个寄存器中，以此类�
+             -�
+ 144                  @bit    位结果
+ 145                  @return mdTRUE
+ 146              根据地址在当前句柄中读取位大小
+ 147          */
+ 148          static mdSTATUS mdReadBit(RegisterPoolHandle handler, mdU32 addr,mdBit *abit) reentrant {
+ 149   1          mdSTATUS ret = mdFALSE;
+ 150   1          mdU32 reg_addr = mdREG_ADDR(addr);
+ 151   1          mdU32 reg_off = mdREG_OFFSET(addr);
+ 152   1          RegisterHandle reg;
+ 153   1          ret = mdFindRegisterByAddress(handler,reg_addr,&reg);
+ 154   1          if (ret == mdTRUE)
+ 155   1          {
+ 156   2              (*abit) = ToBit( mdGetBit(reg->dat,reg_off));
+ 157   2          }
+ 158   1          else{
+ 159   2              (*abit) = mdLow;
+ 160   2          }
+ 161   1      
+ 162   1          return mdTRUE;
+ 163   1      }
+ 164          
+ 165          /*
+ 166              mdWriteBit
+ 167                  @handler 句柄
+ 168                  @addr    位地址，如果寄存器位宽为16，则0~15都在第一个寄存器中，以此类�
+             -�
+ 169                  @abit    位大小
+ 170                  @return 空间不足时返回 mdFalse，否则 mdTRUE
+ 171              根据地址修改当前句柄中的位大小
+ 172          */
+C51 COMPILER V9.60.0.0   MDREGPOOL                                                         09/18/2021 18:02:50 PAGE 4   
+
+ 173          static mdSTATUS mdWriteBit(RegisterPoolHandle handler,mdU32 addr,mdBit abit) reentrant{
+ 174   1          mdSTATUS ret = mdFALSE;
+ 175   1          mdU32 reg_addr = mdREG_ADDR(addr);
+ 176   1          mdU32 reg_off = mdREG_OFFSET(addr);
+ 177   1          RegisterHandle reg;
+ 178   1          ret = mdFindRegisterByAddress(handler,reg_addr,&reg);
+ 179   1          abit = ToBit(abit);
+ 180   1          if (ret == mdTRUE)    {
+ 181   2              reg->dat |= (abit << reg_off);
+ 182   2          }
+ 183   1          else{
+ 184   2              ret = mdCreateRegister(handler,&reg);
+ 185   2              if (ret == mdTRUE)
+ 186   2              {
+ 187   3                  reg->addr = reg_addr;
+ 188   3                  reg->dat |= (abit << reg_off);
+ 189   3                  ret = mdInsertRegister(handler,&reg);
+ 190   3              }
+ 191   2          }
+ 192   1          return ret;
+ 193   1      }
+ 194          
+ 195          /*
+ 196              mdReadBits
+ 197                  @handler 句柄
+ 198                  @addr    位地址，如果寄存器位宽为16，则0~15都在第一个寄存器中，以此类�
+             -�
+ 199                  @len    长度
+ 200                  @bits    位数组
+ 201                  @return mdTRUE
+ 202              根据地址在当前句柄中读取 len 个位大小，结果保存在 bits中
+ 203          */
+ 204          static mdSTATUS mdReadBits(RegisterPoolHandle handler,mdU32 addr,mdU32 len,mdBit *bits) reentrant{
+ 205   1          mdSTATUS ret = mdFALSE;
+ 206   1              mdU32 i = 0;
+ 207   1              
+ 208   1          for (i = 0; i < len; i++)
+ 209   1          {
+ 210   2              ret = handler->mdReadBit(handler,addr+i, bits++);
+ 211   2          }
+ 212   1          return ret;
+ 213   1      
+ 214   1      }
+ 215          
+ 216          /*
+ 217              mdReadBits
+ 218                  @handler 句柄
+ 219                  @addr    位地址，如果寄存器位宽为16，则0~15都在第一个寄存器中，以此类�
+             -�
+ 220                  @len    长度
+ 221                  @bits    位数组
+ 222                  @return 空间不足时返回 mdFalse，否则 mdTRUE
+ 223              根据地址修改当前句柄中的 len 个位大小
+ 224          */
+ 225          static mdSTATUS mdWriteBits(RegisterPoolHandle handler,mdU32 addr,mdU32 len,mdBit* bits) reentrant{
+ 226   1          mdSTATUS ret = mdFALSE;
+ 227   1              mdU32 i = 0;
+ 228   1              
+ 229   1          for (i = 0; i < len; i++)
+ 230   1          {
+ 231   2              ret = handler->mdWriteBit(handler,addr+i,bits[i]);
+ 232   2          }
+C51 COMPILER V9.60.0.0   MDREGPOOL                                                         09/18/2021 18:02:50 PAGE 5   
+
+ 233   1          return ret;
+ 234   1      }
+ 235          
+ 236          /*
+ 237              mdReadU16
+ 238                  @handler 句柄
+ 239                  @addr    寄存器地址
+ 240                  @data    寄存器数据
+ 241                  @return  mdTRUE
+ 242              根据地址读取一个寄存器值
+ 243          */
+ 244          static mdSTATUS mdReadU16(RegisterPoolHandle handler,mdU32 addr,mdU16 *dat) reentrant{
+ 245   1          mdSTATUS ret = mdFALSE;
+ 246   1          RegisterHandle reg;
+ 247   1          ret = mdFindRegisterByAddress(handler,addr,&reg);
+ 248   1          if (ret == mdTRUE)
+ 249   1          {
+ 250   2              (*dat) = reg->dat;
+ 251   2          }
+ 252   1          else{
+ 253   2              (*dat) = 0;
+ 254   2          }
+ 255   1          return mdTRUE;
+ 256   1      }
+ 257          
+ 258          
+ 259          /*
+ 260              mdReadU16
+ 261                  @handler 句柄
+ 262                  @addr    寄存器地址
+ 263                  @dat    寄存器数据
+ 264                  @return  空间不足时返回 mdFALSE ,否则返回 mdTRUE
+ 265              根据地址写入一个寄存器
+ 266          */
+ 267          static mdSTATUS mdWriteU16(RegisterPoolHandle handler,mdU32 addr,mdU16 dat) reentrant{
+ 268   1          mdSTATUS ret = mdFALSE;
+ 269   1          RegisterHandle reg;
+ 270   1          ret = mdFindRegisterByAddress(handler,addr,&reg);
+ 271   1          if (ret == mdTRUE)
+ 272   1          {
+ 273   2              reg->dat = dat;
+ 274   2          }
+ 275   1          else{
+ 276   2              ret = mdCreateRegister(handler,&reg);
+ 277   2              if (ret == mdTRUE)
+ 278   2              {
+ 279   3                  reg->addr = addr;
+ 280   3                  reg->dat = dat;
+ 281   3                  ret = mdInsertRegister(handler,&reg);
+ 282   3              }
+ 283   2          }
+ 284   1          return ret;
+ 285   1      }
+ 286          
+ 287          /*
+ 288              mdReadU16
+ 289                  @handler 句柄
+ 290                  @addr    寄存器地址
+ 291                  @len    读取长度
+ 292                  @dat    值数组
+ 293                  @return  mdTRUE
+ 294              根据地址读取一组寄存器值
+C51 COMPILER V9.60.0.0   MDREGPOOL                                                         09/18/2021 18:02:50 PAGE 6   
+
+ 295          */
+ 296          static mdSTATUS mdReadU16s(RegisterPoolHandle handler,mdU32 addr,mdU32 len,mdU16 *dat) reentrant{
+ 297   1          mdSTATUS ret = mdFALSE;
+ 298   1              mdU32 i = 0;
+ 299   1              
+ 300   1          for (i = 0; i < len; i++)
+ 301   1          {
+ 302   2              ret = handler->mdReadU16(handler,addr+i, dat++);
+ 303   2          }
+ 304   1          return ret;
+ 305   1      }
+ 306          
+ 307          
+ 308          /*
+ 309              mdWriteU16s
+ 310                  @handler 句柄
+ 311                  @addr    寄存器地址
+ 312                  @len    写入长度
+ 313                  @dat    值数组
+ 314                  @return  空间不足时返回 mdFALSE ,否则返回 mdTRUE
+ 315              根据地址写入一组寄存器值
+ 316          */
+ 317          static mdSTATUS mdWriteU16s(RegisterPoolHandle handler,mdU32 addr,mdU32 len,mdU16 *dat) reentrant{
+ 318   1          mdSTATUS ret = mdFALSE;
+ 319   1              mdU32 i = 0;
+ 320   1              
+ 321   1          for (i = 0; i < len; i++)
+ 322   1          {
+ 323   2              ret = handler->mdWriteU16(handler,addr+i,*(dat++));
+ 324   2          }
+ 325   1          return ret;
+ 326   1      }
+ 327          
+ 328          
+ 329          
+ 330          static mdSTATUS mdReadCoil(RegisterPoolHandle handler, mdU32 addr, mdBit* abit) reentrant
+ 331          {
+ 332   1          mdU16 buf;
+ 333   1          mdSTATUS ret = handler->mdReadU16(handler, addr + COIL_OFFSET, &buf);
+ 334   1          (*abit) = buf & 0x01;
+ 335   1          return ret;
+ 336   1      }
+ 337          
+ 338          static mdSTATUS mdReadCoils(RegisterPoolHandle handler, mdU32 addr, mdU32 len, mdBit* bits) reentrant
+ 339          {
+ 340   1          mdU16 buf;
+ 341   1          mdSTATUS ret = mdFALSE;
+ 342   1              mdU32 i = 0;
+ 343   1              
+ 344   1          for (i = 0; i < len; i++)
+ 345   1          {
+ 346   2              ret |= handler->mdReadU16(handler, addr + i + COIL_OFFSET, &buf);
+ 347   2              *(bits++) = buf & 0x01;
+ 348   2          }
+ 349   1          return ret;
+ 350   1      }
+ 351          
+ 352          static mdSTATUS mdWriteCoil(RegisterPoolHandle handler, mdU32 addr, mdBit abit) reentrant
+ 353          {
+ 354   1          return handler->mdWriteU16(handler, addr + COIL_OFFSET, (mdU16)abit);
+ 355   1      }
+ 356          
+C51 COMPILER V9.60.0.0   MDREGPOOL                                                         09/18/2021 18:02:50 PAGE 7   
+
+ 357          static mdSTATUS mdWriteCoils(RegisterPoolHandle handler, mdU32 addr, mdU32 len, mdBit* bits) reentrant
+ 358          {
+ 359   1          mdSTATUS ret = mdFALSE;
+ 360   1              mdU32 i = 0;
+ 361   1              
+ 362   1          for (i = 0; i < len; i++)
+ 363   1          {
+ 364   2              ret |= handler->mdWriteU16(handler, addr + i + COIL_OFFSET, (mdU16)(*(bits++)));
+ 365   2          }
+ 366   1          return ret;
+ 367   1      }
+ 368          
+ 369          static mdSTATUS mdReadInputCoil(RegisterPoolHandle handler, mdU32 addr, mdBit* abit) reentrant
+ 370          {
+ 371   1          mdU16 buf;
+ 372   1          mdSTATUS ret = handler->mdReadU16(handler, addr + INPUT_COIL_OFFSET, &buf);
+ 373   1          (*abit) = buf & 0x01;
+ 374   1          return ret;
+ 375   1      }
+ 376          
+ 377          static mdSTATUS mdReadInputCoils(RegisterPoolHandle handler, mdU32 addr, mdU32 len, mdBit* bits) reentrant
+ 378          {
+ 379   1          mdU16 buf;
+ 380   1          mdSTATUS ret = mdFALSE;
+ 381   1              mdU32 i = 0;
+ 382   1              
+ 383   1          for (i = 0; i < len; i++)
+ 384   1          {
+ 385   2              ret |= handler->mdReadU16(handler, addr + i + INPUT_COIL_OFFSET, &buf);
+ 386   2              *(bits++) = buf & 0x01;
+ 387   2          }
+ 388   1          return ret;
+ 389   1      }
+ 390          
+ 391          static mdSTATUS mdWriteInputCoil(RegisterPoolHandle handler, mdU32 addr, mdBit abit) reentrant
+ 392          {
+ 393   1          return handler->mdWriteU16(handler, addr + INPUT_COIL_OFFSET, (mdU16)abit);
+ 394   1      }
+ 395          
+ 396          static mdSTATUS mdWriteInputCoils(RegisterPoolHandle handler, mdU32 addr, mdU32 len, mdBit* bits) reentran
+             -t
+ 397          {
+ 398   1          mdSTATUS ret = mdFALSE;
+ 399   1              mdU32 i = 0;
+ 400   1              
+ 401   1          for (i = 0; i < len; i++)
+ 402   1          {
+ 403   2              ret |= handler->mdWriteU16(handler, addr + i + INPUT_COIL_OFFSET, (mdU16)(*(bits++)));
+ 404   2          }
+ 405   1          return ret;
+ 406   1      }
+ 407          
+ 408          static mdSTATUS mdReadInputRegister(RegisterPoolHandle handler, mdU32 addr, mdU16* dat) reentrant
+ 409          {
+ 410   1          return handler->mdReadU16(handler, addr + INPUT_REGISTER_OFFSET, dat);
+ 411   1      }
+ 412          
+ 413          static mdSTATUS mdReadInputRegisters(RegisterPoolHandle handler, mdU32 addr, mdU32 len, mdU16* dat) reentr
+             -ant
+ 414          {
+ 415   1          return handler->mdReadU16s(handler, addr + INPUT_REGISTER_OFFSET, len, dat);
+ 416   1      }
+C51 COMPILER V9.60.0.0   MDREGPOOL                                                         09/18/2021 18:02:50 PAGE 8   
+
+ 417          
+ 418          static mdSTATUS mdWriteInputRegister(RegisterPoolHandle handler, mdU32 addr, mdU16 dat) reentrant
+ 419          {
+ 420   1          return handler->mdWriteU16(handler, addr + INPUT_REGISTER_OFFSET, dat);
+ 421   1      }
+ 422          
+ 423          static mdSTATUS mdWriteInputRegisters(RegisterPoolHandle handler, mdU32 addr, mdU32 len, mdU16* dat) reent
+             -rant
+ 424          {
+ 425   1          return handler->mdWriteU16s(handler, addr + INPUT_REGISTER_OFFSET, len, dat);
+ 426   1      }
+ 427          
+ 428          
+ 429          static mdSTATUS mdReadHoldRegister(RegisterPoolHandle handler, mdU32 addr, mdU16* dat) reentrant
+ 430          {
+ 431   1          return handler->mdReadU16(handler, addr + HOLD_REGISTER_OFFSET, dat);
+ 432   1      }
+ 433          
+ 434          static mdSTATUS mdReadHoldRegisters(RegisterPoolHandle handler, mdU32 addr, mdU32 len, mdU16* dat) reentra
+             -nt
+ 435          {
+ 436   1          return handler->mdReadU16s(handler, addr + HOLD_REGISTER_OFFSET, len, dat);
+ 437   1      }
+ 438          
+ 439          static mdSTATUS mdWriteHoldRegister(RegisterPoolHandle handler, mdU32 addr, mdU16 dat) reentrant
+ 440          {
+ 441   1          return handler->mdWriteU16(handler, addr + HOLD_REGISTER_OFFSET, dat);
+ 442   1      }
+ 443          
+ 444          static mdSTATUS mdWriteHoldRegisters(RegisterPoolHandle handler, mdU32 addr, mdU32 len, mdU16* dat) reentr
+             -ant
+ 445          {
+ 446   1          return handler->mdWriteU16s(handler, addr + HOLD_REGISTER_OFFSET, len, dat);
+ 447   1      }
+ 448          
+ 449          /*
+ 450              mdCreateRegisterPool
+ 451                  @regpoolhandle  句柄
+ 452                  @return 空间不足时返回 mdFALSE，否则返回 mdTRUE
+ 453              创建并初始化寄存器池
+ 454          */
+ 455          mdSTATUS mdCreateRegisterPool(RegisterPoolHandle* regpoolhandle){
+ 456   1          mdSTATUS ret = mdFALSE;
+ 457   1          RegisterPoolHandle handler;
+ 458   1              mdU32 i = 0;
+ 459   1              mdU32 j = 0;
+ 460   1          handler= (RegisterPoolHandle)malloc(sizeof(struct RegisterPool));
+ 461   1          if (handler != NULL)
+ 462   1          {
+ 463   2              //注册方法
+ 464   2              handler->mdReadBit              = mdReadBit;
+ 465   2              handler->mdReadBits             = mdReadBits;
+ 466   2              handler->mdReadU16              = mdReadU16;
+ 467   2              handler->mdReadU16s             = mdReadU16s;
+ 468   2              handler->mdWriteBit             = mdWriteBit;
+ 469   2              handler->mdWriteBits            = mdWriteBits;
+ 470   2              handler->mdWriteU16             = mdWriteU16;
+ 471   2              handler->mdWriteU16s            = mdWriteU16s;
+ 472   2      
+ 473   2              handler->mdReadCoil             = mdReadCoil;
+ 474   2              handler->mdReadCoils            = mdReadCoils;
+ 475   2              handler->mdWriteCoil            = mdWriteCoil;
+C51 COMPILER V9.60.0.0   MDREGPOOL                                                         09/18/2021 18:02:50 PAGE 9   
+
+ 476   2              handler->mdWriteCoils           = mdWriteCoils;
+ 477   2              handler->mdReadInputCoil        = mdReadInputCoil;
+ 478   2              handler->mdReadInputCoils       = mdReadInputCoils;
+ 479   2              handler->mdWriteInputCoil       = mdWriteInputCoil;
+ 480   2              handler->mdWriteInputCoils      = mdWriteInputCoils;
+ 481   2              handler->mdReadInputRegister    = mdReadInputRegister;
+ 482   2              handler->mdReadInputRegisters   = mdReadInputRegisters;
+ 483   2              handler->mdWriteInputRegister   = mdWriteInputRegister;
+ 484   2              handler->mdWriteInputRegisters  = mdWriteInputRegisters;
+ 485   2              handler->mdReadHoldRegister     = mdReadHoldRegister;
+ 486   2              handler->mdReadHoldRegisters    = mdReadHoldRegisters;
+ 487   2              handler->mdWriteHoldRegister    = mdWriteHoldRegister;
+ 488   2              handler->mdWriteHoldRegisters   = mdWriteHoldRegisters;
+ 489   2      
+ 490   2              //设定当前寄存器数量(此处不设置，可能会出错，编译器不会初始化结构�
+             -�变量为0)
+ 491   2                      handler->curRegisterNumber = 0;
+ 492   2              //设定最大寄存器数量
+ 493   2              handler->maxRegisterNumber = REGISTER_POOL_MAX_REGISTER_NUMBER;
+ 494   2      
+ 495   2              //采用头节点模式
+ 496   2              ret = mdCreateRegister(handler,&(handler->pool));
+ 497   2              if (ret == mdFALSE) goto exit;
+ 498   2      
+ 499   2              //构建寄存器池和快表
+ 500   2              RegisterHandle p = handler->pool;
+*** ERROR C141 IN LINE 500 OF FreeModBus\Src\mdregpool.c: syntax error near 'RegisterHandle', expected '__asm'
+*** ERROR C202 IN LINE 500 OF FreeModBus\Src\mdregpool.c: 'p': undefined identifier
+ 501   2              for (i = 0; i < 4; i++)
+ 502   2              {
+ 503   3                  for (j = 0; j < REGISTER_POOL_MAX_BUFFER; j++)
+ 504   3                  {
+ 505   4                      RegisterHandle reg;
+ 506   4                      ret = mdCreateRegister(handler,&reg);
+ 507   4                      if (ret == mdFALSE) goto exit;
+ 508   4                      reg->addr = start_addr[i] + j;
+ 509   4                      handler->quickMap[i][j] = reg;
+ 510   4                      p->next = reg;
+*** ERROR C202 IN LINE 510 OF FreeModBus\Src\mdregpool.c: 'p': undefined identifier
+ 511   4                      p = reg;
+*** ERROR C202 IN LINE 511 OF FreeModBus\Src\mdregpool.c: 'p': undefined identifier
+ 512   4                  }
+ 513   3              }
+ 514   2              ret = mdTRUE;
+ 515   2          }
+ 516   1      exit:    (*regpoolhandle) = handler;
+ 517   1          return ret;
+ 518   1      }
+*** ERROR C233 IN LINE 518 OF FreeModBus\Src\mdregpool.c: 'exit': undefined label
+ 519          
+ 520          /*
+ 521              mdDestoryRegisterPool
+ 522                  @regpoolhandle  句柄
+ 523                  @return
+ 524              释放寄存器池空间，句柄置 NULL
+ 525          */
+ 526          mdVOID mdDestoryRegisterPool(RegisterPoolHandle* regpoolhandle){
+ 527   1      
+ 528   1          //释放所有寄存器
+ 529   1          RegisterHandle p = (*regpoolhandle)->pool;
+ 530   1          while (p->next != NULL)
+ 531   1          {
+C51 COMPILER V9.60.0.0   MDREGPOOL                                                         09/18/2021 18:02:50 PAGE 10  
+
+ 532   2              RegisterHandle q = p->next;
+ 533   2              mdDestoryRegister(*regpoolhandle,&p);
+ 534   2              p = q;
+ 535   2          }
+ 536   1          //释放寄存器池
+ 537   1          free(*regpoolhandle);
+ 538   1          (*regpoolhandle) = NULL;
+ 539   1      }
+ 540          
+ 541          #endif
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  5 ERROR(S)

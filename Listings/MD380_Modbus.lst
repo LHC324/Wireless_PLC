@@ -1,0 +1,581 @@
+C51 COMPILER V9.60.0.0   MD380_MODBUS                                                      09/26/2021 13:51:46 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE MD380_MODBUS
+OBJECT MODULE PLACED IN .\Objects\MD380_Modbus.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE Source\MD380_Modbus.c LARGE OPTIMIZE(9,SPEED) BROWSE INCDIR(.\Include;.\
+                    -FreeModBus\Inc) DEBUG OBJECTEXTEND PRINT(.\Listings\MD380_Modbus.lst) OBJECT(.\Objects\MD380_Modbus.obj)
+
+line level    source
+
+   1          #include "MD380_Modbus.h"
+   2          #include "string.h"
+   3          #include "usart.h"
+   4          
+   5          MODS_T g_tModS;
+   6          
+   7          Md_struct g_Mdbuff[2] = {               //2个变频器
+   8                  {MD380_SLAVEADDR1, {{RUNNING_SPEED_ADDR, MODS_SPEED1_ADDR,0x00}, {OUTPUT_VOLTAGE_ADDR,MODS_VOLTAGE_ADDR,0
+             -x00}, \
+   9                                          {OUTPUT_CURRENT_ADDR,MODS_CURRENT_ADDR,0x00}, {FAULT_ADDR,MODS_ERROR_ADDR,0x00}}
+  10                  },    //第一个变频器
+  11                  {MD380_SLAVEADDR2, {{RUNNING_SPEED_ADDR,MODS_SPEED2_ADDR,0x00}, {OUTPUT_VOLTAGE_ADDR,MODS_VOLTAGE2_ADDR,0
+             -x00}, \
+  12                                                      {OUTPUT_CURRENT_ADDR,MODS_CURRENT2_ADDR,0x00}, {FAULT_ADDR,MODS_ERROR2_ADDR,0x00}}
+  13                  },    //第二个变频器
+  14          };
+  15          
+  16          
+  17          uint16_t Mods_RigAddrNow;   //有一些Mosbus主站指令回复没有寄存器地址
+  18          uint8_t Mods_UsartNow;    //当前串口
+  19          
+  20          
+  21          #define InverterQuantity (sizeof(g_Inverter)/sizeof(Md_struct))
+  22             
+  23          
+  24          /*
+  25          *********************************************************************************************************
+  26          *       
+  27          *       
+  28          *       
+  29          *       
+  30          *********************************************************************************************************
+  31          */
+  32          void MODS_SlaveInit(void)
+  33          {
+  34   1      //      uint8_t i = 0;
+  35   1      //      uint8_t j = 0;
+  36   1              
+  37   1          Mods_UsartNow = USART3;    //缺省为串口3
+  38   1              
+  39   1      //      for(i = 0;i < InverterQuantity;i++){
+  40   1      //              g_Mdbuff[i].slaveaddr = g_Inverter[i].slaveaddr;
+  41   1      //              
+  42   1      //              for(j = 0;j < sizeof(Md_parm) >> 1;j++){
+  43   1      //                      g_Mdbuff[i].modsparm[j].Mdrigaddr = g_Inverter[i].modsparm[j].Mdrigaddr;
+  44   1      //                      g_Mdbuff[i].modsparm[j].addr = g_Inverter[i].modsparm[j].addr;
+  45   1      //                      g_Mdbuff[i].modsparm[j].value = g_Inverter[i].modsparm[j].value;
+  46   1      //              }       
+  47   1      //      }
+  48   1      }
+  49          
+  50          
+  51          /*
+  52          *********************************************************************************************************
+C51 COMPILER V9.60.0.0   MD380_MODBUS                                                      09/26/2021 13:51:46 PAGE 2   
+
+  53          *       函数名:   getCrc16
+  54          *       功能说明: CRC16检测
+  55          *       形    参: 无
+  56          *       返回值：无
+  57          *********************************************************************************************************
+  58          */
+  59          uint16_t getCrc16(const uint8_t *ptr, uint8_t length, uint16_t IniDat)
+  60          {
+  61   1          uint8_t iix;
+  62   1          uint16_t iiy;
+  63   1          uint16_t crc16 = IniDat;
+  64   1      
+  65   1          for(iix = 0; iix < length; iix++)
+  66   1          {
+  67   2              crc16 ^= *ptr++;
+  68   2      
+  69   2              for(iiy = 0; iiy < 8; iiy++)
+  70   2              {
+  71   3                  if(crc16 & 0x0001)
+  72   3                  {
+  73   4                      crc16 = (crc16 >> 1) ^ 0xa001;
+  74   4                  }
+  75   3                  else
+  76   3                  {
+  77   4                      crc16 = crc16 >> 1;
+  78   4                  }
+  79   3              }
+  80   2          }
+  81   1      
+  82   1          return(crc16);
+  83   1      }
+  84          /*
+  85          *********************************************************************************************************
+  86          *       函数名:   checkCrc16
+  87          *       功能说明: CRC16??
+  88          *       形    参: 无
+  89          *       返回值： 无
+  90          *********************************************************************************************************
+  91          */
+  92          //uint8_t checkCrc16(const uint8_t *ptr, uint8_t length)
+  93          //{
+  94          //    uint16_t crc1;
+  95          //    uint16_t crc2;
+  96          
+  97          //    crc1 = getCrc16(ptr, length - 2, 0xFFFF);
+  98          
+  99          //    crc2 = *(ptr + length - 1) << 8;        // CRC MSB
+ 100          //    crc2 += *(ptr + length - 2);            // CRC LSB
+ 101          
+ 102          //    // ??????????0xCCCC?0xcccc??????CRC
+ 103          //    if((crc1 == crc2) || (crc2 == 0xCCCC) || (crc2 == 0xcccc))
+ 104          //        return 1;
+ 105          
+ 106          //    return 0;
+ 107          //}
+ 108          
+ 109          
+ 110          /*
+ 111          *********************************************************************************************************
+ 112          *       
+ 113          *       
+ 114          *       
+C51 COMPILER V9.60.0.0   MD380_MODBUS                                                      09/26/2021 13:51:46 PAGE 3   
+
+ 115          *       
+ 116          *********************************************************************************************************
+ 117          */
+ 118          void MODS_ReciveNew(uint8_t * rxBuf, uint16_t Len)
+ 119          {
+ 120   1          uint16_t i;
+ 121   1      
+ 122   1          for(i = 0; i < Len; i++)
+ 123   1          {
+ 124   2              g_tModS.RxBuf[i] = rxBuf[i];
+ 125   2          }
+ 126   1      
+ 127   1          g_tModS.RxCount = Len;
+ 128   1      }
+ 129          
+ 130          
+ 131          
+ 132          /*
+ 133          *********************************************************************************************************
+ 134          *       
+ 135          *       
+ 136          *       
+ 137          *       
+ 138          *********************************************************************************************************
+ 139          */
+ 140          void MODS_SendWithCRC(uint8_t *_pBuf, uint8_t _ucLen)
+ 141          {
+ 142   1          uint16_t crc;
+ 143   1          uint8_t buf[MOD_TX_BUF_SIZE];
+ 144   1      
+ 145   1          memcpy(buf, _pBuf, _ucLen);
+ 146   1          crc = getCrc16(_pBuf, _ucLen, 0xffff);
+ 147   1          buf[_ucLen++] = crc;
+ 148   1          buf[_ucLen++] = crc >> 8;
+ 149   1      
+ 150   1          switch(Mods_UsartNow)
+ 151   1          {
+ 152   2      //                       case USART1: Uart1SendStr(buf,_ucLen); break;
+ 153   2      //        case USART2:
+ 154   2      //            Uart2SendStr(buf, _ucLen);
+ 155   2      //            break;
+ 156   2      
+ 157   2              case USART3: //发送命令请求变频器数据
+ 158   2      //            Uart3SendStr(buf, _ucLen);
+ 159   2                          Uartx_SendStr(&Uart3,&buf,_ucLen+1); //485端口数据需要额外加一位
+ 160   2                  break;
+ 161   2      
+ 162   2              case USART4: //把从变频器回应的数据处理后存入PLC
+ 163   2      //            Uart4SendStr(buf, _ucLen);  
+ 164   2                               Uartx_SendStr(&Uart4,&buf,_ucLen); 
+ 165   2      //                  memcpy(&buffer1, &buf, _ucLen); //测试
+ 166   2                  break;
+ 167   2      
+ 168   2              default:
+ 169   2                  break;
+ 170   2          }
+ 171   1      }
+ 172          
+ 173          //void MODS_Host_01(uint16_t slaveaddr, uint16_t startaddr, uint16_t length) //离散输出
+ 174          //{
+ 175          //    g_tModS.TxCount = 0;
+ 176          //    g_tModS.TxBuf[g_tModS.TxCount++] = slaveaddr;
+C51 COMPILER V9.60.0.0   MD380_MODBUS                                                      09/26/2021 13:51:46 PAGE 4   
+
+ 177          //    g_tModS.TxBuf[g_tModS.TxCount++] = 0x01;
+ 178          //    g_tModS.TxBuf[g_tModS.TxCount++] = startaddr >> 8;
+ 179          //    g_tModS.TxBuf[g_tModS.TxCount++] = startaddr;
+ 180          //    g_tModS.TxBuf[g_tModS.TxCount++] = length >> 8;
+ 181          //    g_tModS.TxBuf[g_tModS.TxCount++] = length;
+ 182          
+ 183          //    MODS_SendWithCRC(g_tModS.TxBuf, g_tModS.TxCount);
+ 184          
+ 185          //}
+ 186          
+ 187          
+ 188          //void MODS_Host_02(uint16_t slaveaddr, uint16_t startaddr, uint16_t length)            //离散输入
+ 189          //{
+ 190          //    g_tModS.TxCount = 0;
+ 191          //    g_tModS.TxBuf[g_tModS.TxCount++] = slaveaddr;
+ 192          //    g_tModS.TxBuf[g_tModS.TxCount++] = 0x02;
+ 193          //    g_tModS.TxBuf[g_tModS.TxCount++] = startaddr >> 8;
+ 194          //    g_tModS.TxBuf[g_tModS.TxCount++] = startaddr;
+ 195          //    g_tModS.TxBuf[g_tModS.TxCount++] = length >> 8;
+ 196          //    g_tModS.TxBuf[g_tModS.TxCount++] = length;
+ 197          
+ 198          //    MODS_SendWithCRC(g_tModS.TxBuf, g_tModS.TxCount);
+ 199          
+ 200          //}
+ 201          
+ 202          void MODS_Host_03(uint16_t slaveaddr, uint16_t startaddr, uint16_t length) //保持寄存器
+ 203          {
+ 204   1          g_tModS.TxCount = 0;
+ 205   1          g_tModS.TxBuf[g_tModS.TxCount++] = slaveaddr;
+ 206   1          g_tModS.TxBuf[g_tModS.TxCount++] = 0x03;
+ 207   1          g_tModS.TxBuf[g_tModS.TxCount++] = startaddr >> 8;
+ 208   1          g_tModS.TxBuf[g_tModS.TxCount++] = startaddr;
+ 209   1          g_tModS.TxBuf[g_tModS.TxCount++] = length >> 8;
+ 210   1          g_tModS.TxBuf[g_tModS.TxCount++] = length;
+ 211   1      
+ 212   1          MODS_SendWithCRC(g_tModS.TxBuf, g_tModS.TxCount);
+ 213   1      }
+ 214          
+ 215          
+ 216          //void MODS_Host_04(uint16_t slaveaddr, uint16_t startaddr, uint16_t length)            //模拟输入
+ 217          //{
+ 218          //    g_tModS.TxCount = 0;
+ 219          //    g_tModS.TxBuf[g_tModS.TxCount++] = slaveaddr;
+ 220          //    g_tModS.TxBuf[g_tModS.TxCount++] = 0x04;
+ 221          //    g_tModS.TxBuf[g_tModS.TxCount++] = startaddr >> 8;
+ 222          //    g_tModS.TxBuf[g_tModS.TxCount++] = startaddr;
+ 223          //    g_tModS.TxBuf[g_tModS.TxCount++] = length >> 8;
+ 224          //    g_tModS.TxBuf[g_tModS.TxCount++] = length;
+ 225          
+ 226          //    MODS_SendWithCRC(g_tModS.TxBuf, g_tModS.TxCount);
+ 227          //}
+ 228          
+ 229          
+ 230          //void MODS_Host_05(uint16_t slaveaddr, uint16_t startaddr, uint8_t power)                      //写单个线圈
+ 231          //{
+ 232          //    g_tModS.TxCount = 0;
+ 233          //    g_tModS.TxBuf[g_tModS.TxCount++] = slaveaddr;
+ 234          //    g_tModS.TxBuf[g_tModS.TxCount++] = 0x05;
+ 235          //    g_tModS.TxBuf[g_tModS.TxCount++] = startaddr >> 8;
+ 236          //    g_tModS.TxBuf[g_tModS.TxCount++] = startaddr;
+ 237          
+ 238          //    if(power)
+C51 COMPILER V9.60.0.0   MD380_MODBUS                                                      09/26/2021 13:51:46 PAGE 5   
+
+ 239          //    {
+ 240          //        g_tModS.TxBuf[g_tModS.TxCount++] = 0xff;
+ 241          //    }
+ 242          //    else
+ 243          //    {
+ 244          //        g_tModS.TxBuf[g_tModS.TxCount++] = 0x00;
+ 245          //    }
+ 246          
+ 247          //    g_tModS.TxBuf[g_tModS.TxCount++] = 0x00;
+ 248          
+ 249          //    MODS_SendWithCRC(g_tModS.TxBuf, g_tModS.TxCount);
+ 250          //}
+ 251          
+ 252          
+ 253          //void MODS_Host_06(uint16_t slaveaddr, uint16_t startaddr, uint16_t wdata)      //写单个寄存器
+ 254          //{
+ 255          //    g_tModS.TxCount = 0;
+ 256          //    g_tModS.TxBuf[g_tModS.TxCount++] = slaveaddr;
+ 257          //    g_tModS.TxBuf[g_tModS.TxCount++] = 0x06;
+ 258          //    g_tModS.TxBuf[g_tModS.TxCount++] = startaddr >> 8;
+ 259          //    g_tModS.TxBuf[g_tModS.TxCount++] = startaddr;
+ 260          //    g_tModS.TxBuf[g_tModS.TxCount++] = wdata >> 8;
+ 261          //    g_tModS.TxBuf[g_tModS.TxCount++] = wdata;
+ 262          
+ 263          //    MODS_SendWithCRC(g_tModS.TxBuf, g_tModS.TxCount);
+ 264          //}
+ 265          
+ 266          
+ 267          //void MODS_Host_0F(uint16_t slaveaddr, uint16_t startaddr, uint16_t length, uint16_t bytes, uint8_t* wdat
+             -a) //写多个线圈
+ 268          //{
+ 269          //    uint8_t i;
+ 270          //    g_tModS.TxCount = 0;
+ 271          //    g_tModS.TxBuf[g_tModS.TxCount++] = slaveaddr;
+ 272          //    g_tModS.TxBuf[g_tModS.TxCount++] = 0x0F;
+ 273          //    g_tModS.TxBuf[g_tModS.TxCount++] = startaddr >> 8;
+ 274          //    g_tModS.TxBuf[g_tModS.TxCount++] = startaddr;
+ 275          //    g_tModS.TxBuf[g_tModS.TxCount++] = length >> 8;
+ 276          //    g_tModS.TxBuf[g_tModS.TxCount++] = length;
+ 277          //    g_tModS.TxBuf[g_tModS.TxCount++] = bytes;
+ 278          
+ 279          //    for(i = 0 ; i < bytes; i++)
+ 280          //    {
+ 281          //        g_tModS.TxBuf[g_tModS.TxCount++] = wdata[i];
+ 282          //    }
+ 283          
+ 284          //    MODS_SendWithCRC(g_tModS.TxBuf, g_tModS.TxCount);
+ 285          //}
+ 286          
+ 287          /*
+ 288          *********************************************************************************************************
+ 289          *       函 数 名: MODH_Send10
+ 290          *       功能说明: 发送10H指令，连续写多个保持寄存器. 最多一次支持23个寄存器。
+ 291          *       形    参: _addr : 从站地址
+ 292          *                         _reg : 寄存器编号
+ 293          *                         _num : 寄存器个数n (每个寄存器2个字节) 值域
+ 294          *                         _buf : n个寄存器的数据。长度 = 2 * n
+ 295          *       返 回 值: 无
+ 296          *********************************************************************************************************
+ 297          */
+ 298          void MODS_Host_10(uint16_t slaveaddr, uint16_t startaddr, uint16_t length, uint8_t *wdata)              //写多个寄
+             -存器
+C51 COMPILER V9.60.0.0   MD380_MODBUS                                                      09/26/2021 13:51:46 PAGE 6   
+
+ 299          {
+ 300   1          uint8_t i;
+ 301   1          g_tModS.TxCount = 0;
+ 302   1          g_tModS.TxBuf[g_tModS.TxCount++] = slaveaddr;
+ 303   1          g_tModS.TxBuf[g_tModS.TxCount++] = 0x10;
+ 304   1          g_tModS.TxBuf[g_tModS.TxCount++] = startaddr >> 8;
+ 305   1          g_tModS.TxBuf[g_tModS.TxCount++] = startaddr;
+ 306   1          g_tModS.TxBuf[g_tModS.TxCount++] = length >> 8;
+ 307   1          g_tModS.TxBuf[g_tModS.TxCount++] = length;
+ 308   1          g_tModS.TxBuf[g_tModS.TxCount++] = length * 2;
+ 309   1      
+ 310   1          for(i = 0 ; i < length * 2; i++)
+ 311   1          {
+ 312   2              g_tModS.TxBuf[g_tModS.TxCount++] = wdata[i];
+ 313   2          }
+ 314   1      
+ 315   1          MODS_SendWithCRC(g_tModS.TxBuf, g_tModS.TxCount);
+ 316   1      }
+ 317          
+ 318          
+ 319          /*
+ 320          *********************************************************************************************************
+ 321          *       函数名:: MODS_Host_Poll
+ 322          *       功能说明: Modbus主站接收
+ 323          *       形   参: 无
+ 324          *       返回值: 无
+ 325          *********************************************************************************************************
+ 326          */
+ 327          void MODS_Host_Poll(void)
+ 328          {
+ 329   1          uint16_t addr;
+ 330   1              
+ 331   1          if (g_tModS.RxCount < 4) /* 收到的数据长度小于4则为错误帧 */
+ 332   1          {
+ 333   2              goto err_ret;
+ 334   2          }
+ 335   1      
+ 336   1          addr = g_tModS.RxBuf[0]; /*从站地址不对则为错误 */
+ 337   1      
+ 338   1          if(addr != g_Mdbuff[0].slaveaddr && addr != g_Mdbuff[1].slaveaddr)
+ 339   1          {
+ 340   2              goto err_ret;
+ 341   2          }
+ 342   1      
+ 343   1          MODS_Host_AnalyzeApp();
+ 344   1      
+ 345   1      err_ret:
+ 346   1          g_tModS.RxCount = 0;
+ 347   1      }
+ 348          
+ 349          /*
+ 350          *********************************************************************************************************
+ 351          *       函数名:: MODS_Host_AnalyzeApp
+ 352          *       功能说明: Modbus主站接收处理
+ 353          *       形   参: 无
+ 354          *       返回值: 无
+ 355          *********************************************************************************************************
+ 356          */
+ 357          void MODS_Host_AnalyzeApp(void)
+ 358          {
+ 359   1          switch (g_tModS.RxBuf[1])      /* 命令码 */
+ 360   1          {
+C51 COMPILER V9.60.0.0   MD380_MODBUS                                                      09/26/2021 13:51:46 PAGE 7   
+
+ 361   2              case 0x01:
+ 362   2              {
+ 363   3                  MODS_Host_01H();
+ 364   3                  break;
+ 365   3              }
+ 366   2      
+ 367   2              case 0x02:
+ 368   2              {
+ 369   3                  MODS_Host_02H();
+ 370   3                  break;
+ 371   3              }
+ 372   2      
+ 373   2              case 0x03:
+ 374   2              {
+ 375   3                  MODS_Host_03H();
+ 376   3                  break;
+ 377   3              }
+ 378   2      
+ 379   2              case 0x04:
+ 380   2              {
+ 381   3                  MODS_Host_04H();
+ 382   3                  break;
+ 383   3              }
+ 384   2      
+ 385   2              case 0x05:
+ 386   2              {
+ 387   3                  MODS_Host_05H();
+ 388   3                  break;
+ 389   3              }
+ 390   2      
+ 391   2              case 0x06:
+ 392   2              {
+ 393   3                  MODS_Host_06H();
+ 394   3                  break;
+ 395   3              }
+ 396   2      
+ 397   2              case 0x0F:
+ 398   2              {
+ 399   3                  MODS_Host_0FH();
+ 400   3                  break;
+ 401   3              }
+ 402   2      
+ 403   2              case 0x10:
+ 404   2              {
+ 405   3                  MODS_Host_10H();
+ 406   3                  break;
+ 407   3              }
+ 408   2      
+ 409   2              default:
+ 410   2                  break;
+ 411   2          }
+ 412   1      }
+ 413          
+ 414          void MODS_Host_01H(void)
+ 415          {
+ 416   1      
+ 417   1      }
+ 418          
+ 419          void MODS_Host_02H(void)
+ 420          {
+ 421   1      
+ 422   1      }
+C51 COMPILER V9.60.0.0   MD380_MODBUS                                                      09/26/2021 13:51:46 PAGE 8   
+
+ 423          
+ 424          void MODS_Host_03H(void)
+ 425          {
+ 426   1          uint16_t rcvdata;
+ 427   1          uint8_t slaveaddr;
+ 428   1          uint8_t datanum;
+ 429   1          uint8_t i;
+ 430   1      
+ 431   1          slaveaddr = g_tModS.RxBuf[0];
+ 432   1          datanum = g_tModS.RxBuf[2];
+ 433   1          rcvdata = ((uint16_t)g_tModS.RxBuf[4] << 8) | g_tModS.RxBuf[5];
+ 434   1      
+ 435   1          if(slaveaddr == g_Mdbuff[0].slaveaddr)
+ 436   1          {
+ 437   2              for(i = 0; i < VALUE_NUMS; i++)
+ 438   2              {
+ 439   3                  if(Mods_RigAddrNow == g_Mdbuff[0].modsparm[i].Mdrigaddr)
+ 440   3                  {
+ 441   4                      g_Mdbuff[0].modsparm[i].value = rcvdata;
+ 442   4                  }
+ 443   3              }
+ 444   2          }
+ 445   1      
+ 446   1          if(slaveaddr == g_Mdbuff[1].slaveaddr)
+ 447   1          {
+ 448   2              for(i = 0; i < VALUE_NUMS; i++)
+ 449   2              {
+ 450   3                  if(Mods_RigAddrNow == g_Mdbuff[1].modsparm[i].Mdrigaddr)
+ 451   3                  {
+ 452   4                      g_Mdbuff[1].modsparm[i].value = rcvdata;
+ 453   4                  }
+ 454   3              }
+ 455   2          }
+ 456   1      }
+ 457          
+ 458          void MODS_Host_04H(void)
+ 459          {
+ 460   1      
+ 461   1      }
+ 462          
+ 463          void MODS_Host_05H(void)
+ 464          {
+ 465   1      
+ 466   1      }
+ 467          
+ 468          void MODS_Host_06H(void)
+ 469          {
+ 470   1      
+ 471   1      }
+ 472          
+ 473          void MODS_Host_0FH(void)
+ 474          {
+ 475   1      
+ 476   1      }
+ 477          
+ 478          void MODS_Host_10H(void)
+ 479          {
+ 480   1      
+ 481   1      }
+ 482          
+ 483          void MODS_Host_SetRigAddr(uint16_t regaddr)
+ 484          {
+C51 COMPILER V9.60.0.0   MD380_MODBUS                                                      09/26/2021 13:51:46 PAGE 9   
+
+ 485   1          Mods_RigAddrNow = regaddr;
+ 486   1      }
+ 487          
+ 488          void MODS_Host_Set_Usart(uint8_t uartval)
+ 489          {
+ 490   1          Mods_UsartNow = uartval;
+ 491   1      }
+ 492          
+ 493          
+ 494          void Inverter_SaveData_To_PLC(void)
+ 495          {
+ 496   1          static uint8_t k = 0;
+ 497   1          static uint8_t j = 0;
+ 498   1              static uint8_t count = 0;
+ 499   1              static uint8_t buffer[20] = {0};
+ 500   1      
+ 501   1          MODS_Host_Set_Usart(USART4);
+ 502   1              
+ 503   1              if(g_Mdbuff[j].modsparm[k].addr == MODS_SPEED2_ADDR){
+ 504   2                      
+ 505   2                      memset(&buffer[8], 0, 2 * sizeof(uint16_t)); //对第10、11两个寄存器填零
+ 506   2                      count += sizeof(uint16_t) * 2;
+ 507   2              }
+ 508   1                      buffer[count++] = g_Mdbuff[j].modsparm[k].value >> 8;
+ 509   1                      buffer[count++] = g_Mdbuff[j].modsparm[k].value;
+ 510   1              
+ 511   1      //    MODS_Host_06(PLC_SLAVEADDRESS, g_Mdbuff[j].modsparm[k].addr, g_Mdbuff[j].modsparm[k].value);
+ 512   1      ////    MODS_Host_06(PLC_SLAVEADDRESS,g_Mdbuff[0].modsparm[k].addr,g_Mdbuff[0].modsparm[k].value);
+ 513   1              
+ 514   1      ////    Uartx_SendStr(&Uart1,&buffer1,0x02); //测试用
+ 515   1              
+ 516   1      //    k++;
+ 517   1      
+ 518   1          if(k++ >= VALUE_NUMS -1)
+ 519   1          {
+ 520   2              k = 0;
+ 521   2      
+ 522   2              if(j++ >= RECTIFIER_NUMS -1)
+ 523   2              {
+ 524   3                  j = 0;
+ 525   3              }
+ 526   2          }
+ 527   1              
+ 528   1      
+ 529   1      //      Uartx_SendStr(&Uart1,&buffer,20); //测试用
+ 530   1              
+ 531   1              if((k == 0)     && (j == 0)){ //变频器数据采集完毕
+ 532   2                      count = 0;
+ 533   2                      MODS_Host_10(PLC_SLAVEADDRESS, MODS_SPEED1_ADDR, 0x0A, &buffer);                //写多个寄存器
+ 534   2              }
+ 535   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   1218    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =    484     233
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+C51 COMPILER V9.60.0.0   MD380_MODBUS                                                      09/26/2021 13:51:46 PAGE 10  
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

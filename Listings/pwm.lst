@@ -1,0 +1,255 @@
+C51 COMPILER V9.60.0.0   PWM                                                               05/21/2021 21:51:17 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE PWM
+OBJECT MODULE PLACED IN .\Objects\pwm.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE Source\pwm.c LARGE OPTIMIZE(8,SPEED) BROWSE INCDIR(.\Include) DEBUG OBJE
+                    -CTEXTEND PRINT(.\Listings\pwm.lst) OBJECT(.\Objects\pwm.obj)
+
+line level    source
+
+   1          //#include"config.h"
+   2          ///*********************************************************************
+   3          //* 函数名：void PWM0_OUT(unsigned short cycle,unsigned short LOW_Val,unsigned short HIGH_Val,unsigned cha
+             -r Pin)
+   4          //* 功能：  指定引脚输出可控的PWM方波
+   5          //* 参数：
+   6          //* 作者：zhao1peng
+   7          //* note： 改PWM的输出时钟是基于PCA时钟的  可根据PCA时钟的三个模块进行
+   8          //* 分别设置，可同时四路输出PWM波 
+   9          //* PWM 引脚的输出默认是每一组PWM的第一个引脚输出。
+  10          //*
+  11          //********************************************************************/
+  12          //
+  13          //
+  14          ///*
+  15          //      init() example:
+  16          //
+  17          //      PWM_STATUE PWM1QWQW;
+  18          //
+  19          //      PWM1QWQW.PWM_MOD = PWM_MOD7;
+  20          //      PWM1QWQW.OUT_PIN_GROUP= PIN_GROUP3;
+  21          //      PWM1QWQW.cycle = 0X1000;
+  22          //      PWM1QWQW.LOW_Val = 0X0100;
+  23          //      PWM1QWQW.HIGH_Val = 0X0200;
+  24          //      PWM_MOD_OUT(&PWM1QWQW);
+  25          //      
+  26          //      */
+  27          //
+  28          //
+  29          //void PWM_MOD_OUT(PWM_STATUE *PWM_OUT)
+  30          //{     
+  31          //      if((PWM_OUT->PWM_MOD) == PWM_MOD0)
+  32          //      {
+  33          //              P_SW2 = 0x80;
+  34          //      
+  35          //          PWMCKS = 0x00;                              // PWM时钟为系统时钟
+  36          //          PWMC = PWM_OUT->cycle;                               //设置PWM周期为cycle H个PWM时钟
+  37          //          PWM0T1= PWM_OUT->LOW_Val;                            //在计数值为LOW_Val H地方输出低电平
+  38          //          PWM0T2= PWM_OUT->HIGH_Val;                           //在计数值为HIGH_Val H地方输出高电平
+  39          //          
+  40          //              
+  41          //              switch(PWM_OUT->OUT_PIN_GROUP)  //使能PWM0输出
+  42          //              {
+  43          //                 case 0: PWM0_P20;
+  44          //                              break;
+  45          //                 case 1: PWM0_P10;
+  46          //                              break;
+  47          //                 case 2: PWM0_P60;
+  48          //                              break;
+  49          //                 default:     PWM0_P20;
+  50          //                              break;
+  51          //              }
+  52          //                                            
+  53          //          P_SW2 = 0x00;
+C51 COMPILER V9.60.0.0   PWM                                                               05/21/2021 21:51:17 PAGE 2   
+
+  54          //              PWMCR = 0x80;     //启动PWM模块
+  55          //      }
+  56          //
+  57          //      if((PWM_OUT->PWM_MOD) == PWM_MOD1)
+  58          //      {
+  59          //              P_SW2 = 0x80;
+  60          //      
+  61          //          PWMCKS = 0x00;                              // PWM时钟为系统时钟
+  62          //          PWMC = PWM_OUT->cycle;                               //设置PWM周期为1000H个PWM时钟
+  63          //          PWM1T1= PWM_OUT->LOW_Val;                            //在计数值为100H地方输出低电平
+  64          //          PWM1T2= PWM_OUT->HIGH_Val;                           //在计数值为500H地方输出高电平
+  65          //          switch(PWM_OUT->OUT_PIN_GROUP) //使能PWM0输出
+  66          //              {
+  67          //                 case 0: PWM1_P21;
+  68          //                              break;
+  69          //                 case 1: PWM1_P11;
+  70          //                              break;
+  71          //                 case 2: PWM1_P61;
+  72          //                              break;
+  73          //                 default:     PWM1_P21;
+  74          //                              break;
+  75          //              }                               
+  76          //          P_SW2 = 0x00;
+  77          //              
+  78          //          PWMCR = 0x80;                               //启动PWM模块
+  79          //      }
+  80          //      if((PWM_OUT->PWM_MOD) == PWM_MOD2)  //使能PWM0输出
+  81          //      {
+  82          //              P_SW2 = 0x80;
+  83          //      
+  84          //          PWMCKS = 0x00;                              // PWM时钟为系统时钟
+  85          //          PWMC = PWM_OUT->cycle;                               //设置PWM周期为1000H个PWM时钟
+  86          //          PWM2T1= PWM_OUT->LOW_Val;                            //在计数值为100H地方输出低电平
+  87          //          PWM2T2= PWM_OUT->HIGH_Val;                           //在计数值为500H地方输出高电平
+  88          //              switch(PWM_OUT->OUT_PIN_GROUP)
+  89          //              {
+  90          //                 case 0: PWM2_P22;
+  91          //                              break;
+  92          //                 case 1: PWM2_P12;
+  93          //                              break;
+  94          //                 case 2: PWM2_P62;
+  95          //                              break;
+  96          //                 default:     PWM2_P22;
+  97          //                              break;
+  98          //              }                             //使能PWM0输出
+  99          //          P_SW2 = 0x00;
+ 100          //              
+ 101          //      
+ 102          //          PWMCR = 0x80;                               //启动PWM模块
+ 103          //      }
+ 104          //      if((PWM_OUT->PWM_MOD) == PWM_MOD3)
+ 105          //      {
+ 106          //              P_SW2 = 0x80;
+ 107          //      
+ 108          //          PWMCKS = 0x00;                              // PWM时钟为系统时钟
+ 109          //          PWMC = PWM_OUT->cycle;                               //设置PWM周期为1000H个PWM时钟
+ 110          //          PWM3T1= PWM_OUT->LOW_Val;                            //在计数值为100H地方输出低电平
+ 111          //          PWM3T2= PWM_OUT->HIGH_Val;                           //在计数值为500H地方输出高电平
+ 112          //          switch(PWM_OUT->OUT_PIN_GROUP) //使能PWM0输出
+ 113          //              {
+ 114          //                 case 0: PWM3_P23;
+ 115          //                              break;
+C51 COMPILER V9.60.0.0   PWM                                                               05/21/2021 21:51:17 PAGE 3   
+
+ 116          //                 case 1: PWM3_P13;
+ 117          //                              break;
+ 118          //                 case 2: PWM3_P63;
+ 119          //                              break;
+ 120          //                 default:     PWM3_P23;
+ 121          //                              break;
+ 122          //              }                               
+ 123          //          P_SW2 = 0x00;
+ 124          //              
+ 125          //              
+ 126          //          PWMCR = 0x80;                               //启动PWM模块
+ 127          //      }
+ 128          //      if((PWM_OUT->PWM_MOD) == PWM_MOD4)
+ 129          //      {
+ 130          //              P_SW2 = 0x80;
+ 131          //      
+ 132          //          PWMCKS = 0x00;                              // PWM时钟为系统时钟
+ 133          //          PWMC = PWM_OUT->cycle;                               //设置PWM周期为1000H个PWM时钟
+ 134          //          PWM4T1= PWM_OUT->LOW_Val;                            //在计数值为100H地方输出低电平
+ 135          //          PWM4T2= PWM_OUT->HIGH_Val;                           //在计数值为500H地方输出高电平
+ 136          //          switch(PWM_OUT->OUT_PIN_GROUP)        //使能PWM0输出
+ 137          //              {
+ 138          //                 case 0: PWM4_P24;
+ 139          //                              break;
+ 140          //                 case 1: PWM4_P14;
+ 141          //                              break;
+ 142          //                 case 2: PWM4_P64;
+ 143          //                              break;
+ 144          //                 default:     PWM4_P24;
+ 145          //                              break;
+ 146          //              }                                
+ 147          //          P_SW2 = 0x00;
+ 148          //              
+ 149          //      
+ 150          //          PWMCR = 0x80;                               //启动PWM模块
+ 151          //      }
+ 152          //      if((PWM_OUT->PWM_MOD) == PWM_MOD5)        //使能PWM0输出
+ 153          //      {
+ 154          //              P_SW2 = 0x80;
+ 155          //      
+ 156          //          PWMCKS = 0x00;                              // PWM时钟为系统时钟
+ 157          //          PWMC = PWM_OUT->cycle;                               //设置PWM周期为1000H个PWM时钟
+ 158          //          PWM5T1= PWM_OUT->LOW_Val;                            //在计数值为100H地方输出低电平
+ 159          //          PWM5T2= PWM_OUT->HIGH_Val;                           //在计数值为500H地方输出高电平
+ 160          //          switch(PWM_OUT->OUT_PIN_GROUP)
+ 161          //              {
+ 162          //                 case 0: PWM5_P25;
+ 163          //                              break;
+ 164          //                 case 1: PWM5_P15;
+ 165          //                              break;
+ 166          //                 case 2: PWM5_P65;
+ 167          //                              break;
+ 168          //                 default:     PWM5_P25;
+ 169          //                              break;
+ 170          //              }                              
+ 171          //          P_SW2 = 0x00;               
+ 172          //          PWMCR = 0x80;                               //启动PWM模块
+ 173          //      }
+ 174          //      if((PWM_OUT->PWM_MOD) == PWM_MOD6)
+ 175          //      {
+ 176          //              P_SW2 = 0x80;
+ 177          //      
+C51 COMPILER V9.60.0.0   PWM                                                               05/21/2021 21:51:17 PAGE 4   
+
+ 178          //          PWMCKS = 0x00;                              // PWM时钟为系统时钟
+ 179          //          PWMC = PWM_OUT->cycle;                               //设置PWM周期为1000H个PWM时钟
+ 180          //          PWM6T1= PWM_OUT->LOW_Val;                            //在计数值为100H地方输出低电平
+ 181          //          PWM6T2= PWM_OUT->HIGH_Val;                           //在计数值为500H地方输出高电平
+ 182          //          switch(PWM_OUT->OUT_PIN_GROUP)                //使能PWM0输出
+ 183          //              {
+ 184          //                 case 0: PWM6_P26;
+ 185          //                              break;
+ 186          //                 case 1: PWM6_P16;
+ 187          //                              break;
+ 188          //                 case 2: PWM6_P66;
+ 189          //                              break;
+ 190          //                 default:     PWM6_P26;
+ 191          //                              break;
+ 192          //              }                                
+ 193          //          P_SW2 = 0x00;
+ 194          //              
+ 195          //      
+ 196          //          PWMCR = 0x80;                               //启动PWM模块
+ 197          //      }
+ 198          //      if((PWM_OUT->PWM_MOD) == PWM_MOD7)
+ 199          //      {
+ 200          //              P_SW2 = 0x80;
+ 201          //      
+ 202          //          PWMCKS = 0x00;                              // PWM时钟为系统时钟
+ 203          //          PWMC = PWM_OUT->cycle;                               //设置PWM周期为1000H个PWM时钟
+ 204          //          PWM7T1= PWM_OUT->LOW_Val;                            //在计数值为100H地方输出低电平
+ 205          //          PWM7T2= PWM_OUT->HIGH_Val;                           //在计数值为500H地方输出高电平
+ 206          //          switch(PWM_OUT->OUT_PIN_GROUP)   //使能PWM0输出
+ 207          //              {
+ 208          //                 case 0: PWM7_P27;
+ 209          //                              break;
+ 210          //                 case 1: PWM7_P17;
+ 211          //                              break;
+ 212          //                 case 2: PWM7_P67;
+ 213          //                              break;
+ 214          //                 default:     PWM7_P27;
+ 215          //                              break;
+ 216          //              }                                
+ 217          //          P_SW2 = 0x00;
+ 218          //              
+ 219          //      
+ 220          //          PWMCR = 0x80;                               //启动PWM模块
+ 221          //      }
+ 222          //}
+ 223          
+ 224          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   ----    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

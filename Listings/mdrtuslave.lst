@@ -1,0 +1,550 @@
+C51 COMPILER V9.60.0.0   MDRTUSLAVE                                                        09/18/2021 18:02:50 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE MDRTUSLAVE
+OBJECT MODULE PLACED IN .\Objects\mdrtuslave.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE FreeModBus\Src\mdrtuslave.c LARGE OPTIMIZE(8,SPEED) BROWSE INCDIR(.\Incl
+                    -ude;.\FreeModBus\Inc) DEBUG OBJECTEXTEND PRINT(.\Listings\mdrtuslave.lst) OBJECT(.\Objects\mdrtuslave.obj)
+
+line level    source
+
+   1          #include <stdlib.h>
+   2          #include <string.h>
+   3          #include "mdrtuslave.h"
+   4          #include "mdcrc16.h"
+   5          #include "usart.h"
+   6          
+   7          #if(USER_MODBUS_LIB)
+   8          /* ================================================================== */
+   9          /*                        接口区                                       */
+  10          /* ================================================================== */
+  11          ModbusRTUSlaveHandler mdhandler;
+  12          
+  13          /*
+  14              popchar
+  15                  @handler 句柄
+  16                  @c 待发送字符
+  17              接口：Modbus协议栈发送底层接口
+  18          */
+  19          static mdVOID popchar(ModbusRTUSlaveHandler handler, mdU8* dat, mdU32 length)
+  20          {
+  21   1          /*启用DMA发送一包数据*/
+  22   1      //    #if(USING_DMA_TRANSPORT)
+  23   1      //    HAL_UART_Transmit_DMA(&huart1, dat, length);
+  24   1      //      while (__HAL_UART_GET_FLAG(&huart1,UART_FLAG_TC) == RESET) { }
+  25   1      //    #else
+  26   1      //    for (mdU32 i = 0; i < length; i++)
+  27   1      //    {
+  28   1      //        handler->mdRTUPopChar(handler, dat[i]);
+  29   1      //    }
+  30   1          #endif
+  31   1      }
+*** WARNING C280 IN LINE 19 OF FreeModBus\Src\mdrtuslave.c: 'handler': unreferenced local variable
+*** WARNING C280 IN LINE 19 OF FreeModBus\Src\mdrtuslave.c: 'dat': unreferenced local variable
+*** WARNING C280 IN LINE 19 OF FreeModBus\Src\mdrtuslave.c: 'length': unreferenced local variable
+  32          
+  33          /*
+  34              portRtuPushChar
+  35                  @handler 句柄
+  36                  @c 待接收字符
+  37                  @return
+  38              接口：接收一个字符
+  39          */
+  40          static mdVOID portRtuPushChar(ModbusRTUSlaveHandler handler,mdU8 c){
+  41   1          ReceiveBufferHandle recbuf = handler->receiveBuffer;
+  42   1          recbuf->buf[recbuf->count++] = c;
+  43   1      }
+  44          
+  45          /*
+  46              portRtuPushString
+  47                  @handler 句柄
+  48                  @*data   数据 
+  49                  @length  数据长度 
+  50              接口：接收一个字符串
+  51          */
+C51 COMPILER V9.60.0.0   MDRTUSLAVE                                                        09/18/2021 18:02:50 PAGE 2   
+
+  52          static mdVOID portRtuPushString(ModbusRTUSlaveHandler handler,mdU8* dat, mdU32 length)
+  53          {
+  54   1          ReceiveBufferHandle recbuf = handler->receiveBuffer;
+  55   1              memcpy(&recbuf->buf[0], dat, length);
+  56   1              recbuf->count = length;
+  57   1      }
+  58          
+  59          /*
+  60              mdRTUSendString
+  61                  @handler 句柄
+  62                  @*dat   数据缓冲区
+  63                  @length  数据长度
+  64                  @return
+  65              接口：发送一帧数据
+  66          */
+  67          static mdVOID mdRTUSendString(ModbusRTUSlaveHandler handler, mdU8* dat, mdU32 length)
+  68          {
+  69   1          popchar(handler, dat, length);
+  70   1      }
+  71          
+  72          /*
+  73              ModbusInit
+  74                  @void
+  75              接口：初始化Modbus协议栈
+  76          */
+  77          void ModbusInit(void)
+  78          {
+  79   1          struct ModbusRTUSlaveRegisterInfo info;
+  80   1          info.slaveId       = SLAVE_ID;
+  81   1          info.usartBaudRate = BUAD_RATE;
+  82   1          info.mdRTUPopChar  = popchar;
+  83   1          mdCreateModbusRTUSlave(&mdhandler, info);
+  84   1      }
+  85          
+  86          /*
+  87              mdRTUError
+  88                  @handler 句柄
+  89                  @error   错误码
+  90                  @return
+  91              接口：Modbus协议栈出错处理
+  92          */
+  93          static mdVOID mdRTUError(ModbusRTUSlaveHandler handler, mdU8 error)
+  94          {
+  95   1      
+  96   1      }
+*** WARNING C280 IN LINE 93 OF FreeModBus\Src\mdrtuslave.c: 'handler': unreferenced local variable
+*** WARNING C280 IN LINE 93 OF FreeModBus\Src\mdrtuslave.c: 'error': unreferenced local variable
+  97          
+  98          
+  99          /*
+ 100              mdRtuBaseTimerTick
+ 101                  @handler 句柄
+ 102                  @time   时长跨度，单位 us
+ 103                  @return
+ 104              接口：帧间隙监控
+ 105          */
+ 106          static mdVOID portRtuTimerTick(ModbusRTUSlaveHandler handler, mdU32 ustime)
+ 107          {
+ 108   1          static mdU32 lastCount;
+ 109   1          static mdU32 timeSum;
+ 110   1          static mdFMStatus error;
+ 111   1          if (handler->receiveBuffer->count > 0)
+C51 COMPILER V9.60.0.0   MDRTUSLAVE                                                        09/18/2021 18:02:50 PAGE 3   
+
+ 112   1          {
+ 113   2              if (handler->receiveBuffer->count != lastCount)
+ 114   2              {
+ 115   3                  if (timeSum > handler->invalidTime)
+ 116   3                  {
+ 117   4                      error++;
+ 118   4                  }
+ 119   3                  lastCount = handler->receiveBuffer->count;
+ 120   3                  timeSum = 0;
+ 121   3              }
+ 122   2              if(timeSum > handler->stopTime)
+ 123   2              {
+ 124   3                  if(error == 0 || IGNORE_LOSS_FRAME != 0)
+ 125   3                  {   /*发生主机对从机寄存器写数据操作*/
+ 126   4                      handler->updateFlag = true;
+ 127   4                      handler->mdRTUCenterProcessor(handler);
+ 128   4                  }
+ 129   3                  else
+ 130   3                  {
+ 131   4                      handler->mdRTUError(handler, ERROR1);
+ 132   4                  }
+ 133   3                  mdClearReceiveBuffer(handler->receiveBuffer);
+ 134   3                  TIMER_CLEAN();
+ 135   3              }
+ 136   2              timeSum += ustime;
+ 137   2          }
+ 138   1          else
+ 139   1          {
+ 140   2              TIMER_CLEAN();
+ 141   2          }
+ 142   1      
+ 143   1      }
+ 144          
+ 145          /*
+ 146              modbusRTU_Handler
+ 147                  @void
+ 148              接口：100us定时器回调函数
+ 149          */
+ 150          void mdRTU_Handler(void) 
+ 151          {
+ 152   1          mdhandler->portRTUTimerTick(mdhandler, TIMER_UTIME);
+ 153   1      }
+ 154          
+ 155          /*
+ 156              mdRTUHandleCode1
+ 157                  @handler 句柄
+ 158                  @return
+ 159              接口：解析01功能码
+ 160          */
+ 161          static mdVOID mdRTUHandleCode1(ModbusRTUSlaveHandler handler)
+ 162          {
+ 163   1      //    mdU32 reclen = handler->receiveBuffer->count;
+ 164   1          mdU8* recbuf = handler->receiveBuffer->buf;
+ 165   1          RegisterPoolHandle regPool = handler->registerPool;
+ 166   1          mdU16 startAddress = ToU16(recbuf[2], recbuf[3]);  
+ 167   1          mdU16 length = ToU16(recbuf[4], recbuf[5]);
+ 168   1          mdBit *dat;
+ 169   1          mdU8  *data2;
+ 170   1          mdU8  length2 = 0;
+ 171   1          mdU16 crc;
+ 172   1              mdU32 i = 0;
+ 173   1              mdU32 j = 0;
+C51 COMPILER V9.60.0.0   MDRTUSLAVE                                                        09/18/2021 18:02:50 PAGE 4   
+
+ 174   1      
+ 175   1          mdmalloc(dat, mdBit, length);
+ 176   1          regPool->mdReadCoils(regPool, startAddress, length, dat);
+ 177   1          length2 = length % 8 > 0 ? length / 8 + 1: length / 8;
+ 178   1          mdmalloc(data2, mdU8, 5 + length2);
+ 179   1          data2[0] = recbuf[0];
+ 180   1          data2[1] = recbuf[1];
+ 181   1          data2[2] = length2;
+ 182   1          for (i = 0; i <  length2; i++)
+ 183   1          {
+ 184   2              for (j = 0; j < 8 && (i * 8 + j) < length; j++)
+ 185   2              {
+ 186   3                  data2[3 + i] |= ((dat[i * 8 + j] & 0x01) << j);
+ 187   3              }
+ 188   2          }
+ 189   1          crc = mdCrc16(data2, 3 + length2);
+ 190   1          /*注意CRC顺序*/
+ 191   1          data2[3 + length2] = LOW(crc);
+ 192   1          data2[4 + length2] = HIGH(crc);
+ 193   1          handler->mdRTUSendString(handler, data2, 5 + length2);
+*** ERROR C212 IN LINE 193 OF FreeModBus\Src\mdrtuslave.c: indirect call: parameters do not fit within registers
+ 194   1          free(dat);
+ 195   1          free(data2);
+ 196   1      }
+ 197          
+ 198          static mdVOID mdRTUHandleCode2(ModbusRTUSlaveHandler handler)
+ 199          {
+ 200   1          mdU8* recbuf = handler->receiveBuffer->buf;
+ 201   1          RegisterPoolHandle regPool = handler->registerPool;
+ 202   1          mdU16 startAddress = ToU16(recbuf[2], recbuf[3]);
+ 203   1          mdBit* dat;
+ 204   1          mdU16 length = ToU16(recbuf[4], recbuf[5]);
+ 205   1          mdU8 *data2;
+ 206   1          mdU8 length2 = 0;
+ 207   1          mdU16 crc;
+ 208   1              mdU32 i = 0;
+ 209   1              mdU32 j = 0;
+ 210   1              
+ 211   1          mdmalloc(dat, mdBit, length);
+ 212   1          regPool->mdReadInputCoils(regPool, startAddress, length, dat);
+ 213   1          length2 = length % 8 > 0 ? length / 8 + 1: length / 8;
+ 214   1          mdmalloc(data2, mdU8, 5 + length2);
+ 215   1          data2[0] = recbuf[0];
+ 216   1          data2[1] = recbuf[1];
+ 217   1          data2[2] = length2;
+ 218   1          for (i = 0; i <  length2; i++)
+ 219   1          {
+ 220   2              for (j = 0; j < 8 && (i * 8 + j) < length; j++)
+ 221   2              {
+ 222   3                  data2[3 + i] |= ((dat[i * 8 + j] & 0x01) << j);
+ 223   3              }
+ 224   2          }
+ 225   1          crc = mdCrc16(data2, 3 + length2);
+ 226   1          data2[3 + length2] = LOW(crc);
+ 227   1          data2[4 + length2] = HIGH(crc);
+ 228   1          handler->mdRTUSendString(handler, data2, 5 + length2);
+*** ERROR C212 IN LINE 228 OF FreeModBus\Src\mdrtuslave.c: indirect call: parameters do not fit within registers
+ 229   1          free(dat);
+ 230   1          free(data2);
+ 231   1      }
+ 232          
+ 233          static mdVOID mdRTUHandleCode3(ModbusRTUSlaveHandler handler)
+C51 COMPILER V9.60.0.0   MDRTUSLAVE                                                        09/18/2021 18:02:50 PAGE 5   
+
+ 234          {
+ 235   1          mdU8* recbuf = handler->receiveBuffer->buf;
+ 236   1          RegisterPoolHandle regPool = handler->registerPool;
+ 237   1          mdU16 startAddress = ToU16(recbuf[2], recbuf[3]);
+ 238   1          mdU16* dat;
+ 239   1          mdU16 length = ToU16(recbuf[4], recbuf[5]);
+ 240   1          mdU8 *data2;
+ 241   1          mdU16 crc;
+ 242   1              mdU32 i = 0;
+ 243   1      
+ 244   1          mdmalloc(dat, mdU16, length);
+ 245   1          regPool->mdReadHoldRegisters(regPool, startAddress, length, dat);
+ 246   1          /*此处为了解决由于ARM小端存储造成的半字顺序混乱问题*/
+ 247   1          if(length > sizeof(mdU8))
+ 248   1          {/*只针对2个及以上寄存器而言*/
+ 249   2            mdU16Swap(dat,length);  
+ 250   2          }
+ 251   1          
+ 252   1          mdmalloc(data2, mdU8, 5 + length * 2);
+ 253   1          data2[0] = recbuf[0];
+ 254   1          data2[1] = recbuf[1];
+ 255   1          data2[2] = (mdU8)(length * 2);
+ 256   1          for (i = 0; i <  length; i++)
+ 257   1          {
+ 258   2              data2[3 + 2 * i] = HIGH(dat[i]);
+ 259   2              data2[3 + 2 * i + 1] = LOW(dat[i]);
+ 260   2          }
+ 261   1          crc = mdCrc16(data2, 3 + length * 2);
+ 262   1          data2[3 + length * 2] = LOW(crc);
+ 263   1          data2[4 + length * 2] = HIGH(crc);
+ 264   1          handler->mdRTUSendString(handler, data2, 5 + length * 2);
+*** ERROR C212 IN LINE 264 OF FreeModBus\Src\mdrtuslave.c: indirect call: parameters do not fit within registers
+ 265   1          free(dat);
+ 266   1          free(data2);
+ 267   1      }
+ 268          
+ 269          static mdVOID mdRTUHandleCode4(ModbusRTUSlaveHandler handler)
+ 270          {
+ 271   1          mdU8* recbuf = handler->receiveBuffer->buf;
+ 272   1          RegisterPoolHandle regPool = handler->registerPool;
+ 273   1          mdU16 startAddress = ToU16(recbuf[2], recbuf[3]);
+ 274   1          mdU16* dat;
+ 275   1          mdU16 length = ToU16(recbuf[4], recbuf[5]);
+ 276   1          mdU8 *data2;
+ 277   1          mdU16 crc;
+ 278   1              mdU32 i = 0;
+ 279   1      
+ 280   1          mdmalloc(dat, mdU16, length);
+ 281   1          regPool->mdReadInputRegisters(regPool, startAddress, length, dat);
+ 282   1          /*此处为了解决由于ARM小端存储造成的半字顺序混乱问题*/
+ 283   1          if(length > sizeof(mdU8))
+ 284   1          {/*只针对2个及以上寄存器而言*/
+ 285   2            mdU16Swap(dat,length);  
+ 286   2          }
+ 287   1          mdmalloc(data2, mdU8, 5 + length * 2);
+ 288   1          data2[0] = recbuf[0];
+ 289   1          data2[1] = recbuf[1];
+ 290   1          data2[2] = (mdU8)(length * 2);
+ 291   1          for (i = 0; i <  length; i++)
+ 292   1          {
+ 293   2              data2[3 + 2 * i] = HIGH(dat[i]);
+ 294   2              data2[3 + 2 * i + 1] = LOW(dat[i]);
+C51 COMPILER V9.60.0.0   MDRTUSLAVE                                                        09/18/2021 18:02:50 PAGE 6   
+
+ 295   2          }
+ 296   1          crc = mdCrc16(data2, 3 + length * 2);
+ 297   1          data2[3 + length * 2] = LOW(crc);
+ 298   1          data2[4 + length * 2] = HIGH(crc);
+ 299   1          handler->mdRTUSendString(handler, data2, 5 + length * 2);
+*** ERROR C212 IN LINE 299 OF FreeModBus\Src\mdrtuslave.c: indirect call: parameters do not fit within registers
+ 300   1          free(dat);
+ 301   1          free(data2);
+ 302   1      }
+ 303          
+ 304          static mdVOID mdRTUHandleCode5(ModbusRTUSlaveHandler handler)
+ 305          {
+ 306   1          mdU32 reclen = handler->receiveBuffer->count;
+ 307   1          mdU8* recbuf = handler->receiveBuffer->buf;
+ 308   1          RegisterPoolHandle regPool = handler->registerPool;
+ 309   1          mdU16 startAddress = ToU16(recbuf[2], recbuf[3]);
+ 310   1          mdBit dat = ToU16(recbuf[4], recbuf[5]) > 0 ? mdHigh : mdLow;
+ 311   1          regPool->mdWriteCoil(regPool, startAddress, dat);
+ 312   1          handler->mdRTUSendString(handler, recbuf, reclen);
+*** ERROR C212 IN LINE 312 OF FreeModBus\Src\mdrtuslave.c: indirect call: parameters do not fit within registers
+ 313   1      }
+ 314          
+ 315          static mdVOID mdRTUHandleCode6(ModbusRTUSlaveHandler handler)
+ 316          {
+ 317   1          mdU32 reclen = handler->receiveBuffer->count;
+ 318   1          mdU8* recbuf = handler->receiveBuffer->buf;
+ 319   1          RegisterPoolHandle regPool = handler->registerPool;
+ 320   1          mdU16 startAddress = ToU16(recbuf[2], recbuf[3]);
+ 321   1          mdU16 dat = ToU16(recbuf[4], recbuf[5]);
+ 322   1          regPool->mdWriteHoldRegister(regPool, startAddress, dat);
+ 323   1          handler->mdRTUSendString(handler, recbuf, reclen);
+*** ERROR C212 IN LINE 323 OF FreeModBus\Src\mdrtuslave.c: indirect call: parameters do not fit within registers
+ 324   1      }
+ 325          
+ 326          static mdVOID mdRTUHandleCode15(ModbusRTUSlaveHandler handler)
+ 327          {
+ 328   1          mdU8* recbuf = handler->receiveBuffer->buf;
+ 329   1          RegisterPoolHandle regPool = handler->registerPool;
+ 330   1          mdU16 startAddress = ToU16(recbuf[2], recbuf[3]);
+ 331   1          mdU16 length = ToU16(recbuf[4], recbuf[5]);
+ 332   1          mdU8 *dat;
+ 333   1          mdU16 crc;
+ 334   1              mdU32 i = 0;
+ 335   1      
+ 336   1          for (i = 0; i < length; i++)
+ 337   1          {
+ 338   2              regPool->mdWriteCoil(regPool, startAddress + i, ((recbuf[7 + i / 8] >> (i % 8)) & 0x01));
+ 339   2          }
+ 340   1          mdmalloc(dat, mdU8, 8);
+ 341   1          memcpy(dat, recbuf, 6);
+ 342   1          crc = mdCrc16(dat, 6);
+ 343   1          dat[6] = LOW(crc);
+ 344   1          dat[7] = HIGH(crc);
+ 345   1          handler->mdRTUSendString(handler, dat, 8);
+*** ERROR C212 IN LINE 345 OF FreeModBus\Src\mdrtuslave.c: indirect call: parameters do not fit within registers
+ 346   1          free(dat);
+ 347   1      }
+ 348          
+ 349          static mdVOID mdRTUHandleCode16(ModbusRTUSlaveHandler handler)
+ 350          {
+ 351   1          mdU8* recbuf = handler->receiveBuffer->buf;
+ 352   1          RegisterPoolHandle regPool = handler->registerPool;
+C51 COMPILER V9.60.0.0   MDRTUSLAVE                                                        09/18/2021 18:02:50 PAGE 7   
+
+ 353   1          mdU16 startAddress = ToU16(recbuf[2], recbuf[3]);
+ 354   1          mdU16 length = ToU16(recbuf[4], recbuf[5]);
+ 355   1          mdU8 *dat;
+ 356   1          mdU16 crc;
+ 357   1              mdU32 i = 0;
+ 358   1      
+ 359   1          for (i = 0; i < length; i++)
+ 360   1          {
+ 361   2              regPool->mdWriteHoldRegister(regPool, startAddress + i,
+ 362   2                   ToU16(recbuf[7 + 2 * i], recbuf[7 + 2 * i + 1]));
+ 363   2          }
+ 364   1          mdmalloc(dat, mdU8, 8);
+ 365   1          memcpy(dat, recbuf, 6);
+ 366   1          crc = mdCrc16(dat, 6);
+ 367   1          dat[6] = LOW(crc);
+ 368   1          dat[7] = HIGH(crc);
+ 369   1          handler->mdRTUSendString(handler, dat, 8);
+*** ERROR C212 IN LINE 369 OF FreeModBus\Src\mdrtuslave.c: indirect call: parameters do not fit within registers
+ 370   1          free(dat);
+ 371   1      }
+ 372          /*
+ 373              mdModbusRTUCenterProcessor
+ 374                  @handler 句柄
+ 375                  @receFrame 待处理的帧（已校验通过）
+ 376              处理一帧，并且通过接口发送处理结果
+ 377          */
+ 378          static mdVOID mdRTUCenterProcessor(ModbusRTUSlaveHandler handler)
+ 379          {
+ 380   1          mdU32 reclen = handler->receiveBuffer->count;
+ 381   1          mdU8* recbuf = handler->receiveBuffer->buf;
+ 382   1          if (reclen < 3)
+ 383   1          {
+ 384   2              handler->mdRTUError(handler, ERROR2);
+ 385   2              return;
+ 386   2          }
+ 387   1          if(mdCrc16(recbuf,reclen-2) != mdGetCrc16()
+ 388   1              && CRC_CHECK != 0)
+ 389   1          {
+ 390   2              handler->mdRTUError(handler, ERROR3);
+ 391   2              return;
+ 392   2          }
+ 393   1          if (mdGetSlaveId() != handler->slaveId)
+ 394   1          {
+ 395   2              handler->mdRTUError(handler, ERROR4);
+ 396   2              return;
+ 397   2          }
+ 398   1          switch(mdGetCode())
+ 399   1          {
+ 400   2              case MODBUS_CODE_1:
+ 401   2                  handler->mdRTUHandleCode1(handler);
+ 402   2                  break;
+ 403   2              case MODBUS_CODE_2:
+ 404   2                  handler->mdRTUHandleCode2(handler);
+ 405   2                  break;
+ 406   2              case MODBUS_CODE_3:
+ 407   2                  handler->mdRTUHandleCode3(handler);
+ 408   2                  break;
+ 409   2              case MODBUS_CODE_4:
+ 410   2                  handler->mdRTUHandleCode4(handler);
+ 411   2                  break;
+ 412   2              case MODBUS_CODE_5:
+ 413   2                  handler->mdRTUHandleCode5(handler);
+C51 COMPILER V9.60.0.0   MDRTUSLAVE                                                        09/18/2021 18:02:50 PAGE 8   
+
+ 414   2                  break;
+ 415   2              case MODBUS_CODE_6:
+ 416   2                  handler->mdRTUHandleCode6(handler);
+ 417   2                  break;
+ 418   2              case MODBUS_CODE_15:
+ 419   2                  handler->mdRTUHandleCode15(handler);
+ 420   2                  break;
+ 421   2              case MODBUS_CODE_16:
+ 422   2                  handler->mdRTUHandleCode16(handler);
+ 423   2                  break;
+ 424   2              default:
+ 425   2                  handler->mdRTUError(handler, ERROR5);
+ 426   2                  break;
+ 427   2          }
+ 428   1      }
+ 429          
+ 430          /* ================================================================== */
+ 431          /*                        API                                         */
+ 432          /* ================================================================== */
+ 433          /*
+ 434              mdCreateModbusRTUSlave
+ 435                  @handler 句柄
+ 436                  @mdRtuPopChar 字符发送函数
+ 437              创建一个modbus从机
+ 438          */
+ 439          mdSTATUS mdCreateModbusRTUSlave(ModbusRTUSlaveHandler *handler, struct ModbusRTUSlaveRegisterInfo info)
+ 440          {
+ 441   1          (*handler) = (ModbusRTUSlaveHandler)malloc(sizeof(struct ModbusRTUSlave));
+ 442   1          if ((*handler) != NULL)
+ 443   1          {
+ 444   2              (*handler)->mdRTUPopChar = info.mdRTUPopChar;
+ 445   2              (*handler)->mdRTUCenterProcessor = mdRTUCenterProcessor;
+ 446   2              (*handler)->mdRTUError = mdRTUError;
+ 447   2              (*handler)->slaveId = info.slaveId;
+ 448   2              (*handler)->invalidTime = (int)(1.5 * DATA_BITS * 1000 * 1000 / info.usartBaudRate);
+ 449   2              (*handler)->stopTime = (int)(3.5 * DATA_BITS * 1000 * 1000 / info.usartBaudRate);
+ 450   2              (*handler)->updateFlag = false;
+ 451   2              (*handler)->portRTUPushChar  = portRtuPushChar;
+ 452   2              (*handler)->portRTUTimerTick = portRtuTimerTick;
+ 453   2              (*handler)->portRTUPushString= portRtuPushString;
+ 454   2              (*handler)->mdRTUSendString  = mdRTUSendString;
+ 455   2              (*handler)->mdRTUHandleCode1 = mdRTUHandleCode1;
+ 456   2              (*handler)->mdRTUHandleCode2 = mdRTUHandleCode2;
+ 457   2              (*handler)->mdRTUHandleCode3 = mdRTUHandleCode3;
+ 458   2              (*handler)->mdRTUHandleCode4 = mdRTUHandleCode4;
+ 459   2              (*handler)->mdRTUHandleCode5 = mdRTUHandleCode5;
+ 460   2              (*handler)->mdRTUHandleCode6 = mdRTUHandleCode6;
+ 461   2              (*handler)->mdRTUHandleCode15 = mdRTUHandleCode15;
+ 462   2              (*handler)->mdRTUHandleCode16 = mdRTUHandleCode16;
+ 463   2      
+ 464   2              if(mdCreateRegisterPool(&((*handler)->registerPool)) &&
+ 465   2                  mdCreateReceiveBuffer(&((*handler)->receiveBuffer))){
+ 466   3                      return mdTRUE;
+ 467   3              }
+ 468   2              else
+ 469   2              {
+ 470   3                  free((*handler));
+ 471   3              }
+ 472   2          }
+ 473   1          return mdFALSE;
+ 474   1      }
+ 475          
+C51 COMPILER V9.60.0.0   MDRTUSLAVE                                                        09/18/2021 18:02:50 PAGE 9   
+
+ 476          
+ 477          /*
+ 478              mdDestoryModbusRTUSlave
+ 479                  @handler 句柄
+ 480              销毁一个modbus从机
+ 481          */
+ 482          mdVOID mdDestoryModbusRTUSlave(ModbusRTUSlaveHandler *handler){
+ 483   1          mdDestoryRegisterPool(&((*handler)->registerPool));
+ 484   1          mdDestoryReceiveBuffer(&((*handler)->receiveBuffer));
+ 485   1          free(*handler);
+ 486   1          (*handler) = NULL;
+ 487   1      }
+ 488          
+ 489          /*
+ 490              mdU16Swap
+ 491                  @*data   交换的缓冲区
+ 492                  @*length 长度
+ 493              交换一个mdU16缓冲区中相邻两个元素
+ 494          */
+ 495          mdVOID mdU16Swap(mdU16 *dat, mdU32 length)
+ 496          {
+ 497   1              mdU16 temp = 0;
+ 498   1              mdU16 *p;
+ 499   1              
+ 500   1              for(*p = &dat[0]; p < &dat[0] + length; p += 2)
+ 501   1              {
+ 502   2                      temp = *p;
+ 503   2                      *p = *(p+1);
+ 504   2                      *(p+1) = temp;
+ 505   2              }
+ 506   1      }
+ 507          
+ 508          #endif
+*** WARNING C312 IN LINE 508 OF FreeModBus\Src\mdrtuslave.c: misplaced endif control
+
+C51 COMPILATION COMPLETE.  6 WARNING(S),  8 ERROR(S)

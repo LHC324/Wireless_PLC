@@ -1,0 +1,418 @@
+C51 COMPILER V9.60.0.0   LED                                                               05/21/2021 22:14:13 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE LED
+OBJECT MODULE PLACED IN .\Objects\LED.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE Source\LED.c LARGE OPTIMIZE(8,SPEED) BROWSE INCDIR(.\Include) DEBUG OBJE
+                    -CTEXTEND PRINT(.\Listings\LED.lst) OBJECT(.\Objects\LED.obj)
+
+line level    source
+
+   1          #include"LCD.h"
+   2          #include"usart.h"
+   3          #include"pFunc.h"
+   4          #include<STC8.h>
+   5          #include"systemTimer.h"
+   6          #include"Chinese_code.h"
+   7          
+   8          FRONT_PARM frontCurrent;
+   9          
+  10           /*******************************************************************/
+  11          //                                         液晶发送指令
+  12          /*******************************************************************/
+  13          
+  14          void transfer_command(int data1)
+  15          {
+  16   1              uint8_t i;
+  17   1              LCD_CS = 0;
+  18   1              LCD_RS = 0;
+  19   1              for(i = 0;i < 8;i++)
+  20   1              {               
+  21   2                      LCD_SCK = 0;
+  22   2      
+  23   2                      if(data1&0x80)
+  24   2                              LCD_SDA = 1;
+  25   2                      else 
+  26   2                              LCD_SDA = 0;
+  27   2      
+  28   2                      LCD_SCK = 1;
+  29   2                      data1 = data1<<=1;
+  30   2              }
+  31   1              LCD_CS = 1;
+  32   1      }
+  33          
+  34          
+  35          /*******************************************************************/
+  36          //                                          液晶发送数据
+  37          /*******************************************************************/
+  38          void transfer_data(unsigned char data1)
+  39          {
+  40   1              uint8_t i;
+  41   1              LCD_CS = 0;
+  42   1              LCD_RS = 1;
+  43   1      
+  44   1              for(i = 0;i < 8;i++)
+  45   1              {
+  46   2                      LCD_SCK = 0;
+  47   2      
+  48   2                      if(data1&0x80){   
+  49   3                              LCD_SDA = 1;
+  50   3                      }else {
+  51   3                              LCD_SDA = 0;
+  52   3                      }
+  53   2                      LCD_SCK=1;
+  54   2      
+C51 COMPILER V9.60.0.0   LED                                                               05/21/2021 22:14:13 PAGE 2   
+
+  55   2                      data1 = data1<<=1;
+  56   2              }
+  57   1              LCD_CS = 1;
+  58   1      }
+  59          
+  60          void GUI_Point(unsigned char x,unsigned char y)
+  61          {
+  62   1              uint8_t y_Dy,y_by;
+  63   1      
+  64   1              y_Dy = y/8;     //计算y坐标在哪一行
+  65   1              y_by = y&(~8);  //计算y坐标在哪一位
+  66   1      
+  67   1      }
+*** WARNING C280 IN LINE 60 OF Source\LED.c: 'x': unreferenced local variable
+  68          
+  69          
+  70          /*******************************************************************/
+  71          //                                          液晶清屏
+  72          /*******************************************************************/
+  73          void clear_screen()
+  74          {
+  75   1              unsigned char i,j;
+  76   1              for(i = 0;i < 8;i++)
+  77   1              {
+  78   2                      transfer_command(0xB0 + i);      //列地址为0xB0到0xB7
+  79   2                      for(j = 0;j < 192; j++)
+  80   2                      {
+  81   3                               transfer_data(0x00);
+  82   3                      }
+  83   2              }
+  84   1      }
+  85          
+  86          
+  87          /*******************************************************************/
+  88          //                                       设置液晶DDRAM地址
+  89          /*******************************************************************/
+  90          
+  91          void lcd_address(unsigned char page,unsigned char column)
+  92          {
+  93   1      //      column = column - 1; //我们平常所说的第 1 列，在 LCD 驱动 IC 里是第 0 列。
+  94   1      //      page = page - 1;
+  95   1      
+  96   1              if(page < 2){                                       //第0列对应B6，第1列对应B7
+  97   2                      transfer_command(0xB6 + page);   //设置页地址。每页是 8 行。一个画面的 64 行被分成 8 个页。
+  98   2              }else{
+  99   2                      transfer_command(0xAE + page);          
+ 100   2              }
+ 101   1              transfer_command(((column>>4)&0x0f) + 0x10); //设置列地址的高 4 位
+ 102   1              transfer_command(column&0x0f); //设置列地址的低 4 位
+ 103   1      }
+ 104          
+ 105          /*******************************************************************/
+ 106          //                                           液晶初始化
+ 107          /*******************************************************************/
+ 108          void initial_lcd()
+ 109          {
+ 110   1              LCD_RST = 0;                    //低电平复位
+ 111   1              Delay_ms(100);
+ 112   1              LCD_RST = 1;                    //复位完毕
+ 113   1      
+ 114   1              Delay_ms(50);
+ 115   1              transfer_command(0xe2); //软复位
+C51 COMPILER V9.60.0.0   LED                                                               05/21/2021 22:14:13 PAGE 3   
+
+ 116   1              Delay_ms(50);
+ 117   1              transfer_command(0x2f); //打开内部升压
+ 118   1              Delay_ms(20);
+ 119   1              transfer_command(0xa0); //
+ 120   1              Delay_ms(20);
+ 121   1              //transfer_command(0xff); //微调对比度
+ 122   1              Delay_ms(20);
+ 123   1              transfer_command(0x70); //微调对比度的值，可设置范围 0x00～0xFF
+ 124   1              //****************************
+ 125   1              Delay_ms(20);
+ 126   1              transfer_command(0x81); //微调对比度
+ 127   1              Delay_ms(20);
+ 128   1              transfer_command(0x70); //微调对比度的值，可设置范围 0x00～0xFF
+ 129   1              //******************************
+ 130   1              Delay_ms(20);
+ 131   1              transfer_command(0xeb); //1/9 偏压比（bias）
+ 132   1              Delay_ms(20);
+ 133   1              transfer_command(0xc4); //行列扫描顺序：从上到下
+ 134   1              Delay_ms(20);
+ 135   1              transfer_command(0xaf); //开显示
+ 136   1              
+ 137   1              LCD_BAK = 0;      //背光开启
+ 138   1              
+ 139   1              clear_screen();
+ 140   1      }
+ 141          
+ 142          
+ 143          /*******************************************************************/
+ 144          //                                   根据字库类型获取对应参数
+ 145          /*******************************************************************/
+ 146          uint8_t GetFrontParm(FONT font)   //获取字体参数   
+ 147          {
+ 148   1          switch(font)
+ 149   1          {
+ 150   2              case CH_12_12 :
+ 151   2              {                       
+ 152   3                  frontCurrent.F_Bytes = 24;
+ 153   3                  frontCurrent.F_High = 16;
+ 154   3                  frontCurrent.F_Width = 12;            
+ 155   3                  frontCurrent.pArray = Chinese_code_12x12;  //中文字库指针
+ 156   3                  frontCurrent.F_Offect = 12;                  //点阵之间的偏移量
+ 157   3                  break;   
+ 158   3              }
+ 159   2              case EN_5_8 :
+ 160   2              {
+ 161   3                  frontCurrent.F_Bytes = 5;
+ 162   3                  frontCurrent.F_High = 8;
+ 163   3                  frontCurrent.F_Width = 5;
+ 164   3                  frontCurrent.F_Offect = 7;
+ 165   3                  frontCurrent.pArray = Ascii_table_5x8;        //英文字库指针
+*** WARNING C182 IN LINE 165 OF Source\LED.c: pointer to different objects
+ 166   3                  break;
+ 167   3              }
+ 168   2      //                              case EN_6_12 :
+ 169   2      //                              {
+ 170   2      //                                              frontCurrent.F_Bytes = 16;
+ 171   2      //            frontCurrent.F_High = 16;
+ 172   2      //            frontCurrent.F_Width = 8;
+ 173   2      //            frontCurrent.F_Offect = 8;
+ 174   2      //            frontCurrent.pArray = Ascii_table_6x12;     //英文字库指针
+ 175   2      //                              }
+ 176   2                      default: return 0;
+C51 COMPILER V9.60.0.0   LED                                                               05/21/2021 22:14:13 PAGE 4   
+
+ 177   2          }
+ 178   1              return 1;
+ 179   1      }
+ 180          
+ 181          /*******************************************************************/
+ 182          //                                       获取文字的字库索引
+ 183          /*******************************************************************/
+ 184          
+ 185          uint16_t GetCHIndex(uint16_t ZoneCode)
+ 186          {
+ 187   1          uint16_t i = 0;
+ 188   1          uint16_t CHCode;
+ 189   1      
+ 190   1          for(i = 0; i < MAX_WORD_LIBRARY; i++)
+ 191   1          {
+ 192   2              CHCode = (ChineseTable[i][0] << 8) | (ChineseTable[i][1]);
+ 193   2              if(CHCode == ZoneCode)
+ 194   2              {
+ 195   3                  break;         // 返回汉字在gbkCodeTable[][]表中的索引位置
+ 196   3              }
+ 197   2          }
+ 198   1          return i;
+ 199   1      }
+ 200          
+ 201          /*******************************************************************/
+ 202          //                                        写自定义字符串
+ 203          /*******************************************************************/
+ 204          void GUI_String(unsigned char x,unsigned char y,unsigned char *pString,FONT font)
+ 205          {
+ 206   1          //FRONT_PARM front_parm;                     // 字符参数
+ 207   1                unsigned short ChIndex;                          // 要显示的字符在gbkCodeTable[][2]中的序号
+ 208   1          unsigned char  Offset;                           // 点阵内偏移量
+ 209   1        
+ 210   1          uint16_t ZoneCode;                         // 字符的区位码    
+ 211   1          GetFrontParm(font);    //获取不同点阵对应参数
+ 212   1      
+ 213   1          Offset = 0;  
+ 214   1      
+ 215   1          do
+ 216   1          {
+ 217   2              if(*(pString + Offset) < 0x80)          //英文字符或数字显示
+ 218   2              {
+ 219   3                  ChIndex = *(pString + Offset) - ' '; //获取英文或字符的索引
+ 220   3                              //Uart1Send(ChIndex);
+ 221   3                              GUI_Lattice(x,y,5,8,frontCurrent.pArray + ChIndex * 5);    //液晶显示
+ 222   3                              x += frontCurrent.F_Offect;
+ 223   3                  Offset ++;
+ 224   3              }
+ 225   2              else                                    //汉字显示
+ 226   2              {
+ 227   3                
+ 228   3                  ZoneCode = *(pString + Offset) << 8;  //0x80为文字起始
+ 229   3                  ZoneCode = ZoneCode | *(pString + Offset + 1);  //不是区位码,是国标码
+ 230   3                  
+ 231   3                  ChIndex = GetCHIndex(ZoneCode);
+ 232   3      //                      Uart1Send(frontCurrent.F_High);
+ 233   3      //                      Uart1Send(frontCurrent.F_Bytes);
+ 234   3      //                      Uart1Send(frontCurrent.F_Width);
+ 235   3                              GUI_Lattice(x,y,12,16,frontCurrent.pArray + ChIndex * 24);   //液晶显示
+ 236   3                  x += frontCurrent.F_Offect;
+ 237   3                  Offset += 2;
+ 238   3              }
+C51 COMPILER V9.60.0.0   LED                                                               05/21/2021 22:14:13 PAGE 5   
+
+ 239   2              
+ 240   2          }while(*(pString + Offset) != '\0');
+ 241   1      }
+ 242          
+ 243          
+ 244          /*******************************************************************/
+ 245          //                                        液晶写自定义点阵
+ 246          /*******************************************************************/
+ 247          void GUI_Lattice(unsigned char x,unsigned char y,unsigned char Width,unsigned char High,unsigned char* pla
+             -ttice) //x:起始坐标x    y:起始坐标y
+ 248          {       
+ 249   1              uint8_t y_Dy,y_by,y1_Dy,y1_by,y_Bytes;
+ 250   1              uint8_t i,j;
+ 251   1              uint8_t tempH,tempL;
+ 252   1      
+ 253   1              High = MULTIPLE_8(High);   //高度不为8的倍数时，要补齐，不然会出错，此句很重要
+ 254   1      
+ 255   1              y1_Dy = (y + High)/8;           //求出y终点的所在列
+ 256   1              y1_by = (y + High)%8;
+ 257   1      
+ 258   1              y_Dy = y/8;                      //求出y起点的所在列
+ 259   1              y_by = y % 8;
+ 260   1      
+ 261   1              y_Bytes = y1_Dy - y_Dy + 1;
+ 262   1      
+ 263   1              for(i = 0; i < y_Bytes;i++)
+ 264   1              {
+ 265   2                      if(y1_Dy > y_Dy)
+ 266   2                      {               
+ 267   3                              for(j = 0; j < Width; j++)
+ 268   3                              {
+ 269   4                                      if(i == 0)  //第一行
+ 270   4                                      {                                 
+ 271   5                                              lcd_address(y_Dy,x + j);
+ 272   5                                              transfer_data(*(plattice + j )<< y_by);
+ 273   5      
+ 274   5                                      }else if(i == y_Bytes - 1) //最后一行
+ 275   4                                      {       
+ 276   5                                              lcd_address(y1_Dy,x + j);
+ 277   5                                              transfer_data(*(plattice + Width*(i - 1) + j)>>(8 - y1_by));    //16点阵 offect16                               
+ 278   5                                      }else
+ 279   4                                      {                               
+ 280   5                                              tempH = (*(plattice + j + Width*(i - 1))>>(8 - y_by));
+ 281   5                                              tempL = (*(plattice + j + Width*i)<< y_by);
+ 282   5      
+ 283   5                                              lcd_address(y_Dy + i,x + j);                                    
+ 284   5                                              transfer_data(tempH|tempL);
+ 285   5                                      }                               
+ 286   4                              }
+ 287   3                      }
+ 288   2                      else               //只有一行的点阵
+ 289   2                      {
+ 290   3                              lcd_address(y_Dy,x + j);  //设置第一字节y首地址
+ 291   3                              transfer_data(GET_BITS_SE(*(plattice + j),y_by,y1_by));            //通过
+ 292   3                      }               
+ 293   2              }                       
+ 294   1      }
+ 295          
+ 296          void DebugShow()
+ 297          {
+ 298   1              //**************密码输入***********
+ 299   1              
+C51 COMPILER V9.60.0.0   LED                                                               05/21/2021 22:14:13 PAGE 6   
+
+ 300   1      //               GUI_Lattice(0,8,81,50,Logo);
+ 301   1      //      
+ 302   1      //         GUI_String(97,35,"5",EN_5_8);
+ 303   1      //               GUI_String(117,35,"4",EN_5_8);
+ 304   1      //               GUI_String(137,35,"3",EN_5_8);
+ 305   1      //               GUI_String(157,35,"2",EN_5_8);
+ 306   1      //               
+ 307   1      //         GUI_String(100,15,"请输入密码",CH_12_12);
+ 308   1                      
+ 309   1      //         GUI_Lattice(57,35,16,12,dot);
+ 310   1      //               GUI_Lattice(77,35,16,12,dot);  
+ 311   1      //               GUI_Lattice(97,35,16,12,dot);  
+ 312   1      //               GUI_Lattice(117,35,16,12,dot); 
+ 313   1      
+ 314   1              //******************密码修改**********************
+ 315   1              
+ 316   1      //          GUI_String(15,15,"请输入新密码",CH_12_12);
+ 317   1      //                      GUI_String(15,35,"请确认新密码",CH_12_12);
+ 318   1                              
+ 319   1      //          GUI_String(100,18,"5",EN_5_8);
+ 320   1      //                GUI_String(120,18,"4",EN_5_8);
+ 321   1      //                GUI_String(140,18,"3",EN_5_8);
+ 322   1      //                GUI_String(160,18,"2",EN_5_8);
+ 323   1      //                      
+ 324   1      //                      GUI_String(100,38,"5",EN_5_8);
+ 325   1      //                GUI_String(120,38,"4",EN_5_8);
+ 326   1      //                GUI_String(140,38,"3",EN_5_8);
+ 327   1      //                GUI_String(160,38,"2",EN_5_8);
+ 328   1              //*************************************************
+ 329   1              
+ 330   1              //******************提示界面**********************
+ 331   1                              
+ 332   1                       
+ 333   1              //************************************************
+ 334   1              
+ 335   1              
+ 336   1              //*****************菜单界面**********************//
+ 337   1               
+ 338   1      //              GUI_Lattice(50,6,16,12,finger);
+ 339   1      //              GUI_Lattice(50,26,16,12,finger);
+ 340   1      //        GUI_Lattice(50,46,16,12,finger);
+ 341   1      //                              
+ 342   1      //              GUI_String(70,5,"通信方式",CH_12_12);
+ 343   1      //              GUI_String(70,25,"启停开关",CH_12_12);
+ 344   1      //              GUI_String(70,45,"密码修改",CH_12_12);
+ 345   1      //              
+ 346   1              //******************PLC启动停止***********************
+ 347   1                      
+ 348   1      //              GUI_String(15,24,"STOP",EN_5_8);
+ 349   1      //              GUI_String(150,24,"RUN",EN_5_8);
+ 350   1      //              GUI_Lattice(45,0,100,56,PlcRun);
+ 351   1                      //GUI_Lattice(45,0,100,56,PlcStop);
+ 352   1                      
+ 353   1              //*********************通信方式************************ 
+ 354   1              
+ 355   1      //        GUI_Lattice(10,11,16,12,finger);
+ 356   1      //              GUI_Lattice(10,41,16,12,finger);
+ 357   1      //              GUI_String(30,10,"本地连接",CH_12_12);
+ 358   1      //              GUI_String(30,40,"远程连接",CH_12_12);
+ 359   1      //              
+ 360   1       //**********************波特率设置**********************
+ 361   1                              
+C51 COMPILER V9.60.0.0   LED                                                               05/21/2021 22:14:13 PAGE 7   
+
+ 362   1      //                      GUI_String(10,10,"本地串口",CH_12_12);
+ 363   1      //                      GUI_String(105,13,"9600",EN_5_8);
+ 364   1      //                      GUI_Lattice(149,13,5,8,IconRight);
+ 365   1      //                      GUI_Lattice(97,13,5,8,Iconleft);
+ 366   1      //                      
+ 367   1      //                      GUI_String(10,40,"远程串口",CH_12_12);
+ 368   1      //                      GUI_String(80,43,"115200(readonly)",EN_5_8);
+ 369   1               
+ 370   1      //***********************恢复出厂设置********************
+ 371   1      
+ 372   1      //                      GUI_String(48,20,"是否恢复出厂设置",CH_12_12);
+ 373   1      //                      GUI_String(10,48,"是",CH_12_12);
+ 374   1      //                      GUI_String(172,48,"否",CH_12_12);
+ 375   1      
+ 376   1      //*******************************************************
+ 377   1                              
+ 378   1                      
+ 379   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   1403    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =      8      29
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  2 WARNING(S),  0 ERROR(S)

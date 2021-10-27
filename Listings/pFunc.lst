@@ -1,0 +1,80 @@
+C51 COMPILER V9.60.0.0   PFUNC                                                             10/27/2021 11:44:19 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE PFUNC
+OBJECT MODULE PLACED IN .\Objects\pFunc.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE Source\pFunc.c LARGE OPTIMIZE(9,SPEED) BROWSE INCDIR(.\Include;.\FreeMod
+                    -Bus\Inc) DEBUG OBJECTEXTEND PRINT(.\Listings\pFunc.lst) OBJECT(.\Objects\pFunc.obj)
+
+line level    source
+
+   1          #include"pFunc.h"
+   2          
+   3          char* myitoa(int num,char* str,int radix)
+   4          {
+   5   1          char index[]="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+   6   1          unsigned unum;
+   7   1                      char temp;
+   8   1          int i=0,j,k;
+   9   1       
+  10   1          if(radix==10&&num<0)
+  11   1          {
+  12   2              unum=(unsigned)-num;
+  13   2              str[i++]='-';
+  14   2          }
+  15   1          else unum=(unsigned)num;
+  16   1       
+  17   1          do
+  18   1          {
+  19   2              str[i++]=index[unum%(unsigned)radix];
+  20   2              unum/=radix;
+  21   2       
+  22   2          }while(unum);
+  23   1       
+  24   1          str[i]='\0';
+  25   1      
+  26   1          if(str[0]=='-') k=1;
+  27   1          else k=0;
+  28   1       
+  29   1          for(j = k;j<=(i-1)/2;j++)
+  30   1          {
+  31   2              temp = str[j];
+  32   2              str[j] = str[i-1+k-j];
+  33   2              str[i-1+k-j] = temp;
+  34   2          }
+  35   1          return str;
+  36   1      }
+  37          
+  38          unsigned char LoopIndex(unsigned char operation,unsigned char Index,unsigned IndexSize)
+  39          {
+  40   1               if(operation == DOWMWORD)
+  41   1               {
+  42   2                        Index++;
+  43   2                              Index%= IndexSize;
+  44   2               }else
+  45   1               {
+  46   2                        if(Index == 0)
+  47   2                              {
+  48   3                                      Index = IndexSize;
+  49   3                              }
+  50   2                        Index--;
+  51   2                              Index%= IndexSize;
+  52   2               }
+  53   1               return Index;
+  54   1      }
+C51 COMPILER V9.60.0.0   PFUNC                                                             10/27/2021 11:44:19 PAGE 2   
+
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    481    ----
+   CONSTANT SIZE    =     37    ----
+   XDATA SIZE       =   ----      53
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

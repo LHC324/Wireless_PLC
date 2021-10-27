@@ -1,0 +1,153 @@
+C51 COMPILER V9.60.0.0   HARDWARESPI                                                       05/19/2021 10:25:52 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE HARDWARESPI
+OBJECT MODULE PLACED IN .\Objects\HardWareSPI.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE Source\HardWareSPI.c LARGE OPTIMIZE(8,SPEED) BROWSE INCDIR(.\Include) DE
+                    -BUG OBJECTEXTEND PRINT(.\Listings\HardWareSPI.lst) OBJECT(.\Objects\HardWareSPI.obj)
+
+line level    source
+
+   1          #include"HardWareSPI.h"
+   2          #include<STC8.h>
+   3          
+   4          /*********************************************************************************
+   5          * 函数名：
+   6          * 功能：
+   7          * 参数：
+   8          * 作者：zhao1peng
+   9          * note：
+  10          * 该STC单片机由于只有一个SPI通讯寄存器，但是能切换SPI通讯的引脚 从而实现多路主SPI
+  11          * 
+  12          *
+  13          *
+  14          *********************************************************************************/
+  15          
+  16           #define SPI1_CS P1^0
+  17           bit busy_spi;
+  18          
+  19           #define LED1 P30
+  20           #define LED2 P31
+  21           #define uint8_t unsigned char
+  22          
+  23           unsigned char SPI_DATA;//储存SPI回读数据
+  24          
+  25          
+  26          /*********************************************************
+  27          * 函数名：void SPI_MasterIit(void)
+  28          * 功能：  初始化SPI的中断形式
+  29          * 参数：
+  30          * 作者：zhao1peng
+  31          * note：
+  32          *硬件SPI的时钟选择请根据实际需求进行修改相应寄存器 SPCTL 的参数值
+  33          * 
+  34          *
+  35          **********************************************************/
+  36          
+  37          
+  38          void SPI_MasterInit(void)
+  39          {
+  40   1              SPCTL = 0x53;                               //使能SPI主机模式
+  41   1          SPSTAT = 0xc0;                              //清中断标志
+  42   1          IE2 = ESPI;                                 //使能SPI中断
+  43   1          EA = 1;
+  44   1      }
+  45          
+  46          void SPI_Isr() interrupt 9
+  47          {
+  48   1          SPSTAT = 0xc0;                              //清中断标志
+  49   1      //    SS = 1;                                     //拉高从机的SS管脚
+  50   1          busy_spi = 0;
+  51   1              SPI_DATA = SPDAT ;
+  52   1              //SPDAT = SPDAT ;
+  53   1                                                          
+  54   1      }
+C51 COMPILER V9.60.0.0   HARDWARESPI                                                       05/19/2021 10:25:52 PAGE 2   
+
+  55          
+  56          
+  57          void SPI_writeByte(unsigned char data__)
+  58          {
+  59   1              unsigned short tt = 2000;
+  60   1              busy_spi = 1;
+  61   1      
+  62   1              SPDAT = data__; 
+  63   1              while(busy_spi)
+  64   1              {
+  65   2                      tt --;
+  66   2                      if(!tt)
+  67   2                      {
+  68   3                              break;
+  69   3                      }
+  70   2              }
+  71   1      }
+  72          
+  73          //硬件SPI读数据有待测试
+  74          unsigned char SPI_readByte(void)
+  75          {
+  76   1              busy_spi = 1;
+  77   1      
+  78   1              SPI_writeByte(0xFF);
+  79   1      
+  80   1              return SPI_DATA;
+  81   1      } 
+  82          
+  83          
+  84          /*********************************************************
+  85          * 函数名：void SPI_writeString( unsigned char *pData,   数据指针
+  86                                                                          unsigned char length,   数据长度        
+  87                                                                      unsigned char PORT)         片选信号的引脚
+  88          * 功能：
+  89          * 参数：
+  90          * 作者：zhao1peng
+  91          * note：
+  92          *
+  93          **********************************************************/
+  94          
+  95          void SPI_writeString(unsigned char *pData,unsigned char length)//
+  96          {
+  97   1              unsigned char dataLength;
+  98   1      
+  99   1              dataLength = length;
+ 100   1               
+ 101   1              while(dataLength--)
+ 102   1              {
+ 103   2                      SPI_writeByte(*pData ++);
+ 104   2              }
+ 105   1              LED1 = !LED1;
+ 106   1      }
+ 107          
+ 108          void SPI_readString(unsigned char *pData,unsigned char length)
+ 109          {
+ 110   1              unsigned char dataLength;
+ 111   1              dataLength = length;
+ 112   1      
+ 113   1              while(dataLength--)
+ 114   1              {
+ 115   2                      *pData = SPI_readByte();
+ 116   2                      pData ++;
+C51 COMPILER V9.60.0.0   HARDWARESPI                                                       05/19/2021 10:25:52 PAGE 3   
+
+ 117   2              }
+ 118   1              LED1 = !LED1;
+ 119   1      
+ 120   1      }
+ 121          
+ 122          
+ 123          
+ 124          
+ 125          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    148    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =      1       3
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      1    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

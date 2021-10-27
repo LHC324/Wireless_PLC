@@ -1,0 +1,25 @@
+{
+    "files.associations": {
+        "gpio.h": "c",
+        "lte.h": "c",
+        "stc8.h": "c",
+        "STC8.H": "cpp",
+        "config.h": "c",
+        "systemtimer.h": "c",
+        "lcd.h": "c",
+        "key.h": "c",
+        "chinese_code.h": "c",
+        "control.h": "c",
+        "usart.h": "c",
+        "md380_modbus.h": "c",
+        "menu.h": "c",
+        "wifi.h": "c",
+        "report.h": "c",
+        "timer.h": "c",
+        "queue.h": "c",
+        "stdio.h": "c",
+        "STDIO.H": "cpp",
+        "intrins.h": "c"
+    },
+    "C_Cpp.errorSquiggles": "Disabled"
+}

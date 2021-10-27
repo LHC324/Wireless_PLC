@@ -1,0 +1,125 @@
+C51 COMPILER V9.60.0.0   ALLINT                                                            05/21/2021 21:51:59 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE ALLINT
+OBJECT MODULE PLACED IN .\Objects\Allint.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE Source\Allint.c LARGE OPTIMIZE(8,SPEED) BROWSE INCDIR(.\Include) DEBUG O
+                    -BJECTEXTEND PRINT(.\Listings\Allint.lst) OBJECT(.\Objects\Allint.obj)
+
+line level    source
+
+   1          #include "Allint.h"
+   2          #include<STC8.h>
+   3          /*********************************************************
+   4          * 函数名：void Int0_init(unsigned char edge)
+   5          * 功能：  初始化外部中断0
+   6          * 参数：  char edge ：触发方式 ：FALL_AND_RISE_EDGE 0  //下降或上升沿中断
+   7                                                                           FALL_EDGE 1     //下降沿中断
+   8          * 作者：zhao1peng
+   9          * note： 外部中断 0 1 支持下降沿中断或者上升沿下降沿触发中断 和根据实际需求进行选择
+  10          *
+  11          **********************************************************/
+  12          
+  13          void Int0_init(unsigned char edge)
+  14          {
+  15   1              IT0 = edge;                                    //使能INT0上升沿和下降沿中断
+  16   1          EX0 = 1;                                    //使能INT0中断
+  17   1          EA = 1;     
+  18   1      }
+  19          
+  20          void Int1_init(unsigned char edge)
+  21          {
+  22   1              IT1 = edge;                                    //使能INT1上升沿和下降沿中断
+  23   1          EX1 = 1;                                    //使能INT1中断
+  24   1          EA = 1;
+  25   1      }
+  26          
+  27           /*********************************************************
+  28          * 函数名：void int_234_choose(unsigned char INTC)
+  29          * 功能：  外部中断2 3 4 的初始化
+  30          * 参数：  unsigned char INTC
+  31                                                   EX2             0x10  //使能中断2
+  32                                                   EX3             0x20  //使能中断3
+  33                                                   EX4             0x40  //使能中断4
+  34          * 作者：zhao1peng
+  35          * note：
+  36          *         外部中断 2 3 4 只支持下降沿中断
+  37          *
+  38          **********************************************************/
+  39          void int_234_choose(unsigned char INTC)
+  40          {
+  41   1              switch(INTC)
+  42   1              {
+  43   2                      case EX2: INTCLKO = INTC;
+  44   2                      break;
+  45   2                      case EX3: INTCLKO = INTC;
+  46   2                      break;
+  47   2                      case EX4: INTCLKO = INTC;
+  48   2                      break;
+  49   2                      default:
+  50   2                      break;
+  51   2              }
+  52   1               EA = 1;
+  53   1      }
+  54          
+C51 COMPILER V9.60.0.0   ALLINT                                                            05/21/2021 21:51:59 PAGE 2   
+
+  55           //***************************************************************************
+  56           /*********************************************************
+  57          * 函数名：
+  58          * 功能：  以下为各个外部中断的中断服务函数
+  59          * 参数：
+  60          * 作者：zhao1peng
+  61          * note：
+  62          *               用户可根据实际需求来编写中断服务函数
+  63          **********************************************************/
+  64          void INT0_Isr() interrupt 0       //外部中断1的中断服务函数
+  65          {
+  66   1          //add your code
+  67   1      
+  68   1      //       LED1 = ~LED1;
+  69   1      //     LED2 = ~LED2;
+  70   1      
+  71   1      
+  72   1      }
+  73          void INT1_Isr() interrupt 2
+  74          {
+  75   1         //add your code
+  76   1         
+  77   1          
+  78   1      }
+  79          void INT2_Isr() interrupt 10
+  80          {
+  81   1          //add your code
+  82   1      
+  83   1      
+  84   1      }
+  85          
+  86          void INT3_Isr() interrupt 11
+  87          {
+  88   1          //add your code
+  89   1      
+  90   1      
+  91   1      }
+  92          
+  93          void INT4_Isr() interrupt 16
+  94          {
+  95   1           //add your code
+  96   1      
+  97   1      
+  98   1      
+  99   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     47    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

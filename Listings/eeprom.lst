@@ -1,0 +1,194 @@
+C51 COMPILER V9.60.0.0   EEPROM                                                            09/22/2021 09:56:55 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE EEPROM
+OBJECT MODULE PLACED IN .\Objects\eeprom.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE Source\eeprom.c LARGE OPTIMIZE(8,SPEED) BROWSE INCDIR(.\Include;.\FreeMo
+                    -dBus\Inc) DEBUG OBJECTEXTEND PRINT(.\Listings\eeprom.lst) OBJECT(.\Objects\eeprom.obj)
+
+line level    source
+
+   1          #include"config.h"
+   2          #include"eeprom.h"
+   3          #include"systemtimer.h"
+   4          
+   5          
+   6           /*********************************************************
+   7          * 函数名：IapConfigWaitTime()
+   8          * 功能：  配置STC8单片机EEPROM的等待时间
+   9          * 参数：
+  10          * 作者:
+  11          * note：
+  12          *
+  13          **********************************************************/
+  14          static void IapConfigWaitTime()
+  15          {
+  16   1              uint32_t XTAL = FOSC/1000000;
+  17   1              
+  18   1              if(XTAL>= 30) //>=30M
+  19   1                      IAP_CONTR = 0x80;
+  20   1              else if(XTAL >= 24)
+  21   1                      IAP_CONTR = 0x81;
+  22   1              else if(XTAL >= 20)
+  23   1                      IAP_CONTR = 0x82;
+  24   1              else if(XTAL >= 12)
+  25   1                      IAP_CONTR = 0x83;
+  26   1              else if(XTAL >= 6)
+  27   1                      IAP_CONTR = 0x84;
+  28   1              else if(XTAL >= 3)
+  29   1                      IAP_CONTR = 0x85;
+  30   1              else if(XTAL >= 2)
+  31   1                      IAP_CONTR = 0x86;
+  32   1              else
+  33   1                      IAP_CONTR = 0x87;
+  34   1      }
+  35          
+  36          
+  37           /*********************************************************
+  38          * 函数名：void IapIdle()
+  39          * 功能：
+  40          * 参数：
+  41          * 作者:
+  42          * note：
+  43          *
+  44          **********************************************************/
+  45          void IapIdle()
+  46          {
+  47   1          IAP_CONTR = 0x00;                              //关闭IAP功能
+  48   1          IAP_CMD = 0x00;                                //清除命令寄存器
+  49   1          IAP_TRIG = 0x00;                               //清除触发寄存器
+  50   1          IAP_ADDRH = 0x80;                           //将地址设置到非IAP区域
+  51   1          IAP_ADDRL = 0x00;
+  52   1      }
+  53          
+  54          
+C51 COMPILER V9.60.0.0   EEPROM                                                            09/22/2021 09:56:55 PAGE 2   
+
+  55           /*********************************************************
+  56          * 函数名：char IapRead(unsigned short addr)
+  57          * 功能：  读函数  读出一个字节
+  58          * 参数：
+  59          * 作者：
+  60          * note：
+  61          *
+  62          **********************************************************/
+  63          char IapRead(char addr)
+  64          {
+  65   1          char dat = 0x00;
+  66   1      
+  67   1              IapConfigWaitTime();
+  68   1              IAP_CMD = 0x01;                         //EEPROM读命令
+  69   1              IAP_ADDRL = addr & 0xFF;
+  70   1              IAP_ADDRH = addr >> 8;
+  71   1              IAP_TRIG = 0x5A;                        //触发指令
+  72   1              IAP_TRIG = 0xA5;
+  73   1              dat = IAP_DATA;
+  74   1      
+  75   1              if(IAP_CONTR & 0x10)
+  76   1              {
+  77   2                      IAP_CONTR &= 0xEF;
+  78   2                      return 0x2333;
+  79   2              }
+  80   1              else return dat;
+  81   1      }
+  82          
+  83          /*********************************************************
+  84          * 函数名：void IapProgram(unsigned short addr, char dat)
+  85          * 功能：  指定地址写数据
+  86          * 参数：
+  87          * 作者：
+  88          * note：
+  89          *
+  90          **********************************************************/
+  91          
+  92          void IapProgram(unsigned short addr, unsigned char dat)
+  93          {
+  94   1      //    IAP_CONTR = WT_12M;//WT_24M;                //使能IAP
+  95   1              IapConfigWaitTime();
+  96   1          IAP_CMD = 0x02;                                //设置IAP写命令
+  97   1          IAP_ADDRL = (unsigned char)addr;                           //设置IAP低地址
+  98   1          IAP_ADDRH = (unsigned char)addr >> 8;                      //设置IAP高地址
+  99   1          IAP_DATA = dat;                             //写IAP数据
+ 100   1          IAP_TRIG = 0x5a;                            //写触发命令(0x5a)
+ 101   1          IAP_TRIG = 0xa5;                            //写触发命令(0xa5)
+ 102   1          //_nop_();
+ 103   1      //      Delay_ms(5);//延时5毫秒
+ 104   1          IapIdle();                                  //关闭IAP功能
+ 105   1                      
+ 106   1      }
+ 107          
+ 108          /*********************************************************
+ 109          * 函数名：void IapErase(int addr)
+ 110          * 功能：  擦除指定地址的内容
+ 111          * 参数：
+ 112          * 作者：
+ 113          * note：擦除每次按照512B进行，仅提供首地址即可
+ 114          *
+ 115          **********************************************************/
+ 116          void IapErase(unsigned short addr)
+C51 COMPILER V9.60.0.0   EEPROM                                                            09/22/2021 09:56:55 PAGE 3   
+
+ 117          {
+ 118   1      //    IAP_CONTR = WT_12M;//WT_24M;                         //使能IAP
+ 119   1              IapConfigWaitTime();
+ 120   1          IAP_CMD = 0x03;                                //设置IAP擦除命令
+ 121   1          IAP_ADDRL = (unsigned char)addr;                           //设置IAP低地址
+ 122   1          IAP_ADDRH = (unsigned char)addr >> 8;                      //设置IAP高地址
+ 123   1          IAP_TRIG = 0x5a;                            //写触发命令(0x5a)
+ 124   1          IAP_TRIG = 0xa5;                            //写触发命令(0xa5)
+ 125   1          //_nop_();                                    //
+ 126   1          IapIdle();                                  //关闭IAP功能
+ 127   1                      Delay_ms(4);//延时5毫秒
+ 128   1      }
+ 129          
+ 130          /*********************************************************
+ 131          * 函数名：void EEPROM_writeString(unsigned short Address,unsigned char *Pdata,unsigned short length);
+ 132          * 功能：  指定地址 写入数据
+ 133          * 参数：
+ 134          * 作者：
+ 135          * note：写数据一般请按照一个扇区一个扇区的来写，不然在擦除数据的时候会造�
+             -��数据丢失
+ 136          * 一个扇区的大小是 512字节
+ 137          *
+ 138          *
+ 139          *               
+ 140          ***********************************************************************************/
+ 141          bit IapWrite_Buff(uint16_t Addr,const uint8_t *Str,uint8_t Len)
+ 142          {
+ 143   1              while(Len--)
+ 144   1              {
+ 145   2                      IapProgram(Addr++,*Str++);
+ 146   2              }
+ 147   1              return 1;
+ 148   1      }
+ 149          
+ 150          
+ 151          bit IapRead_Buff(uint16_t Addr,uint8_t *Str,uint8_t Len)
+ 152          {
+ 153   1              while(Len--)
+ 154   1              {
+ 155   2                      *Str++ = IapRead(Addr++);
+ 156   2              }
+ 157   1              return 1;
+ 158   1      }
+ 159          
+ 160          
+ 161          
+ 162          
+ 163          
+ 164          
+ 165          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    502    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----      22
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

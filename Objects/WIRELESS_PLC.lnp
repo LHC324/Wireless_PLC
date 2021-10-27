@@ -1,0 +1,17 @@
+".\Objects\main.obj",
+".\Objects\Control.obj",
+".\Objects\report.obj",
+".\Objects\Menu.obj",
+".\Objects\pFunc.obj",
+".\Objects\systemTimer.obj",
+".\Objects\usart.obj",
+".\Objects\timer.obj",
+".\Objects\wifi.obj",
+".\STCLIB\Front.LIB",
+".\STCLIB\Gpio.LIB",
+".\STCLIB\Iape2prom.LIB",
+".\STCLIB\Key.LIB",
+".\STCLIB\Lcd19264.LIB",
+".\Objects\STARTUP.obj" 
+TO ".\Objects\WIRELESS_PLC" 
+PRINT(".\Listings\WIRELESS_PLC.m51") RAMSIZE(256) 
