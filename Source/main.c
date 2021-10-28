@@ -14,7 +14,7 @@
 #include "wifi.h"
 
 /*系统参数*/
-SYSTEM_PARAMETER System_Parameter = {0, "\xFF\xFF\xFF\xFF", "\x08\x08\x02\x08", 0x01, 0x01, 0x00, 0xa988};
+SYSTEM_PARAMETER System_Parameter = {0, false, false, "\xFF\xFF\xFF\xFF", "\x08\x08\x02\x08", 0x01, 0x01, 0x00, 0xa988};
 
 static void systemInit(void);
 static void UsartHandle(void);
@@ -159,9 +159,9 @@ bit CheckIap_Flash(void)
     uint16_t CRC = 0;
 
 	/*读取存储区数据*/
-	IapRead_Buff(START_SAVEADDRESS, &System_Parameter.PSWNext.PassWordbuff[0], (sizeof(System_Parameter) - 1U)); 
+	IapRead_Buff(START_SAVEADDRESS, &System_Parameter.PSWNext.PassWordbuff[0], (sizeof(System_Parameter) - (sizeof(PASSWORDSTRUCT) - 4U))); 
 	/*计算CRC校验码*/
-	CRC = getCrc16(&System_Parameter.PSWNext.PassWordbuff[0], (sizeof(System_Parameter) - 3U), 0xffff);   
+	CRC = getCrc16(&System_Parameter.PSWNext.PassWordbuff[0], (sizeof(System_Parameter) - (sizeof(PASSWORDSTRUCT) - 4U) - 2U), 0xffff);   
 	/*比较当前校验码和存储区校验码是否匹配*/
 	if(CRC == System_Parameter.CRC16)
 	{
@@ -187,9 +187,9 @@ void Iap_Flash_Iinit(void)
 		/*每次写之前必须进行擦除操作：擦除每次按照512B进行(0x00-0x0200)*/
         IapErase(START_SAVEADDRESS); 
 		/*把默认参数拷贝到当前数据结构*/
-		memcpy(&System_Parameter.PSWNext.PassWordbuff[0], DEFAULT_SYSTEM_PARAMETER, (sizeof(System_Parameter) - 1U)); 
+		memcpy(&System_Parameter.PSWNext.PassWordbuff[0], DEFAULT_SYSTEM_PARAMETER, (sizeof(System_Parameter) - (sizeof(PASSWORDSTRUCT) - 4U))); 
 		/*把数据进行存储*/
-        IapWrite_Buff(START_SAVEADDRESS, &System_Parameter.PSWNext.PassWordbuff[0], (sizeof(System_Parameter) - 1U)); //去掉一个字节的index
+        IapWrite_Buff(START_SAVEADDRESS, &System_Parameter.PSWNext.PassWordbuff[0], (sizeof(System_Parameter) - (sizeof(PASSWORDSTRUCT) - 4U))); //去掉一个字节的index
 
         Delay_ms(1000);
         clear_screen();

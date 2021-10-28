@@ -2,8 +2,6 @@
 
 extern uint16_t getCrc16(const uint8_t *ptr, uint8_t length, uint16_t IniDat);
 extern void Uart1SendStr(unsigned char *p, unsigned char length);
-CONTROL_TYPE ControlType; //控件类型
-
 //*************************密码变量****************************
 
 SYSTEM_PARAMETER PassWordI; //输入密码
@@ -12,7 +10,8 @@ SYSTEM_PARAMETER PassWordI; //输入密码
 SYSTEM_PARAMETER PassWordChange1; //修改密码1
 SYSTEM_PARAMETER PassWordChange2; //修改密码2
 
-uint8_t PassWordFirstChangeFlag = false; //输入新密码完成第一次
+// PASSWORDSTRUCT PassWordChange1 = {0, false, false, {0}}; //修改密码1
+// PASSWORDSTRUCT PassWordChange2 = {0, false, false, {0}}; //修改密码2
 //*************************************************************
 
 /*****************波特率变量*********************************/
@@ -36,8 +35,7 @@ uint8_t G_BaudList_Size = (sizeof(Baudlist) / sizeof(BAUDSTRUCT));
 void ControlInit(void)
 {
 	/*缺省控件类型*/
-	ControlType = CONTROL_SCREENSAVE;
-	PassWordFirstChangeFlag = false;
+	System_Parameter.PSWNext.First_Input_Flag = false;
 	BaudInit();		 //串口3波特率初始化
 	PowerInit();	 //开关初始化
 	CommunicaInit(); //通信初始化
@@ -73,6 +71,11 @@ void BaudInit(void)
  */
 uint8_t PassWordInput(uint8_t operation, SYSTEM_PARAMETER *Password) //密码输入
 {
+	/*解决初始时密码错乱*/
+	if (Password->PSWNext.PassWordbuff[Password->PSWNext.Index] == 0xFF)
+	{
+		Password->PSWNext.PassWordbuff[Password->PSWNext.Index] = 0;
+	}
 	if (operation == ADD)
 	{
 		Password->PSWNext.PassWordbuff[Password->PSWNext.Index]++;
@@ -109,13 +112,18 @@ uint8_t PassWordjudge(SYSTEM_PARAMETER PasswordA, SYSTEM_PARAMETER PasswordB) //
 
 void PassWordDelete(SYSTEM_PARAMETER *Password)
 {
-	memset(Password->PSWNext.PassWordbuff, 0, sizeof(Password->PSWNext.PassWordbuff));
+	memset(Password->PSWNext.PassWordbuff, 0xFF, sizeof(Password->PSWNext.PassWordbuff));
 	Password->PSWNext.Index = 0;
 }
 
 void InputOffect(SYSTEM_PARAMETER *Password)
 {
 	Password->PSWNext.Index++;
+	if(Password->PSWNext.Index == PASSWORDBITS)
+	{	/*密码输入为有效位数*/
+		System_Parameter.PSWNext.Bit_Efficient_Flag = true;
+	}
+	
 	Password->PSWNext.Index %= PASSWORDBITS;
 }
 
@@ -141,10 +149,23 @@ void PassWordInputUIShow(void) //输入密码界面进入显示
 
 void PassWordChangeUIShow(void) //修改密码界面进入显示
 {
-	PassWordDelete(&PassWordChange1); //清0数据
-	PassWordDelete(&PassWordChange2);
+	// PassWordDelete(&PassWordChange1); //清0数据
+	// PassWordDelete(&PassWordChange2);
+	uint8_t i;
+    uint8_t temp[2];
 
 	clear_screen();
+	/*如果是输入第二次密码*/
+	if (System_Parameter.PSWNext.First_Input_Flag)
+	{
+		/*保留原来的密码*/
+		for (i = 0; i < PASSWORDBITS; i++) //显示4位密码
+        {
+            GUI_String(i * 20 + 100, 18, myitoa(PassWordChange1.PSWNext.PassWordbuff[i], temp, 10), EN_5_8);
+        }
+    	GUI_Lattice(175, 16, 16, 12, dot);
+	}
+
 	GUI_String(15, 15, "请输入新密码", CH_12_12);
 	GUI_String(15, 35, "请确认新密码", CH_12_12);
 }
@@ -171,8 +192,8 @@ void CommunicaUIshow(void)
 	clear_screen();
 	GUI_Lattice(10, System_Parameter.CommunicationType * 30 + 11, 16, 12, finger);
 
-	GUI_String(30, 10, "本地连接", CH_12_12);
-	GUI_String(30, 40, "远程连接", CH_12_12);
+	GUI_String(30, 10, "关闭无线模块", CH_12_12);
+	GUI_String(30, 40, "打开无线模块", CH_12_12);
 }
 
 // void BaudSettingUIshow(void)
@@ -240,11 +261,11 @@ void ReloadSettingUIshow(void)
 void ControlSave(void)
 {
 	/*计算出当前有效数据的校验码并存储*/
-	System_Parameter.CRC16 = getCrc16(&System_Parameter.PSWNext.PassWordbuff[0], (sizeof(System_Parameter) - 3U), 0xffff);
+	System_Parameter.CRC16 = getCrc16(&System_Parameter.PSWNext.PassWordbuff[0], (sizeof(System_Parameter) - (sizeof(PASSWORDSTRUCT) - 4U) - 2U), 0xffff);
 	
 	CLOSE_GLOBAL_OUTAGE();
 	/*每次写之前必须进行擦除操作：擦除每次按照512B进行(0x00-0x0200)*/
 	IapErase(START_SAVEADDRESS); 
-	IapWrite_Buff(START_SAVEADDRESS, &System_Parameter.PSWNext.PassWordbuff[0], (sizeof(System_Parameter) - 1U));
+	IapWrite_Buff(START_SAVEADDRESS, &System_Parameter.PSWNext.PassWordbuff[0], (sizeof(System_Parameter) - (sizeof(PASSWORDSTRUCT) - 4U)));
 	OPEN_GLOBAL_OUTAGE();
 }

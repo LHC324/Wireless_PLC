@@ -15,9 +15,9 @@
 #include "usart.h"
 
 /*当前设备热点名称*/
-#define AP_NAME	 "AT+WAP=PLC0_AP,NONE\r\n"
+#define AP_NAME	 "AT+WAP=PLC1_AP,NONE\r\n"
 // /*当前设备云平台设备号*/
-#define CLOUD_ID "AT+REGCLOUD=00019639000000000040,SkdGAzyl\r\n"
+#define CLOUD_ID "AT+REGCLOUD=00019639000000000041,SkdGAzyl\r\n"
 
 /*USR-C210模块AT指令列表*/
 const AT_Command code Wifi_Cmd[] =

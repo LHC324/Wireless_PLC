@@ -25,6 +25,12 @@ typedef enum
 	BAUD_STATE	   //波特率控件
 } SHOW_STATE;
 
+typedef struct 
+{	/*当前UI界面*/
+	SHOW_STATE Ui;
+	/*当前显示控件*/
+	CONTROL_TYPE Widget;
+}Current_UI;
 typedef struct
 {
 	KEY_e Keycodel;	   //按键码
