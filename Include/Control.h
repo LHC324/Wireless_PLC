@@ -36,6 +36,7 @@ typedef enum //控件
 	CONTROL_BAUD2,			//波特率2控件
 	CONTROL_BAUD3,			//波特率3控件
 	CONTROL_BAUD4,			//波特率4控件
+	CONTROL_HOTSPOT,		//热点控件
 	CONTROL_NO,
 } CONTROL_TYPE;
 
@@ -99,12 +100,23 @@ typedef struct
 extern BAUDSTRUCT Baudlist[];	//波特率列表
 extern uint8_t G_BaudList_Size;
 
+/*热点状态切换*/
+typedef struct Control
+{
+	unsigned char *pstring;
+	void (*fun)(void);
+}APSTRUCT;
+extern APSTRUCT Aplist[];
+extern uint8_t G_Aplist_Size;
+
+
 // void BaudSettingUIshow(void); //波特率设置界面显示
 void BaudSettingUI1show(void);
 void BaudSettingUI2show(void);
 void BaudSettingUI3show(void);
 void BaudSettingUI4show(void);
 void BaudInit(void);
+void HotspotSettingUIshow(void);
 //*********************************************************************//
 
 //****************************恢复出厂设置****************************//

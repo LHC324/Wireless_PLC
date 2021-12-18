@@ -106,5 +106,6 @@ extern Uart_HandleTypeDef Uart1; //串口1句柄
 extern Uart_HandleTypeDef Uart2; //串口2句柄
 extern Uart_HandleTypeDef Uart3; //串口3句柄
 extern Uart_HandleTypeDef Uart4; //串口4句柄
+extern SEL_CHANNEL current_request_channel;
 
 #endif

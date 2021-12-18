@@ -22,6 +22,28 @@ extern "C" {
 #define WIFI_RESET		P14
 #define WIFI_RELOAD		P15
 
+/*定义设备ID*/
+#define DRIVERS_ID "51"
+/*定义热点ID*/
+#define AP_ID "PLC11_AP"
+/*转化为字符串*/
+#define SWITCH_STR(S) #S
+/*拼接一个宏定义和字符串*/
+#define STR_MCRO() ("AT+WAP=" AP_ID ",NONE\r\n")
+/*连接两个字符串S1、S2*/
+#define STR_CONNECT(S1,S2) (S1##""##S2)
+/*当前设备热点名称*/
+#define AP_NAME	 STR_MCRO()//"AT+WAP=PLC7_AP,NONE\r\n"
+/*当前设备云平台设备号*/
+#define CLOUD_ID "AT+REGCLOUD=000196390000000000" DRIVERS_ID ",SkdGAzyl\r\n"
+/*当前WIFI模块工作方式*/
+#define AP_STA_MODE "AT+WMODE=APSTA\r\n"
+#define STA_MODE "AT+WMODE=APSTA\r\n"
+/*进入透传模式命令*/
+#define ENTM_CMD "AT+ENTM\r\n"
+/*模块重启命令*/
+#define RESTART_CMD "AT+Z\r\n"
+
 typedef unsigned char (*event)(void);
 typedef struct
 {
@@ -50,6 +72,30 @@ extern void Wifi_Init(void);
  * @retval	None
  */
 extern void Wifi_Enable(uint8_t status);
+
+/**
+ * @brief	WIFI模块执行指令表中特定指令
+ * @details	
+ * @param	None
+ * @retval	None
+ */
+static void Exe_Appoint_Cmd(uint8_t *str, uint16_t times);
+
+/**
+ * @brief	打开WIFI模块热点
+ * @details	
+ * @param	None
+ * @retval	None
+ */
+extern void Wifi_Open_Ap(void);
+
+/**
+ * @brief	关闭WIFI模块热点
+ * @details	
+ * @param	None
+ * @retval	None
+ */
+extern void Wifi_Close_Ap(void);
 
 #ifdef	__cplusplus
 }

@@ -14,10 +14,6 @@
 #include "systemTimer.h"
 #include "usart.h"
 
-/*当前设备热点名称*/
-#define AP_NAME	 "AT+WAP=PLC1_AP,NONE\r\n"
-// /*当前设备云平台设备号*/
-#define CLOUD_ID "AT+REGCLOUD=00019639000000000041,SkdGAzyl\r\n"
 
 /*USR-C210模块AT指令列表*/
 const AT_Command code Wifi_Cmd[] =
@@ -31,7 +27,7 @@ const AT_Command code Wifi_Cmd[] =
 	/*显示SSID*/ 
 	//{"AT+HSSID = OFF\r\n", "+OK", 500}, 
 	/*WIFI工作模式：AP + STA*/ 
-	{"AT+WMODE=APSTA\r\n", "+OK", 200U, NULL},        
+	{AP_STA_MODE, "+OK", 200U, NULL},        
 	/*设置路由器名称*/ 
 	{AP_NAME, "+OK", 200U, NULL},
 	/*设置心跳数据:www.ynpax.com*/ 
@@ -221,9 +217,84 @@ void Wifi_Init(void)
 
 	for(i = 0; i < WIFI_CMDSIZE; i++)
 	{
-		Uartx_SendStr(&Uart2, (uint8_t *)Wifi_Cmd[i].pSend, strlen(Wifi_Cmd[i].pSend));
-		/*执行对应的等待时间*/
-		Delay_ms(Wifi_Cmd[i].WaitTimes);
+		// Uartx_SendStr(&Uart2, (uint8_t *)Wifi_Cmd[i].pSend, strlen(Wifi_Cmd[i].pSend));
+		// /*执行对应的等待时间*/
+		// Delay_ms(Wifi_Cmd[i].WaitTimes);
+		Exe_Appoint_Cmd((uint8_t *)Wifi_Cmd[i].pSend, Wifi_Cmd[i].WaitTimes);
 	}
 }
 
+/**
+ * @brief	WIFI模块执行指令表中特定指令
+ * @details	
+ * @param	None
+ * @retval	None
+ */
+static void Exe_Appoint_Cmd(uint8_t *str, uint16_t times)
+{
+	if((str != NULL) && (times))
+	{
+		Uartx_SendStr(&Uart2, str, strlen(str));
+		Delay_ms(times);
+	}
+}
+
+
+/**
+ * @brief	WIFI模块退出透传模式
+ * @details	
+ * @param	None
+ * @retval	None
+ */
+static void Wifi_Exit_Trt(void)
+{
+	
+	uint8_t i = 0;
+
+	for(i = 0; i < 2U; i++)
+	{
+		if((Wifi_Cmd[i].pSend != '\0') && (Wifi_Cmd[i].WaitTimes))
+		{
+			// Uartx_SendStr(&Uart2, (uint8_t *)Wifi_Cmd[i].pSend, strlen(Wifi_Cmd[i].pSend));
+			// /*执行对应的等待时间*/
+			// Delay_ms(Wifi_Cmd[i].WaitTimes);
+			Exe_Appoint_Cmd((uint8_t *)Wifi_Cmd[i].pSend, Wifi_Cmd[i].WaitTimes);
+		}
+	}
+}
+
+/**
+ * @brief	打开WIFI模块热点
+ * @details	
+ * @param	None
+ * @retval	None
+ */
+void Wifi_Open_Ap(void)
+{
+	/*退出透传模式*/
+	Wifi_Exit_Trt();
+	/*发送配置指令*/
+	Exe_Appoint_Cmd(AP_STA_MODE, 200);
+	/*进入透传模式*/
+	Exe_Appoint_Cmd(ENTM_CMD, 200);
+	/*重启模块*/
+	Exe_Appoint_Cmd(RESTART_CMD, 200);
+}
+
+/**
+ * @brief	关闭WIFI模块热点
+ * @details	
+ * @param	None
+ * @retval	None
+ */
+void Wifi_Close_Ap(void)
+{	
+	/*退出透传模式*/
+	Wifi_Exit_Trt();
+	/*发送配置指令*/
+	Exe_Appoint_Cmd(STA_MODE, 200);
+	/*进入透传模式*/
+	Exe_Appoint_Cmd(ENTM_CMD, 200);
+	/*重启模块*/
+	Exe_Appoint_Cmd(RESTART_CMD, 200);
+}

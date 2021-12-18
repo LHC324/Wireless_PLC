@@ -9,6 +9,7 @@ OPTION Optionlist[] =
         {"通信方式", CONTROL_COMMUNICA, CommunicaUIshow},
         {"密码修改", CONTROL_PASSWORD_CHANGE, PassWordChangeUIShow},
         {"波特率设置", CONTROL_BAUDSETTING, Baud_Setting},
+        {"本机热点", CONTROL_HOTSPOT, HotspotSettingUIshow},
         {"恢复出厂设置", CONTROL_RELOAD, ReloadSettingUIshow},
 };
 
@@ -466,6 +467,22 @@ void KeyControl_Enter(void) //控件状态--Enter
         // PublicTimer16.MenuDly16.Timer16Count = T_60S;
     }
     break;
+    /*本机热点设置*/
+    case CONTROL_HOTSPOT:
+    {   /*检查函数指针非空*/
+        if(Aplist[System_Parameter.Apstate].fun != NULL)
+        {
+            /*执行对应的功能函数*/
+            Aplist[System_Parameter.Apstate].fun(); 
+        }
+        ControlSave(); //存盘热点设置
+        clear_screen();
+        GUI_String(70, 22, "修改成功", CH_12_12); //显示修改结果
+        Delay_ms(500);
+        /*返回菜单界面*/
+        Ui_Status.Ui = MENU_STATE;
+        LcdShow(RefreshMenuDisp); //刷新显示
+    }break;
     /*恢复出厂设置*/
     case CONTROL_RELOAD:
     {
@@ -480,6 +497,7 @@ void KeyControl_Enter(void) //控件状态--Enter
         BaudInit();
         PowerInit();
         CommunicaInit();
+        Wifi_Init();
 
         clear_screen();
         GUI_String(70, 22, "修改成功", CH_12_12); //显示修改结果
@@ -636,7 +654,12 @@ void KeyControl_Up(void)
         M_Show[SEC0_MENU].OptionNow = &Optionlist1[M_Show[SEC0_MENU].Option_Index]; //赋值当前选项
     }
     break;
-
+    /*本机热点设置*/
+    case CONTROL_HOTSPOT:
+    {
+        System_Parameter.Apstate = LoopIndex(DOWMWORD, System_Parameter.Apstate, G_Aplist_Size);
+        GUI_String(115, 10, Aplist[System_Parameter.Apstate].pstring, CH_12_12);
+    }break;
     default:
         break;
     }
@@ -710,7 +733,12 @@ void KeyControl_Down(void) //控件状态--Down
         M_Show[SEC0_MENU].OptionNow = &Optionlist1[M_Show[SEC0_MENU].Option_Index]; //赋值当前选项
     }
     break;
-
+    /*本机热点设置*/
+    case CONTROL_HOTSPOT:
+    {
+        System_Parameter.Apstate = LoopIndex(UPWORD, System_Parameter.Apstate, G_Aplist_Size);
+        GUI_String(115, 10, Aplist[System_Parameter.Apstate].pstring, CH_12_12);
+    }break;
     default:
         break;
     }

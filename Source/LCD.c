@@ -11,7 +11,7 @@ FRONT_PARM frontCurrent;
 //				           液晶发送指令
 /*******************************************************************/
 
-void transfer_command(int data1)
+void transfer_command(uint8_t data1)
 {
     uint8_t i;
     LCD_CS = 0;

@@ -1,10 +1,10 @@
-C51 COMPILER V9.60.0.0   CONTROL                                                           10/28/2021 15:29:44 PAGE 1   
+C51 COMPILER V9.60.0.0   CONTROL                                                           12/18/2021 09:21:04 PAGE 1   
 
 
 C51 COMPILER V9.60.0.0, COMPILATION OF MODULE CONTROL
 OBJECT MODULE PLACED IN .\Objects\Control.obj
-COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE Source\Control.c LARGE OPTIMIZE(9,SPEED) BROWSE INCDIR(.\Include;.\FreeM
-                    -odBus\Inc) DEBUG OBJECTEXTEND PRINT(.\Listings\Control.lst) OBJECT(.\Objects\Control.obj)
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE Source\Control.c LARGE OPTIMIZE(9,SIZE) BROWSE INCDIR(.\Include;.\FreeMo
+                    -dBus\Inc) DEBUG OBJECTEXTEND PRINT(.\Listings\Control.lst) OBJECT(.\Objects\Control.obj)
 
 line level    source
 
@@ -42,262 +42,284 @@ line level    source
   32          uint8_t G_BaudList_Size = (sizeof(Baudlist) / sizeof(BAUDSTRUCT));
   33          /************************************************************/
   34          
-  35          void ControlInit(void)
-  36          {
-  37   1              /*缺省控件类型*/
-  38   1              System_Parameter.PSWNext.First_Input_Flag = false;
-  39   1              BaudInit();              //串口3波特率初始化
-  40   1              PowerInit();     //开关初始化
-  41   1              CommunicaInit(); //通信初始化
-  42   1      }
-  43          
-  44          void CommunicaInit(void)
-  45          {       /*默认为本地连接方式*/
-  46   1              /*初始连接状态*/
-  47   1      //      LTEenable(CommunciaType);
-  48   1          Wifi_Enable(System_Parameter.CommunicationType);
-  49   1      }
-  50          
-  51          void PowerInit(void)
-  52          {       /*PLC初始运行状态*/
-  53   1              RUNKEY = System_Parameter.PlcState; //默认为STOP
-  54   1      }
-C51 COMPILER V9.60.0.0   CONTROL                                                           10/28/2021 15:29:44 PAGE 2   
+  35          /*热点设置*/
+  36          APSTRUCT Aplist[] =
+  37          {
+  38                  {"打开", Wifi_Open_Ap},
+  39                  {"关闭", Wifi_Close_Ap}
+  40          };
+  41          uint8_t G_Aplist_Size = (sizeof(Aplist) / sizeof(APSTRUCT));
+  42          
+  43          void ControlInit(void)
+  44          {
+  45   1              /*缺省控件类型*/
+  46   1              System_Parameter.PSWNext.First_Input_Flag = false;
+  47   1              BaudInit();              //串口3波特率初始化
+  48   1              PowerInit();     //开关初始化
+  49   1              CommunicaInit(); //通信初始化
+  50   1      }
+  51          
+  52          void CommunicaInit(void)
+  53          {       /*默认为本地连接方式*/
+  54   1              /*初始连接状态*/
+C51 COMPILER V9.60.0.0   CONTROL                                                           12/18/2021 09:21:04 PAGE 2   
 
-  55          
-  56          void BaudInit(void)
-  57          {       /*默认波特率为9600*/
-  58   1              /*波特率预选索引,操作的是波特率选项界面*/
-  59   1              SET_BRT1(1, Baudlist[System_Parameter.BaudIndex[0]].BaudValue);
-  60   1              SET_BRT1(2, Baudlist[System_Parameter.BaudIndex[1]].BaudValue);
-  61   1              SET_BRT1(3, Baudlist[System_Parameter.BaudIndex[2]].BaudValue);
-  62   1              SET_BRT1(4, Baudlist[System_Parameter.BaudIndex[3]].BaudValue);
-  63   1      }
-  64          
-  65          /**
-  66           * @brief       密码输入
-  67           * @details     
-  68           * @param       operation：操作类型
-  69           * @param       Password：密码对象
-  70           * @retval      当前索引下密码值
-  71           */
-  72          uint8_t PassWordInput(uint8_t operation, SYSTEM_PARAMETER *Password) //密码输入
-  73          {
-  74   1              /*解决初始时密码错乱*/
-  75   1              if (Password->PSWNext.PassWordbuff[Password->PSWNext.Index] == 0xFF)
-  76   1              {
-  77   2                      Password->PSWNext.PassWordbuff[Password->PSWNext.Index] = 0;
-  78   2              }
-  79   1              if (operation == ADD)
-  80   1              {
-  81   2                      Password->PSWNext.PassWordbuff[Password->PSWNext.Index]++;
-  82   2                      Password->PSWNext.PassWordbuff[Password->PSWNext.Index] %= 10;
-  83   2              }
-  84   1              else
-  85   1              {
-  86   2                      if (Password->PSWNext.PassWordbuff[Password->PSWNext.Index] == 0)
-  87   2                      {
-  88   3                              Password->PSWNext.PassWordbuff[Password->PSWNext.Index] = 10;
-  89   3                      }
-  90   2                      Password->PSWNext.PassWordbuff[Password->PSWNext.Index]--;
-  91   2                      Password->PSWNext.PassWordbuff[Password->PSWNext.Index] %= 10;
-  92   2              }
-  93   1              return Password->PSWNext.PassWordbuff[Password->PSWNext.Index]; //显示
-  94   1      }
-  95          
-  96          
-  97          /**
-  98           * @brief       输入密码核对
-  99           * @details     
- 100           * @param       PasswordA：密码A
- 101           * @param       PasswordB：密码B
- 102           * @retval      true/false
- 103           */
- 104          uint8_t PassWordjudge(SYSTEM_PARAMETER PasswordA, SYSTEM_PARAMETER PasswordB) //密码判断
- 105          {
- 106   1              /*密码正确*/
- 107   1              if (!strncmp(PasswordA.PSWNext.PassWordbuff, PasswordB.PSWNext.PassWordbuff, PASSWORDBITS))
- 108   1                      return true;
- 109   1              else
- 110   1                      return false;
- 111   1      }
- 112          
- 113          void PassWordDelete(SYSTEM_PARAMETER *Password)
- 114          {
- 115   1              memset(Password->PSWNext.PassWordbuff, 0xFF, sizeof(Password->PSWNext.PassWordbuff));
- 116   1              Password->PSWNext.Index = 0;
-C51 COMPILER V9.60.0.0   CONTROL                                                           10/28/2021 15:29:44 PAGE 3   
+  55   1      //      LTEenable(CommunciaType);
+  56   1          Wifi_Enable(System_Parameter.CommunicationType);
+  57   1      }
+  58          
+  59          void PowerInit(void)
+  60          {       /*PLC初始运行状态*/
+  61   1              RUNKEY = System_Parameter.PlcState; //默认为STOP
+  62   1      }
+  63          
+  64          void BaudInit(void)
+  65          {       /*默认波特率为9600*/
+  66   1              /*波特率预选索引,操作的是波特率选项界面*/
+  67   1              SET_BRT1(1, Baudlist[System_Parameter.BaudIndex[0]].BaudValue);
+  68   1              SET_BRT1(2, Baudlist[System_Parameter.BaudIndex[1]].BaudValue);
+  69   1              SET_BRT1(3, Baudlist[System_Parameter.BaudIndex[2]].BaudValue);
+  70   1              SET_BRT1(4, Baudlist[System_Parameter.BaudIndex[3]].BaudValue);
+  71   1      }
+  72          
+  73          /**
+  74           * @brief       密码输入
+  75           * @details     
+  76           * @param       operation：操作类型
+  77           * @param       Password：密码对象
+  78           * @retval      当前索引下密码值
+  79           */
+  80          uint8_t PassWordInput(uint8_t operation, SYSTEM_PARAMETER *Password) //密码输入
+  81          {
+  82   1              /*解决初始时密码错乱*/
+  83   1              if (Password->PSWNext.PassWordbuff[Password->PSWNext.Index] == 0xFF)
+  84   1              {
+  85   2                      Password->PSWNext.PassWordbuff[Password->PSWNext.Index] = 0;
+  86   2              }
+  87   1              if (operation == ADD)
+  88   1              {
+  89   2                      Password->PSWNext.PassWordbuff[Password->PSWNext.Index]++;
+  90   2                      Password->PSWNext.PassWordbuff[Password->PSWNext.Index] %= 10;
+  91   2              }
+  92   1              else
+  93   1              {
+  94   2                      if (Password->PSWNext.PassWordbuff[Password->PSWNext.Index] == 0)
+  95   2                      {
+  96   3                              Password->PSWNext.PassWordbuff[Password->PSWNext.Index] = 10;
+  97   3                      }
+  98   2                      Password->PSWNext.PassWordbuff[Password->PSWNext.Index]--;
+  99   2                      Password->PSWNext.PassWordbuff[Password->PSWNext.Index] %= 10;
+ 100   2              }
+ 101   1              return Password->PSWNext.PassWordbuff[Password->PSWNext.Index]; //显示
+ 102   1      }
+ 103          
+ 104          
+ 105          /**
+ 106           * @brief       输入密码核对
+ 107           * @details     
+ 108           * @param       PasswordA：密码A
+ 109           * @param       PasswordB：密码B
+ 110           * @retval      true/false
+ 111           */
+ 112          uint8_t PassWordjudge(SYSTEM_PARAMETER PasswordA, SYSTEM_PARAMETER PasswordB) //密码判断
+ 113          {
+ 114   1              /*密码正确*/
+ 115   1              if (!strncmp(PasswordA.PSWNext.PassWordbuff, PasswordB.PSWNext.PassWordbuff, PASSWORDBITS))
+ 116   1                      return true;
+C51 COMPILER V9.60.0.0   CONTROL                                                           12/18/2021 09:21:04 PAGE 3   
 
- 117   1      }
- 118          
- 119          void InputOffect(SYSTEM_PARAMETER *Password)
- 120          {
- 121   1              Password->PSWNext.Index++;
- 122   1              if(Password->PSWNext.Index == PASSWORDBITS)
- 123   1              {       /*密码输入为有效位数*/
- 124   2                      System_Parameter.PSWNext.Bit_Efficient_Flag = true;
- 125   2              }
- 126   1              
- 127   1              Password->PSWNext.Index %= PASSWORDBITS;
- 128   1      }
- 129          
- 130          //void PassWordChange(void)              //密码修改
- 131          //{
- 132          //
- 133          //}
- 134          
- 135          /*屏保显示页面*/
- 136          void ScreensaverUiShow(void)
- 137          {
- 138   1              clear_screen();
- 139   1              /*显示南方电网Logo*/
- 140   1              GUI_Lattice(0, 0, 192, 64, PowerGrid_Image);
- 141   1      }
+ 117   1              else
+ 118   1                      return false;
+ 119   1      }
+ 120          
+ 121          void PassWordDelete(SYSTEM_PARAMETER *Password)
+ 122          {
+ 123   1              memset(Password->PSWNext.PassWordbuff, 0xFF, sizeof(Password->PSWNext.PassWordbuff));
+ 124   1              Password->PSWNext.Index = 0;
+ 125   1      }
+ 126          
+ 127          void InputOffect(SYSTEM_PARAMETER *Password)
+ 128          {
+ 129   1              Password->PSWNext.Index++;
+ 130   1              if(Password->PSWNext.Index == PASSWORDBITS)
+ 131   1              {       /*密码输入为有效位数*/
+ 132   2                      System_Parameter.PSWNext.Bit_Efficient_Flag = true;
+ 133   2              }
+ 134   1              
+ 135   1              Password->PSWNext.Index %= PASSWORDBITS;
+ 136   1      }
+ 137          
+ 138          //void PassWordChange(void)              //密码修改
+ 139          //{
+ 140          //
+ 141          //}
  142          
- 143          void PassWordInputUIShow(void) //输入密码界面进入显示
- 144          {
- 145   1              clear_screen();
- 146   1              GUI_Lattice(0, 8, 81, 50, Logo); //Logo显示
- 147   1              GUI_String(100, 15, "请输入密码", CH_12_12);
- 148   1      }
- 149          
- 150          void PassWordChangeUIShow(void) //修改密码界面进入显示
- 151          {
- 152   1              // PassWordDelete(&PassWordChange1); //清0数据
- 153   1              // PassWordDelete(&PassWordChange2);
- 154   1              uint8_t i;
- 155   1          uint8_t temp[2];
- 156   1      
- 157   1              clear_screen();
- 158   1              /*如果是输入第二次密码*/
- 159   1              if (System_Parameter.PSWNext.First_Input_Flag)
- 160   1              {
- 161   2                      /*保留原来的密码*/
- 162   2                      for (i = 0; i < PASSWORDBITS; i++) //显示4位密码
- 163   2              {
- 164   3                  GUI_String(i * 20 + 100, 18, myitoa(PassWordChange1.PSWNext.PassWordbuff[i], temp, 10), EN_5_8
+ 143          /*屏保显示页面*/
+ 144          void ScreensaverUiShow(void)
+ 145          {
+ 146   1              clear_screen();
+ 147   1              /*显示南方电网Logo*/
+ 148   1              GUI_Lattice(0, 0, 192, 64, START_LOGO);
+ 149   1      }
+ 150          
+ 151          void PassWordInputUIShow(void) //输入密码界面进入显示
+ 152          {
+ 153   1              clear_screen();
+ 154   1              GUI_Lattice(0, 8, 81, 50, Logo); //Logo显示
+ 155   1              GUI_String(100, 15, "请输入密码", CH_12_12);
+ 156   1      }
+ 157          
+ 158          void PassWordChangeUIShow(void) //修改密码界面进入显示
+ 159          {
+ 160   1              // PassWordDelete(&PassWordChange1); //清0数据
+ 161   1              // PassWordDelete(&PassWordChange2);
+ 162   1              uint8_t i;
+ 163   1          uint8_t temp[2];
+ 164   1      
+ 165   1              clear_screen();
+ 166   1              /*如果是输入第二次密码*/
+ 167   1              if (System_Parameter.PSWNext.First_Input_Flag)
+ 168   1              {
+ 169   2                      /*保留原来的密码*/
+ 170   2                      for (i = 0; i < PASSWORDBITS; i++) //显示4位密码
+ 171   2              {
+ 172   3                  GUI_String(i * 20 + 100, 18, myitoa(PassWordChange1.PSWNext.PassWordbuff[i], temp, 10), EN_5_8
              -);
- 165   3              }
- 166   2              GUI_Lattice(175, 16, 16, 12, dot);
- 167   2              }
- 168   1      
- 169   1              GUI_String(15, 15, "请输入新密码", CH_12_12);
- 170   1              GUI_String(15, 35, "请确认新密码", CH_12_12);
- 171   1      }
- 172          
- 173          void PlcPowerUIshow(void)
- 174          {
- 175   1              clear_screen();
+ 173   3              }
+ 174   2              GUI_Lattice(175, 16, 16, 12, dot);
+ 175   2              }
  176   1      
- 177   1              GUI_String(15, 24, "STOP", EN_5_8);
-C51 COMPILER V9.60.0.0   CONTROL                                                           10/28/2021 15:29:44 PAGE 4   
+ 177   1              GUI_String(15, 15, "请输入新密码", CH_12_12);
+C51 COMPILER V9.60.0.0   CONTROL                                                           12/18/2021 09:21:04 PAGE 4   
 
- 178   1              GUI_String(150, 24, "RUN", EN_5_8);
- 179   1      
- 180   1              if (System_Parameter.PlcState == RUN)
- 181   1              {
- 182   2                      GUI_Lattice(45, 0, 100, 56, PlcRun);
- 183   2              }
- 184   1              else
- 185   1              {
- 186   2                      GUI_Lattice(45, 0, 100, 56, PlcStop);
- 187   2              }
- 188   1      }
- 189          
- 190          void CommunicaUIshow(void)
- 191          {
- 192   1              clear_screen();
- 193   1              GUI_Lattice(10, System_Parameter.CommunicationType * 30 + 11, 16, 12, finger);
- 194   1      
- 195   1              GUI_String(30, 10, "关闭无线模块", CH_12_12);
- 196   1              GUI_String(30, 40, "打开无线模块", CH_12_12);
- 197   1      }
- 198          
- 199          // void BaudSettingUIshow(void)
- 200          // {
- 201          //      // clear_screen();
- 202          //      // GUI_String(10, 10, "本地串口", CH_12_12);
- 203          //      // GUI_String(105, 13, Baudlist[System_Parameter.BaudIndex].pstring, EN_5_8);
- 204          //      // GUI_Lattice(149, 13, 5, 8, IconRight);
- 205          //      // GUI_Lattice(97, 13, 5, 8, Iconleft);
+ 178   1              GUI_String(15, 35, "请确认新密码", CH_12_12);
+ 179   1      }
+ 180          
+ 181          void PlcPowerUIshow(void)
+ 182          {
+ 183   1              clear_screen();
+ 184   1      
+ 185   1              GUI_String(15, 24, "STOP", EN_5_8);
+ 186   1              GUI_String(150, 24, "RUN", EN_5_8);
+ 187   1      
+ 188   1              if (System_Parameter.PlcState == RUN)
+ 189   1              {
+ 190   2                      GUI_Lattice(45, 0, 100, 56, PlcRun);
+ 191   2              }
+ 192   1              else
+ 193   1              {
+ 194   2                      GUI_Lattice(45, 0, 100, 56, PlcStop);
+ 195   2              }
+ 196   1      }
+ 197          
+ 198          void CommunicaUIshow(void)
+ 199          {
+ 200   1              clear_screen();
+ 201   1              GUI_Lattice(10, System_Parameter.CommunicationType * 30 + 11, 16, 12, finger);
+ 202   1      
+ 203   1              GUI_String(30, 10, "关闭无线模块", CH_12_12);
+ 204   1              GUI_String(30, 40, "打开无线模块", CH_12_12);
+ 205   1      }
  206          
- 207          //      // GUI_String(10, 40, "远程串口", CH_12_12);
- 208          //      // GUI_String(80, 43, "115200(readonly)", EN_5_8);
- 209          // }
- 210          
- 211          void BaudSettingUI1show(void)
- 212          {
- 213   1              clear_screen();
- 214   1              GUI_String(10, 29, "以太网", CH_12_12);
- 215   1              GUI_String(105, 31, Baudlist[System_Parameter.BaudIndex[0]].pstring, EN_5_8);
- 216   1              GUI_Lattice(149, 31, 5, 8, IconRight);
- 217   1              GUI_Lattice(97, 31, 5, 8, Iconleft);
- 218   1      }
- 219          
- 220          void BaudSettingUI2show(void)
- 221          {
- 222   1              clear_screen();
- 223   1              GUI_String(10, 29, "无线网", CH_12_12);
- 224   1              GUI_String(105, 31, Baudlist[System_Parameter.BaudIndex[1]].pstring, EN_5_8);
- 225   1              GUI_Lattice(149, 31, 5, 8, IconRight);
- 226   1              GUI_Lattice(97, 31, 5, 8, Iconleft);
- 227   1      }
- 228          
- 229          void BaudSettingUI3show(void)
- 230          {
- 231   1              clear_screen();
- 232   1              GUI_String(10, 29, "扩展网", CH_12_12);
- 233   1              GUI_String(105, 31, Baudlist[System_Parameter.BaudIndex[2]].pstring, EN_5_8);
- 234   1              GUI_Lattice(149, 31, 5, 8, IconRight);
- 235   1              GUI_Lattice(97, 31, 5, 8, Iconleft);
- 236   1      }
- 237          
- 238          void BaudSettingUI4show(void)
- 239          {
-C51 COMPILER V9.60.0.0   CONTROL                                                           10/28/2021 15:29:44 PAGE 5   
+ 207          // void BaudSettingUIshow(void)
+ 208          // {
+ 209          //      // clear_screen();
+ 210          //      // GUI_String(10, 10, "本地串口", CH_12_12);
+ 211          //      // GUI_String(105, 13, Baudlist[System_Parameter.BaudIndex].pstring, EN_5_8);
+ 212          //      // GUI_Lattice(149, 13, 5, 8, IconRight);
+ 213          //      // GUI_Lattice(97, 13, 5, 8, Iconleft);
+ 214          
+ 215          //      // GUI_String(10, 40, "远程串口", CH_12_12);
+ 216          //      // GUI_String(80, 43, "115200(readonly)", EN_5_8);
+ 217          // }
+ 218          
+ 219          void BaudSettingUI1show(void)
+ 220          {
+ 221   1              clear_screen();
+ 222   1              GUI_String(10, 29, "以太网", CH_12_12);
+ 223   1              GUI_String(105, 31, Baudlist[System_Parameter.BaudIndex[0]].pstring, EN_5_8);
+ 224   1              GUI_Lattice(149, 31, 5, 8, IconRight);
+ 225   1              GUI_Lattice(97, 31, 5, 8, Iconleft);
+ 226   1      }
+ 227          
+ 228          void BaudSettingUI2show(void)
+ 229          {
+ 230   1              clear_screen();
+ 231   1              GUI_String(10, 29, "无线网", CH_12_12);
+ 232   1              GUI_String(105, 31, Baudlist[System_Parameter.BaudIndex[1]].pstring, EN_5_8);
+ 233   1              GUI_Lattice(149, 31, 5, 8, IconRight);
+ 234   1              GUI_Lattice(97, 31, 5, 8, Iconleft);
+ 235   1      }
+ 236          
+ 237          void BaudSettingUI3show(void)
+ 238          {
+ 239   1              clear_screen();
+C51 COMPILER V9.60.0.0   CONTROL                                                           12/18/2021 09:21:04 PAGE 5   
 
- 240   1              clear_screen();
- 241   1              GUI_String(10, 29, "内部网", CH_12_12);
- 242   1              GUI_String(105, 31, Baudlist[System_Parameter.BaudIndex[3]].pstring, EN_5_8);
- 243   1              GUI_Lattice(149, 31, 5, 8, IconRight);
- 244   1              GUI_Lattice(97, 31, 5, 8, Iconleft);
- 245   1      }
- 246          
- 247          void ReloadSettingUIshow(void)
- 248          {
- 249   1              clear_screen();
- 250   1              GUI_String(48, 20, "是否恢复出厂设置", CH_12_12);
- 251   1              GUI_String(10, 48, "是", CH_12_12);
- 252   1              GUI_String(172, 48, "否", CH_12_12);
+ 240   1              GUI_String(10, 29, "扩展网", CH_12_12);
+ 241   1              GUI_String(105, 31, Baudlist[System_Parameter.BaudIndex[2]].pstring, EN_5_8);
+ 242   1              GUI_Lattice(149, 31, 5, 8, IconRight);
+ 243   1              GUI_Lattice(97, 31, 5, 8, Iconleft);
+ 244   1      }
+ 245          
+ 246          void BaudSettingUI4show(void)
+ 247          {
+ 248   1              clear_screen();
+ 249   1              GUI_String(10, 29, "内部网", CH_12_12);
+ 250   1              GUI_String(105, 31, Baudlist[System_Parameter.BaudIndex[3]].pstring, EN_5_8);
+ 251   1              GUI_Lattice(149, 31, 5, 8, IconRight);
+ 252   1              GUI_Lattice(97, 31, 5, 8, Iconleft);
  253   1      }
  254          
- 255          /**
- 256           * @brief       系统数据存储到EEPROM
- 257           * @details     存储数据前为了防止中断打断数据的存储，因该关闭全局中断
- 258           * @param       None
- 259           * @retval      None
- 260           */
- 261          void ControlSave(void)
- 262          {
- 263   1              /*计算出当前有效数据的校验码并存储*/
- 264   1              System_Parameter.CRC16 = getCrc16(&System_Parameter.PSWNext.PassWordbuff[0], (sizeof(System_Parameter) - 
+ 255          void ReloadSettingUIshow(void)
+ 256          {
+ 257   1              clear_screen();
+ 258   1              GUI_String(48, 20, "是否恢复出厂设置", CH_12_12);
+ 259   1              GUI_String(10, 48, "是", CH_12_12);
+ 260   1              GUI_String(172, 48, "否", CH_12_12);
+ 261   1      }
+ 262          
+ 263          void HotspotSettingUIshow(void)
+ 264          {
+ 265   1                  clear_screen();
+ 266   1                      GUI_String(10,10,"热点", CH_12_12);
+ 267   1                      GUI_String(115,10,Aplist[System_Parameter.Apstate].pstring,CH_12_12);
+ 268   1                      GUI_Lattice(149,13,5,8,IconRight);
+ 269   1                      GUI_Lattice(97,13,5,8,Iconleft);
+ 270   1                              
+ 271   1                      GUI_String(10,43,"AP ID",EN_5_8);
+ 272   1                      GUI_String(97,43,AP_ID,EN_5_8); 
+ 273   1      }
+ 274          
+ 275          /**
+ 276           * @brief       系统数据存储到EEPROM
+ 277           * @details     存储数据前为了防止中断打断数据的存储，因该关闭全局中断
+ 278           * @param       None
+ 279           * @retval      None
+ 280           */
+ 281          void ControlSave(void)
+ 282          {
+ 283   1              /*计算出当前有效数据的校验码并存储*/
+ 284   1              System_Parameter.CRC16 = getCrc16(&System_Parameter.PSWNext.PassWordbuff[0], (sizeof(System_Parameter) - 
              -(sizeof(PASSWORDSTRUCT) - 4U) - 2U), 0xffff);
- 265   1              
- 266   1              CLOSE_GLOBAL_OUTAGE();
- 267   1              /*每次写之前必须进行擦除操作：擦除每次按照512B进行(0x00-0x0200)*/
- 268   1              IapErase(START_SAVEADDRESS); 
- 269   1              IapWrite_Buff(START_SAVEADDRESS, &System_Parameter.PSWNext.PassWordbuff[0], (sizeof(System_Parameter) - (
+ 285   1              
+ 286   1              CLOSE_GLOBAL_OUTAGE();
+ 287   1              /*每次写之前必须进行擦除操作：擦除每次按照512B进行(0x00-0x0200)*/
+ 288   1              IapErase(START_SAVEADDRESS); 
+ 289   1              IapWrite_Buff(START_SAVEADDRESS, &System_Parameter.PSWNext.PassWordbuff[0], (sizeof(System_Parameter) - (
              -sizeof(PASSWORDSTRUCT) - 4U)));
- 270   1              OPEN_GLOBAL_OUTAGE();
- 271   1      }
+ 290   1              OPEN_GLOBAL_OUTAGE();
+ 291   1      }
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =   1088    ----
-   CONSTANT SIZE    =    193    ----
-   XDATA SIZE       =    109      41
+   CODE SIZE        =   1201    ----
+   CONSTANT SIZE    =    223    ----
+   XDATA SIZE       =    125      43
    PDATA SIZE       =   ----    ----
    DATA SIZE        =   ----    ----
+C51 COMPILER V9.60.0.0   CONTROL                                                           12/18/2021 09:21:04 PAGE 6   
+
    IDATA SIZE       =   ----    ----
    BIT SIZE         =   ----    ----
 END OF MODULE INFORMATION.

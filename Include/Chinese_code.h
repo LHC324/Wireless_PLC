@@ -19,4 +19,5 @@ extern unsigned char code Iconleft[];
 extern unsigned char code IconRight[];
 //extern unsigned char  bmp2[];
 extern const unsigned char code PowerGrid_Image[];
+extern const unsigned char code Kmust_Image[];
 #endif

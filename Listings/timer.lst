@@ -1,10 +1,10 @@
-C51 COMPILER V9.60.0.0   TIMER                                                             10/28/2021 15:29:44 PAGE 1   
+C51 COMPILER V9.60.0.0   TIMER                                                             12/18/2021 09:21:04 PAGE 1   
 
 
 C51 COMPILER V9.60.0.0, COMPILATION OF MODULE TIMER
 OBJECT MODULE PLACED IN .\Objects\timer.obj
-COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE Source\timer.c LARGE OPTIMIZE(9,SPEED) BROWSE INCDIR(.\Include;.\FreeMod
-                    -Bus\Inc) DEBUG OBJECTEXTEND PRINT(.\Listings\timer.lst) OBJECT(.\Objects\timer.obj)
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE Source\timer.c LARGE OPTIMIZE(9,SIZE) BROWSE INCDIR(.\Include;.\FreeModB
+                    -us\Inc) DEBUG OBJECTEXTEND PRINT(.\Listings\timer.lst) OBJECT(.\Objects\timer.obj)
 
 line level    source
 
@@ -62,7 +62,7 @@ line level    source
   52   1              { //首次初始化，把TMOD和AUXR全部置零
   53   2                      AUXR = tim_baseHandle->Register_AUXR;
   54   2                      TMOD = tim_baseHandle->Timer_Mode;                        //模式0
-C51 COMPILER V9.60.0.0   TIMER                                                             10/28/2021 15:29:44 PAGE 2   
+C51 COMPILER V9.60.0.0   TIMER                                                             12/18/2021 09:21:04 PAGE 2   
 
   55   2                      TL0 = (uint8_t)(tim_baseHandle->Timer_Count); //65536-11.0592M/12/1000
   56   2                      TH0 = (uint8_t)((tim_baseHandle->Timer_Count) >> 8);
@@ -102,7 +102,7 @@ line level    source
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =    558    ----
+   CODE SIZE        =    468    ----
    CONSTANT SIZE    =   ----    ----
    XDATA SIZE       =      8    ----
    PDATA SIZE       =   ----    ----

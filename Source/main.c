@@ -14,7 +14,7 @@
 #include "wifi.h"
 
 /*系统参数*/
-SYSTEM_PARAMETER System_Parameter = {0, false, false, "\xFF\xFF\xFF\xFF", "\x08\x08\x02\x08", 0x01, 0x01, 0x00, 0xa988};
+SYSTEM_PARAMETER System_Parameter = {0, false, false, "\xFF\xFF\xFF\xFF", "\x08\x08\x02\x08", 0x01, 0x01, 0x00, 0x00,0x487e};
 
 static void systemInit(void);
 static void UsartHandle(void);
@@ -40,15 +40,19 @@ void systemInit(void)
 	
 	/***********************************************************************/
     //以太网串口结构体初始化
+    Init_ListQueue(&COM_UART1);
 	memset(&COM_UART1,  0, sizeof(COM_UART1));
 	
 	// 4G串口结构体初始化
+    Init_ListQueue(&COM_UART2);
 	memset(&COM_UART2, 0, sizeof(COM_UART2));
 	
 	// RS485串口结构体初始化
+    Init_ListQueue(&COM_UART3);
 	memset(&COM_UART3, 0, sizeof(COM_UART3));
 	
 	// PLC串口结构体初始化
+    Init_ListQueue(&COM_UART4);
 	memset(&COM_UART4, 0, sizeof(COM_UART4));
 
 	/***********************************************************************/

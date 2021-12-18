@@ -9,6 +9,8 @@
 #include <string.h>
 #include <absacc.h> //可直接操作内存地址
 
+/*屏保界面LOGO*/
+#define START_LOGO Kmust_Image
 /**********************布尔变量定义**********************/
 #define true 1
 #define false 0
@@ -52,7 +54,7 @@ typedef volatile __IO;
 /***********************************常用的数据类型***********************************/
 
 /***********************************系统上电参数***********************************/
-#define DEFAULT_SYSTEM_PARAMETER "\xFF\xFF\xFF\xFF\x08\x08\x02\x08\x01\x01\x00\xA9\x88"
+#define DEFAULT_SYSTEM_PARAMETER "\xFF\xFF\xFF\xFF\x08\x08\x02\x08\x01\x01\x00\x00\x48\x7E"
 #define START_SAVEADDRESS 0x0000         //参数存储开始地址
 #define BAUDRATE_SAVEADDRESS 0x0004      //波特率
 #define PLCSTAE_SAVEADDRESS 0x0005       // PLC状态
@@ -79,6 +81,7 @@ typedef struct
     uint8_t PlcState;                 // PLC状态
     uint8_t CommunicationType;        //通讯类型
     uint8_t WifiInitFlag;             // WIFI初始化标志
+    uint8_t Apstate;                  //热点状态
     uint16_t CRC16;                   // CRC校验码
 } SYSTEM_PARAMETER;                   //系统参数
 
@@ -99,7 +102,7 @@ extern SYSTEM_PARAMETER System_Parameter;
 #define BUSY 1 // 忙
 
 // 通信结构体用常量
-#define MAX_SIZE 16     // 缓冲区长度
+#define MAX_SIZE 128    // 缓冲区长度
 #define MAX_SILENCE 2   // 两个字符最大间隔时间，MAX_SILENCE * 定时器周期，若定时器10ms，则静默时间为：10 * 10 = 100ms  #define	MAX_SILENCE
 #define T_PLC_ANSWER 20 // PLC应答超时定时器，要求PLC在200ms内应答  #define	T_PLC_ANSWER	20
 
@@ -122,7 +125,7 @@ typedef enum
 /*定义当前链队条数*/
 #define MAX_LQUEUE 4U
 /*定义每条链表最大节点数*/
-#define MAX_NODE 40U // 20
+#define MAX_NODE 5U // 20
 /*定义循环值*/
 //#define LOOP(x) (COM_UART##x.Wptr + 1U) % MAX_NODE)
 /*判断环形队列为空处理方式1*/
@@ -139,6 +142,8 @@ typedef enum
 /*链队数据结构*/
 typedef struct
 {
+    SEL_CHANNEL Source_Channel;     /*数据起源通道*/
+    SEL_CHANNEL Target_Channel;     /*数据交付通道*/
     uint8_t Frame_Flag;          /*帧标志*/
     uint8_t Timer_Flag;          /*打开定时器标志*/
     uint8_t Rx_Buffer[MAX_SIZE]; /*数据接收缓冲区*/
@@ -162,7 +167,8 @@ typedef struct
 {
     SEL_CHANNEL Source_Channel; /*数据起源通道*/
     SEL_CHANNEL Target_Channel; /*数据交付通道*/
-    void (*pHandle)(void);
+    void (*pHandle)(SEL_CHANNEL, SEL_CHANNEL);
+    // void (*pHandle)(void);
 } ComData_Handle;
 
 /***********************************多串口通讯***********************************/

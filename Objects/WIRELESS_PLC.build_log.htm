@@ -19,13 +19,14 @@ CPU DLL:         S8051.DLL V3.122.0.0
 Dialog DLL:      DP51.DLL V2.67.0.0 
 <h2>Project:</h2>
 g:\STC_Workers\PLC\Wireless_Plc\WIRELESS_PLC.uvproj
-Project File Date:  09/29/2021
+Project File Date:  12/17/2021
 
 <h2>Output:</h2>
 Rebuild target 'Target 1'
 compiling main.c...
 compiling Control.c...
 compiling report.c...
+Source\report.c(83): warning C280: 'i': unreferenced local variable
 compiling Menu.c...
 compiling pFunc.c...
 compiling systemTimer.c...
@@ -36,9 +37,11 @@ assembling STARTUP.A51...
 linking...
 *** WARNING L7: MODULE NAME NOT UNIQUE
     MODULE:  .\Objects\STARTUP.obj (?C_STARTUP)
-Program Size: data=9.0 xdata=3975 code=18564
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?RS485_TO_PLC?REPORT
+Program Size: data=9.0 xdata=3206 code=21381
 creating hex file from ".\Objects\WIRELESS_PLC"...
-".\Objects\WIRELESS_PLC" - 0 Error(s), 1 Warning(s).
+".\Objects\WIRELESS_PLC" - 0 Error(s), 3 Warning(s).
 Build Time Elapsed:  00:00:01
 </pre>
 </body>

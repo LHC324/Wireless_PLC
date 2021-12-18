@@ -16,6 +16,13 @@
  * @retval	None
  */
 extern void Uart_Handle(void);
+/**
+ * @brief	初始化静态链队
+ * @details
+ * @param	*List:当前链队指针
+ * @retval	None
+ */
+ extern void Init_ListQueue(Uart_List *List);
 
 /**
  * @brief	获取16bitCRC码

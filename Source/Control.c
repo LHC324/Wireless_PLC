@@ -32,6 +32,14 @@ BAUDSTRUCT Baudlist[] =
 uint8_t G_BaudList_Size = (sizeof(Baudlist) / sizeof(BAUDSTRUCT));
 /************************************************************/
 
+/*热点设置*/
+APSTRUCT Aplist[] =
+{
+	{"打开", Wifi_Open_Ap},
+	{"关闭", Wifi_Close_Ap}
+};
+uint8_t G_Aplist_Size = (sizeof(Aplist) / sizeof(APSTRUCT));
+
 void ControlInit(void)
 {
 	/*缺省控件类型*/
@@ -137,7 +145,7 @@ void ScreensaverUiShow(void)
 {
 	clear_screen();
 	/*显示南方电网Logo*/
-	GUI_Lattice(0, 0, 192, 64, PowerGrid_Image);
+	GUI_Lattice(0, 0, 192, 64, START_LOGO);
 }
 
 void PassWordInputUIShow(void) //输入密码界面进入显示
@@ -250,6 +258,18 @@ void ReloadSettingUIshow(void)
 	GUI_String(48, 20, "是否恢复出厂设置", CH_12_12);
 	GUI_String(10, 48, "是", CH_12_12);
 	GUI_String(172, 48, "否", CH_12_12);
+}
+
+void HotspotSettingUIshow(void)
+{
+	    clear_screen();
+		GUI_String(10,10,"热点", CH_12_12);
+		GUI_String(115,10,Aplist[System_Parameter.Apstate].pstring,CH_12_12);
+		GUI_Lattice(149,13,5,8,IconRight);
+		GUI_Lattice(97,13,5,8,Iconleft);
+			
+		GUI_String(10,43,"AP ID",EN_5_8);
+		GUI_String(97,43,AP_ID,EN_5_8);	
 }
 
 /**

@@ -1,10 +1,10 @@
-C51 COMPILER V9.60.0.0   LCD                                                               09/22/2021 09:56:55 PAGE 1   
+C51 COMPILER V9.60.0.0   LCD                                                               12/16/2021 17:33:23 PAGE 1   
 
 
 C51 COMPILER V9.60.0.0, COMPILATION OF MODULE LCD
 OBJECT MODULE PLACED IN .\Objects\LCD.obj
-COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE Source\LCD.c LARGE OPTIMIZE(8,SPEED) BROWSE INCDIR(.\Include;.\FreeModBu
-                    -s\Inc) DEBUG OBJECTEXTEND PRINT(.\Listings\LCD.lst) OBJECT(.\Objects\LCD.obj)
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE Source\LCD.c LARGE OPTIMIZE(9,SIZE) BROWSE INCDIR(.\Include;.\FreeModBus
+                    -\Inc) DEBUG OBJECTEXTEND PRINT(.\Listings\LCD.lst) OBJECT(.\Objects\LCD.obj)
 
 line level    source
 
@@ -21,7 +21,7 @@ line level    source
   11          //                                         液晶发送指令
   12          /*******************************************************************/
   13          
-  14          void transfer_command(int data1)
+  14          void transfer_command(uint8_t data1)
   15          {
   16   1          uint8_t i;
   17   1          LCD_CS = 0;
@@ -62,7 +62,7 @@ line level    source
   52   3                  LCD_SDA = 1;
   53   3              }
   54   2              else
-C51 COMPILER V9.60.0.0   LCD                                                               09/22/2021 09:56:55 PAGE 2   
+C51 COMPILER V9.60.0.0   LCD                                                               12/16/2021 17:33:23 PAGE 2   
 
   55   2              {
   56   3                  LCD_SDA = 0;
@@ -126,7 +126,7 @@ line level    source
  113   1      
  114   1          transfer_command(((column >> 4) & 0x0f) + 0x10); //设置列地址的高 4 位
  115   1          transfer_command(column & 0x0f); //设置列地址的低 4 位
-C51 COMPILER V9.60.0.0   LCD                                                               09/22/2021 09:56:55 PAGE 3   
+C51 COMPILER V9.60.0.0   LCD                                                               12/16/2021 17:33:23 PAGE 3   
 
  116   1      }
  117          
@@ -190,7 +190,7 @@ line level    source
  175   3                  frontCurrent.F_Bytes = 5;
  176   3                  frontCurrent.F_High = 8;
  177   3                  frontCurrent.F_Width = 5;
-C51 COMPILER V9.60.0.0   LCD                                                               09/22/2021 09:56:55 PAGE 4   
+C51 COMPILER V9.60.0.0   LCD                                                               12/16/2021 17:33:23 PAGE 4   
 
  178   3                  frontCurrent.F_Offect = 7;
  179   3                  frontCurrent.pArray = *Ascii_table_5x8;       //英文字库指针
@@ -254,7 +254,7 @@ line level    source
  237   2              {
  238   3                  ChIndex = *(pString + Offset) - ' '; //获取英文或字符的索引
  239   3                  //Uart1Send(ChIndex);
-C51 COMPILER V9.60.0.0   LCD                                                               09/22/2021 09:56:55 PAGE 5   
+C51 COMPILER V9.60.0.0   LCD                                                               12/16/2021 17:33:23 PAGE 5   
 
  240   3                  GUI_Lattice(x, y, 5, 8, frontCurrent.pArray + ChIndex * 5); //液晶显示
  241   3                  x += frontCurrent.F_Offect;
@@ -318,7 +318,7 @@ line level    source
  298   5                          transfer_data(*(plattice + Width * (i - 1) + j) >> (8 - y1_by));    //16点阵 offect16
  299   5                      }
  300   4                      else
-C51 COMPILER V9.60.0.0   LCD                                                               09/22/2021 09:56:55 PAGE 6   
+C51 COMPILER V9.60.0.0   LCD                                                               12/16/2021 17:33:23 PAGE 6   
 
  301   4                      {
  302   5                          tempH = (*(plattice + j + Width * (i - 1)) >> (8 - y_by));
@@ -340,7 +340,7 @@ line level    source
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =   1383    ----
+   CODE SIZE        =   1140    ----
    CONSTANT SIZE    =   ----    ----
    XDATA SIZE       =      8      26
    PDATA SIZE       =   ----    ----
