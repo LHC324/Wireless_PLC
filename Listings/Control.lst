@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.0.0   CONTROL                                                           12/18/2021 09:21:04 PAGE 1   
+C51 COMPILER V9.60.0.0   CONTROL                                                           12/18/2021 17:07:54 PAGE 1   
 
 
 C51 COMPILER V9.60.0.0, COMPILATION OF MODULE CONTROL
@@ -62,7 +62,7 @@ line level    source
   52          void CommunicaInit(void)
   53          {       /*默认为本地连接方式*/
   54   1              /*初始连接状态*/
-C51 COMPILER V9.60.0.0   CONTROL                                                           12/18/2021 09:21:04 PAGE 2   
+C51 COMPILER V9.60.0.0   CONTROL                                                           12/18/2021 17:07:54 PAGE 2   
 
   55   1      //      LTEenable(CommunciaType);
   56   1          Wifi_Enable(System_Parameter.CommunicationType);
@@ -126,7 +126,7 @@ line level    source
  114   1              /*密码正确*/
  115   1              if (!strncmp(PasswordA.PSWNext.PassWordbuff, PasswordB.PSWNext.PassWordbuff, PASSWORDBITS))
  116   1                      return true;
-C51 COMPILER V9.60.0.0   CONTROL                                                           12/18/2021 09:21:04 PAGE 3   
+C51 COMPILER V9.60.0.0   CONTROL                                                           12/18/2021 17:07:54 PAGE 3   
 
  117   1              else
  118   1                      return false;
@@ -190,7 +190,7 @@ line level    source
  175   2              }
  176   1      
  177   1              GUI_String(15, 15, "请输入新密码", CH_12_12);
-C51 COMPILER V9.60.0.0   CONTROL                                                           12/18/2021 09:21:04 PAGE 4   
+C51 COMPILER V9.60.0.0   CONTROL                                                           12/18/2021 17:07:54 PAGE 4   
 
  178   1              GUI_String(15, 35, "请确认新密码", CH_12_12);
  179   1      }
@@ -254,7 +254,7 @@ line level    source
  237          void BaudSettingUI3show(void)
  238          {
  239   1              clear_screen();
-C51 COMPILER V9.60.0.0   CONTROL                                                           12/18/2021 09:21:04 PAGE 5   
+C51 COMPILER V9.60.0.0   CONTROL                                                           12/18/2021 17:07:54 PAGE 5   
 
  240   1              GUI_String(10, 29, "扩展网", CH_12_12);
  241   1              GUI_String(105, 31, Baudlist[System_Parameter.BaudIndex[2]].pstring, EN_5_8);
@@ -318,7 +318,7 @@ MODULE INFORMATION:   STATIC OVERLAYABLE
    XDATA SIZE       =    125      43
    PDATA SIZE       =   ----    ----
    DATA SIZE        =   ----    ----
-C51 COMPILER V9.60.0.0   CONTROL                                                           12/18/2021 09:21:04 PAGE 6   
+C51 COMPILER V9.60.0.0   CONTROL                                                           12/18/2021 17:07:54 PAGE 6   
 
    IDATA SIZE       =   ----    ----
    BIT SIZE         =   ----    ----

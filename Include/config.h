@@ -102,8 +102,8 @@ extern SYSTEM_PARAMETER System_Parameter;
 #define BUSY 1 // 忙
 
 // 通信结构体用常量
-#define MAX_SIZE 128    // 缓冲区长度
-#define MAX_SILENCE 2   // 两个字符最大间隔时间，MAX_SILENCE * 定时器周期，若定时器10ms，则静默时间为：10 * 10 = 100ms  #define	MAX_SILENCE
+#define MAX_SIZE 64    // 缓冲区长度
+#define MAX_SILENCE 1   // 两个字符最大间隔时间，MAX_SILENCE * 定时器周期，若定时器10ms，则静默时间为：10 * 10 = 100ms  #define	MAX_SILENCE
 #define T_PLC_ANSWER 20 // PLC应答超时定时器，要求PLC在200ms内应答  #define	T_PLC_ANSWER	20
 
 typedef enum
@@ -125,7 +125,7 @@ typedef enum
 /*定义当前链队条数*/
 #define MAX_LQUEUE 4U
 /*定义每条链表最大节点数*/
-#define MAX_NODE 5U // 20
+#define MAX_NODE 16U // 20
 /*定义循环值*/
 //#define LOOP(x) (COM_UART##x.Wptr + 1U) % MAX_NODE)
 /*判断环形队列为空处理方式1*/
@@ -158,6 +158,7 @@ typedef struct
     //存储R ,W指针，表示一个队列
     uint8_t Wptr;
     uint8_t Rptr;
+    // uint8_t Buffer_Size;
 } Uart_List;
 
 /*声明链队*/
@@ -172,7 +173,7 @@ typedef struct
 } ComData_Handle;
 
 /***********************************多串口通讯***********************************/
-
+extern uint8_t xdata mempool[5U * 1024];
 /***********************************函数声明***********************************/
 void Init_All(void);
 bit CheckIap_Flash(void);

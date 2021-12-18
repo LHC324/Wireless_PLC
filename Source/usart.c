@@ -76,7 +76,7 @@ void Uart1_Init(void) //串口1选择定时器1作为波特率发生器
  * note：
  *		使用的是定时器1作为波特率发生器,LAN口用
  **********************************************************/
-void Uart1_ISR() interrupt 4 // using 2 //串口1的定时中断服务函数
+void Uart1_ISR() interrupt 4 using 2 //串口1的定时中断服务函数
 {
     /*发送中断标志*/
     if (TI)
@@ -90,25 +90,20 @@ void Uart1_ISR() interrupt 4 // using 2 //串口1的定时中断服务函数
     {
         RI = 0;
 
-        /*当收到数据时打开帧中断定时器*/
-        // COM_UART1.LNode[COM_UART1.Wptr].Timer_Flag = true;
-        /*当前节点还没有收到一帧数据*/
-        // if(!COM_UART1.LNode[COM_UART1.Wptr].Frame_Flag)
-        // {
-        // 	/*刷新帧超时时间*/
-        // 	COM_UART1.LNode[COM_UART1.Wptr].OverTime = MAX_SILENCE;
-        // 	if(COM_UART1.LNode[COM_UART1.Wptr].Rx_Length < MAX_SIZE)
-        // 	{	/*把数据存到当前节点的缓冲区*/
-        // 		COM_UART1.LNode[COM_UART1.Wptr].Rx_Buffer[COM_UART1.LNode[COM_UART1.Wptr].Rx_Length++] = SBUF;
-        // 	}
-        // 	else
-        // 	{	/*数据缓冲区溢出导致的帧截断*/
-        // 			COM_UART1.LNode[COM_UART1.Wptr].Frame_Flag = true;
-        // 	}
-        // }
+        COM_UART1.LNode[COM_UART1.Wptr].Timer_Flag = true;
+        if (!COM_UART1.LNode[COM_UART1.Wptr].Frame_Flag)
+        {
+            COM_UART1.LNode[COM_UART1.Wptr].OverTime = MAX_SILENCE;
+            if (COM_UART1.LNode[COM_UART1.Wptr].Rx_Length < MAX_SIZE)
+            {
+                COM_UART1.LNode[COM_UART1.Wptr].Rx_Buffer[COM_UART1.LNode[COM_UART1.Wptr].Rx_Length++] = SBUF;
+                COM_UART1.LNode[COM_UART1.Wptr].Source_Channel = CHANNEL_LAN;
+                COM_UART1.LNode[COM_UART1.Wptr].Target_Channel = CHANNEL_PLC;
+            }
+        }
         /*设置当前请求通道*/
         current_request_channel = CHANNEL_LAN;
-        ISR_RECEIVE(COM_UART1, ,CHANNEL_LAN, CHANNEL_PLC);
+        // ISR_RECEIVE(COM_UART1, ,CHANNEL_LAN, CHANNEL_PLC);
     }
 }
 
@@ -143,7 +138,7 @@ void Uart2_Init(void) //串口2选择定时器2作为波特率发生器
  * note：
  *		使用的是定时器2作为波特率发生器,4G口用
  **********************************************************/
-void Uart2_ISR() interrupt 8 // using 2
+void Uart2_ISR() interrupt 8 using 2
 {                            /*发送中断*/
     if (S2CON & S2TI)
     {
@@ -156,22 +151,21 @@ void Uart2_ISR() interrupt 8 // using 2
     {
         S2CON &= ~S2RI;
 
-        /*当收到数据时打开帧中断定时器*/
-        // COM_UART2.LNode[COM_UART2.Wptr].Timer_Flag = true;
-        // /*当前节点还没有收到一帧数据*/
-        // if (!COM_UART2.LNode[COM_UART2.Wptr].Frame_Flag)
-        // {
-        //     /*刷新帧超时时间*/
-        //     COM_UART2.LNode[COM_UART2.Wptr].OverTime = MAX_SILENCE;
-        //     if (COM_UART2.LNode[COM_UART2.Wptr].Rx_Length < MAX_SIZE)
-        //     { /*把数据存到当前节点的缓冲区*/
-        //         COM_UART2.LNode[COM_UART2.Wptr].Rx_Buffer[COM_UART2.LNode[COM_UART2.Wptr].Rx_Length++] = S2BUF;
-        //     }
-        // }
+        COM_UART2.LNode[COM_UART2.Wptr].Timer_Flag = true;
+        if (!COM_UART2.LNode[COM_UART2.Wptr].Frame_Flag)
+        {
+            COM_UART2.LNode[COM_UART2.Wptr].OverTime = MAX_SILENCE;
+            if (COM_UART2.LNode[COM_UART2.Wptr].Rx_Length < MAX_SIZE)
+            {
+                COM_UART2.LNode[COM_UART2.Wptr].Rx_Buffer[COM_UART2.LNode[COM_UART2.Wptr].Rx_Length++] = S2BUF;
+                COM_UART2.LNode[COM_UART2.Wptr].Source_Channel = CHANNEL_WIFI;
+                COM_UART2.LNode[COM_UART2.Wptr].Target_Channel = CHANNEL_PLC;
+            }
+        }
 
         /*设置当前请求通道*/
         current_request_channel = CHANNEL_WIFI;
-        ISR_RECEIVE(COM_UART2, 2, CHANNEL_WIFI, CHANNEL_PLC);
+        // ISR_RECEIVE(COM_UART2, 2, CHANNEL_WIFI, CHANNEL_PLC);
     }
 }
 
@@ -202,7 +196,7 @@ void Uart3_Init(void) //串口3选择定时器3作为波特率发生器
  * note：
  *		使用的是定时器3作为波特率发生器,RS485模块
  **********************************************************/
-void Uart3_ISR() interrupt 17 // using 2
+void Uart3_ISR() interrupt 17 using 2
 {
     /*发送中断完成*/
     if (S3CON & S3TI)
@@ -215,22 +209,21 @@ void Uart3_ISR() interrupt 17 // using 2
     {
         S3CON &= ~S3RI;
 
-        /*当收到数据时打开帧中断定时器*/
-        // COM_UART3.LNode[COM_UART3.Wptr].Timer_Flag = true;
-        // /*当前节点还没有收到一帧数据*/
-        // if (!COM_UART3.LNode[COM_UART3.Wptr].Frame_Flag)
-        // {
-        //     /*刷新帧超时时间*/
-        //     COM_UART3.LNode[COM_UART3.Wptr].OverTime = MAX_SILENCE;
-        //     if (COM_UART3.LNode[COM_UART3.Wptr].Rx_Length < MAX_SIZE)
-        //     { /*把数据存到当前节点的缓冲区*/
-        //         COM_UART3.LNode[COM_UART3.Wptr].Rx_Buffer[COM_UART3.LNode[COM_UART3.Wptr].Rx_Length++] = S3BUF;
-        //     }
-        // }
+        COM_UART3.LNode[COM_UART3.Wptr].Timer_Flag = true;
+        if (!COM_UART3.LNode[COM_UART3.Wptr].Frame_Flag)
+        {
+            COM_UART3.LNode[COM_UART3.Wptr].OverTime = MAX_SILENCE;
+            if (COM_UART3.LNode[COM_UART3.Wptr].Rx_Length < MAX_SIZE)
+            {
+                COM_UART3.LNode[COM_UART3.Wptr].Rx_Buffer[COM_UART3.LNode[COM_UART3.Wptr].Rx_Length++] = S3BUF;
+                COM_UART3.LNode[COM_UART3.Wptr].Source_Channel = CHANNEL_RS485;
+                COM_UART3.LNode[COM_UART3.Wptr].Target_Channel = CHANNEL_PLC;
+            }
+        }
 
         /*设置当前请求通道*/
         current_request_channel = CHANNEL_RS485;
-        ISR_RECEIVE(COM_UART3, 3, CHANNEL_RS485, CHANNEL_PLC);
+        // ISR_RECEIVE(COM_UART3, 3, CHANNEL_RS485, CHANNEL_PLC);
     }
 }
 
@@ -261,9 +254,9 @@ void Uart4_Init(void) //串口4选择定时器4作为波特率发生器
  * note：
  *		使用的是定时器4作为波特率发生器,PLC口用
  **********************************************************/
-void Uart4_Isr() interrupt 18 // using 1
+void Uart4_Isr() interrupt 18 using 1
 {                             /*发送中断*/
-    SEL_CHANNEL temp_channel = CHANNEL_RS485;
+    // SEL_CHANNEL temp_channel = CHANNEL_RS485;
 
     if (S4CON & S4TI)
     {
@@ -276,29 +269,28 @@ void Uart4_Isr() interrupt 18 // using 1
     {
         S4CON &= ~S4RI;
 
-        /*当收到数据时打开帧中断定时器*/
-        // COM_UART4.LNode[COM_UART4.Wptr].Timer_Flag = true;
-        // /*当前节点还没有收到一帧数据*/
-        // if (!COM_UART4.LNode[COM_UART4.Wptr].Frame_Flag)
-        // {
-        //     /*刷新帧超时时间*/
-        //     COM_UART4.LNode[COM_UART4.Wptr].OverTime = MAX_SILENCE;
-        //     if (COM_UART4.LNode[COM_UART4.Wptr].Rx_Length < MAX_SIZE)
-        //     { /*把数据存到当前节点的缓冲区*/
-        //         COM_UART4.LNode[COM_UART4.Wptr].Rx_Buffer[COM_UART4.LNode[COM_UART4.Wptr].Rx_Length++] = S4BUF;
-        //     }
-        // }
+        COM_UART4.LNode[COM_UART4.Wptr].Timer_Flag = true;
+        if (!COM_UART4.LNode[COM_UART4.Wptr].Frame_Flag)
+        {
+            COM_UART4.LNode[COM_UART4.Wptr].OverTime = MAX_SILENCE;
+            if (COM_UART4.LNode[COM_UART4.Wptr].Rx_Length < MAX_SIZE)
+            {
+                COM_UART4.LNode[COM_UART4.Wptr].Rx_Buffer[COM_UART4.LNode[COM_UART4.Wptr].Rx_Length++] = S4BUF;
+                COM_UART4.LNode[COM_UART4.Wptr].Source_Channel = CHANNEL_PLC;
+                COM_UART4.LNode[COM_UART4.Wptr].Target_Channel = current_request_channel;
+            }
+        }
 
         /*判断当前PLC是主动发送还是被动请求*/
-        if (current_request_channel != CHANNEL_IDLE)
-        {
-            temp_channel = CHANNEL_RS485;
-        }
-        else
-        {
-            temp_channel = current_request_channel;
-        }
-        ISR_RECEIVE(COM_UART4, 4, CHANNEL_PLC, temp_channel);
+        // if (current_request_channel != CHANNEL_IDLE)
+        // {
+        //     temp_channel = CHANNEL_RS485;
+        // }
+        // else
+        // {
+        //     temp_channel = current_request_channel;
+        // }
+        // ISR_RECEIVE(COM_UART4, 4, CHANNEL_PLC, CHANNEL_RS485);
     }
 }
 
@@ -421,18 +413,18 @@ void Uartx_SendStr(Uart_HandleTypeDef *const Uart, uint8_t *p, uint8_t length)
  *		  使用printf函数将会占用1K 左右FLASH
  **********************************************************/
 #ifdef USEING_PRINTF
-// char putchar(char str)
-// {
-//     ES = 0; //关闭串口1中断
-//     SBUF = str;
+char putchar(char str)
+{
+    ES = 0; //关闭串口1中断
+    SBUF = str;
 
-//     while (!TI)
-//         ;
+    while (!TI)
+        ;
 
-//     TI = 0;
-//     ES = 1;
-//     return str;
-// }
+    TI = 0;
+    ES = 1;
+    return str;
+}
 #endif
 
 /**********************************公用函数************************/

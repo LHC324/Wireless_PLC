@@ -20,8 +20,12 @@ static void systemInit(void);
 static void UsartHandle(void);
 static void Iap_Flash_Iinit(void);
 
+/*定义一个静态内存池*/
+// uint8_t mempool[5U * 1024] = {0};
+
 void main(void)
-{
+{   /*注意传递的是数组名地址*/
+    // init_mempool (mempool, sizeof(mempool)); 
     systemInit(); //系统初始化
 
     while(1)
@@ -36,7 +40,7 @@ void main(void)
 
 void systemInit(void)
 {
-	Init_All(); //初始化外设
+    Init_All(); //初始化外设
 	
 	/***********************************************************************/
     //以太网串口结构体初始化

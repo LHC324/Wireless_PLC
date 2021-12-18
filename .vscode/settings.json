@@ -19,7 +19,8 @@
         "queue.h": "c",
         "stdio.h": "c",
         "STDIO.H": "cpp",
-        "intrins.h": "c"
+        "intrins.h": "c",
+        "STDLIB.H": "cpp"
     },
     "C_Cpp.errorSquiggles": "Disabled"
 }

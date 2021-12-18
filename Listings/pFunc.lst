@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.0.0   PFUNC                                                             12/18/2021 09:21:04 PAGE 1   
+C51 COMPILER V9.60.0.0   PFUNC                                                             12/18/2021 17:07:55 PAGE 1   
 
 
 C51 COMPILER V9.60.0.0, COMPILATION OF MODULE PFUNC
@@ -62,7 +62,7 @@ line level    source
   52   3            Index = IndexSize;
   53   3          }
   54   2          Index--;
-C51 COMPILER V9.60.0.0   PFUNC                                                             12/18/2021 09:21:04 PAGE 2   
+C51 COMPILER V9.60.0.0   PFUNC                                                             12/18/2021 17:07:55 PAGE 2   
 
   55   2          Index %= IndexSize;
   56   2        }
