@@ -3,7 +3,6 @@
 ".\Objects\report.obj",
 ".\Objects\Menu.obj",
 ".\Objects\pFunc.obj",
-".\Objects\systemTimer.obj",
 ".\Objects\usart.obj",
 ".\Objects\timer.obj",
 ".\Objects\wifi.obj",

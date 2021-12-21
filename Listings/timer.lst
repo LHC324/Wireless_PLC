@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.0.0   TIMER                                                             12/18/2021 17:07:55 PAGE 1   
+C51 COMPILER V9.60.0.0   TIMER                                                             12/21/2021 14:13:59 PAGE 1   
 
 
 C51 COMPILER V9.60.0.0, COMPILATION OF MODULE TIMER
@@ -9,10 +9,10 @@ COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE Source\timer.c LARGE OPTIMIZE(9,
 line level    source
 
    1          #include "timer.h"
-   2          
-   3          extern void systemTimer(void);
-   4          
-   5          TIM_HandleTypeDef Timer0;
+   2          #include "systemTimer.h"
+   3          
+   4          TIM_HandleTypeDef Timer0;
+   5          PUBLIC_TIMER16 PublicTimer16;
    6          
    7          /*********************************************************
    8          * 函数名：void WDT_init(void)
@@ -62,7 +62,7 @@ line level    source
   52   1              { //首次初始化，把TMOD和AUXR全部置零
   53   2                      AUXR = tim_baseHandle->Register_AUXR;
   54   2                      TMOD = tim_baseHandle->Timer_Mode;                        //模式0
-C51 COMPILER V9.60.0.0   TIMER                                                             12/18/2021 17:07:55 PAGE 2   
+C51 COMPILER V9.60.0.0   TIMER                                                             12/21/2021 14:13:59 PAGE 2   
 
   55   2                      TL0 = (uint8_t)(tim_baseHandle->Timer_Count); //65536-11.0592M/12/1000
   56   2                      TH0 = (uint8_t)((tim_baseHandle->Timer_Count) >> 8);
@@ -81,30 +81,63 @@ line level    source
   69           * @param       None
   70           * @retval      None
   71           */
-  72          void Timer0_ISR() interrupt 1
+  72          void Timer0_ISR() interrupt 1 using 1
   73          {
   74   1              /*软件定时器*/
-  75   1              systemTimer();
-  76   1      
-  77   1              if(COM_UART1.LNode[COM_UART1.Wptr].Timer_Flag)
-  78   1                      /*以太网串口接收字符间隔超时处理*/
-  79   1                      SET_FRAME(COM_UART1);
-  80   1              if(COM_UART2.LNode[COM_UART2.Wptr].Timer_Flag)
-  81   1                      /*4G/WiFi串口接收字符间隔超时处理*/
-  82   1                      SET_FRAME(COM_UART2);
-  83   1              if(COM_UART3.LNode[COM_UART3.Wptr].Timer_Flag)
-  84   1                      /*RS485串口接收字符间隔超时处理*/
-  85   1                      SET_FRAME(COM_UART3);
-  86   1              if(COM_UART4.LNode[COM_UART4.Wptr].Timer_Flag)
-  87   1                      /*PLC串口接收字符间隔超时处理*/
-  88   1                      SET_FRAME(COM_UART4);
-  89   1      }
+  75   1              // systemTimer();
+  76   1              SET_SOFTTIMER_FLAG(PublicTimer16);
+  77   1      
+  78   1              if(COM_UART1.LNode[COM_UART1.Wptr].Timer_Flag)
+  79   1                      /*以太网串口接收字符间隔超时处理*/
+  80   1                      SET_FRAME(COM_UART1);
+  81   1              if(COM_UART2.LNode[COM_UART2.Wptr].Timer_Flag)
+  82   1                      /*4G/WiFi串口接收字符间隔超时处理*/
+  83   1                      SET_FRAME(COM_UART2);
+  84   1              if(COM_UART3.LNode[COM_UART3.Wptr].Timer_Flag)
+  85   1                      /*RS485串口接收字符间隔超时处理*/
+  86   1                      SET_FRAME(COM_UART3);
+  87   1              if(COM_UART4.LNode[COM_UART4.Wptr].Timer_Flag)
+  88   1                      /*PLC串口接收字符间隔超时处理*/
+  89   1                      SET_FRAME(COM_UART4);
+  90   1      }
+  91          
+  92          
+  93          void Delay_ms(unsigned short time)
+  94          {
+  95   1          unsigned short temp;
+  96   1      
+  97   1          temp = time;
+  98   1      
+  99   1          while(temp --)
+ 100   1          {
+ 101   2              Delay1ms();
+ 102   2          }
+ 103   1      }
+ 104          
+ 105          /*禁止编译器优化该模块*/
+ 106          // #pragma OPTIMIZE(0)
+ 107          
+ 108          void Delay1ms()         //@11.0592.000MHz
+ 109          {
+ 110   1          unsigned char i, j;
+ 111   1      
+ 112   1          i = 11;
+ 113   1          j = 190;
+ 114   1      
+ 115   1          do
+ 116   1          {
+C51 COMPILER V9.60.0.0   TIMER                                                             12/21/2021 14:13:59 PAGE 3   
+
+ 117   2              while (--j);
+ 118   2          }
+ 119   1          while (--i);
+ 120   1      }
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =    455    ----
+   CODE SIZE        =    490    ----
    CONSTANT SIZE    =   ----    ----
-   XDATA SIZE       =      8    ----
+   XDATA SIZE       =     16       2
    PDATA SIZE       =   ----    ----
    DATA SIZE        =   ----    ----
    IDATA SIZE       =   ----    ----

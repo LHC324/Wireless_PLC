@@ -1,8 +1,8 @@
 #include "timer.h"
-
-extern void systemTimer(void);
+#include "systemTimer.h"
 
 TIM_HandleTypeDef Timer0;
+PUBLIC_TIMER16 PublicTimer16;
 
 /*********************************************************
 * 函数名：void WDT_init(void)
@@ -69,10 +69,11 @@ void TIM_Base_MspInit(TIM_HandleTypeDef *const tim_baseHandle)
  * @param	None
  * @retval	None
  */
-void Timer0_ISR() interrupt 1
+void Timer0_ISR() interrupt 1 using 1
 {
 	/*软件定时器*/
-	systemTimer();
+	// systemTimer();
+	SET_SOFTTIMER_FLAG(PublicTimer16);
 
 	if(COM_UART1.LNode[COM_UART1.Wptr].Timer_Flag)
 		/*以太网串口接收字符间隔超时处理*/
@@ -86,4 +87,34 @@ void Timer0_ISR() interrupt 1
 	if(COM_UART4.LNode[COM_UART4.Wptr].Timer_Flag)
 		/*PLC串口接收字符间隔超时处理*/
 		SET_FRAME(COM_UART4);
+}
+
+
+void Delay_ms(unsigned short time)
+{
+    unsigned short temp;
+
+    temp = time;
+
+    while(temp --)
+    {
+        Delay1ms();
+    }
+}
+
+/*禁止编译器优化该模块*/
+// #pragma OPTIMIZE(0)
+
+void Delay1ms()		//@11.0592.000MHz
+{
+    unsigned char i, j;
+
+    i = 11;
+    j = 190;
+
+    do
+    {
+        while (--j);
+    }
+    while (--i);
 }

@@ -41,7 +41,7 @@ Uart_HandleTypeDef Uart4; //串口4句柄
     } while (0);
 
 /*定义一个当前发起请求通道变量*/
-SEL_CHANNEL current_request_channel = CHANNEL_IDLE;
+volatile  SEL_CHANNEL current_request_channel = CHANNEL_IDLE;
 
 /*********************************************************
  * 函数名：void Uart_1Init(void)
@@ -139,7 +139,7 @@ void Uart2_Init(void) //串口2选择定时器2作为波特率发生器
  *		使用的是定时器2作为波特率发生器,4G口用
  **********************************************************/
 void Uart2_ISR() interrupt 8 using 2
-{                            /*发送中断*/
+{   /*发送中断*/
     if (S2CON & S2TI)
     {
         S2CON &= ~S2TI;
@@ -254,7 +254,7 @@ void Uart4_Init(void) //串口4选择定时器4作为波特率发生器
  * note：
  *		使用的是定时器4作为波特率发生器,PLC口用
  **********************************************************/
-void Uart4_Isr() interrupt 18 using 1
+void Uart4_Isr() interrupt 18 using 2
 {                             /*发送中断*/
     // SEL_CHANNEL temp_channel = CHANNEL_RS485;
 

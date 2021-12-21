@@ -414,11 +414,6 @@
               <FileType>1</FileType>
               <FilePath>.\Source\pFunc.c</FilePath>
             </File>
-            <File>
-              <FileName>systemTimer.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Source\systemTimer.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>

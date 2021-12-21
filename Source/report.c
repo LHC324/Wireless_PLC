@@ -15,17 +15,18 @@ void Rs485_to_Plc(void);
 // 		//	{CHANNEL_LAN,  CHANNEL_PLC,   Lan_To_Plc}
 // };
 
-const ComData_Handle ComData_Array[] =
+const ComData_Handle code ComData_Array[] =
 	{
 		// {CHANNEL_PLC, CHANNEL_RS485, Public_DataHandle},
 		{CHANNEL_WIFI, CHANNEL_PLC, Public_DataHandle},
 		{CHANNEL_LAN, CHANNEL_PLC, Public_DataHandle},
-		{CHANNEL_RS485, CHANNEL_PLC, Public_DataHandle}};
+		{CHANNEL_RS485, CHANNEL_PLC, Public_DataHandle}
+	};
 
 #define COMDATA_SIZE (sizeof(ComData_Array) / sizeof(ComData_Handle))
 
 /*创建4条链队*/
-Uart_List xdata Uart_LinkList[MAX_LQUEUE];
+Uart_List xdata Uart_LinkList[MAX_LQUEUE] = {0};
 
 /**
  * @brief	初始化静态链队
@@ -35,42 +36,23 @@ Uart_List xdata Uart_LinkList[MAX_LQUEUE];
  */
 void Init_ListQueue(Uart_List *List)
 {
-	uint8_t i = 0;
+	uint8_t j = 0;
 
-	for (i = 0; i < MAX_NODE; i++)
+	for (j = 0; j < MAX_NODE; j++)
 	{
 		/*初始化队列数据域*/
-		List->LNode[i].Source_Channel = CHANNEL_IDLE;
-		List->LNode[i].Target_Channel = CHANNEL_IDLE;
-		List->LNode[i].Frame_Flag = false;
-		List->LNode[i].Timer_Flag = false;
-		List->LNode[i].Rx_Length = 0;
-		List->LNode[i].OverTime = MAX_SILENCE;
-		memset(&List->LNode[i].Rx_Buffer[0], 0, MAX_SIZE);
+		List->LNode[j].Source_Channel = CHANNEL_IDLE;
+		List->LNode[j].Target_Channel = CHANNEL_IDLE;
+		List->LNode[j].Frame_Flag = false;
+		List->LNode[j].Timer_Flag = false;
+		List->LNode[j].Rx_Length = 0;
+		List->LNode[j].OverTime = MAX_SILENCE;
+		memset(&List->LNode[j].Rx_Buffer[0], 0, MAX_SIZE);
 	}
 	// List->Buffer_Size = buf_size;
 	/*初始化链表节点读写指针*/
 	List->Wptr = List->Rptr = 0;
 }
-
-/**
- * @brief	串口1对1数据转发
- * @details
- * @param	None
- * @retval	None
- */
-// void Uart_DataForward(SEL_CHANNEL Src, SEL_CHANNEL Dest)
-// {
-// 	uint8_t i = 0;
-
-// 	for (i = 0; i < COMDATA_SIZE; i++)
-// 	{
-// 		if ((Src == ComData_Array[i].Source_Channel) && (Dest == ComData_Array[i].Target_Channel))
-// 		{
-// 			ComData_Array[i].pHandle();
-// 		}
-// 	}
-// }
 
 /**
  * @brief	串口事件处理
@@ -86,7 +68,7 @@ void Uart_Handle(void)
 	// // S4CON &= ~S4REN;
 
 	for (i = 0; i < COMDATA_SIZE; i++)
-	{
+	{	
 		ComData_Array[i].pHandle(ComData_Array[i].Source_Channel, ComData_Array[i].Target_Channel);
 	}
 	// ComData_Array[0].pHandle(ComData_Array[0].Source_Channel, ComData_Array[0].Target_Channel);
@@ -172,108 +154,209 @@ static Uart_HandleTypeDef *Get_Target_Uart(channel)
  * @param   dest 数据交付通道
  * @retval	None
  */
-void Public_DataHandle(SEL_CHANNEL src, SEL_CHANNEL dest)
+// void Public_DataHandle(SEL_CHANNEL src, SEL_CHANNEL dest)
+// {
+// 	Uart_List *psrc = Get_Target_Channel(src);
+// 	Uart_List *pdest = Get_Target_Channel(dest);
+// 	Uart_HandleTypeDef *psuart = Get_Target_Uart(src);
+// 	Uart_HandleTypeDef *peuart = Get_Target_Uart(dest);
+// 	uint8_t i = 0;
+
+// 	if ((psrc == NULL) || (pdest == NULL) || (psuart == NULL) || (peuart == NULL))
+// 	{
+// 		return;
+// 	}
+// 	// printf ("psrc %d, pdest %d, %d, %d, %d, %d\r\n",
+// 	// (uint16_t)psrc, (uint16_t)pdest, (uint16_t)&COM_UART1, (uint16_t)&COM_UART2,
+// 	// (uint16_t)&COM_UART3, (uint16_t)&COM_UART4);
+
+// 	/*检测发起请求接收缓冲区*/
+// 	if (psrc->LNode[psrc->Rptr].Frame_Flag)
+// 	{
+// 		printf("1->>source %bd, target %bd, pdest %d, ptr 0x%X\r\n",
+// 			   psrc->LNode[psrc->Rptr].Source_Channel, psrc->LNode[psrc->Rptr].Target_Channel, psrc, psrc->Rptr);
+
+// 		/*检查当前节点源地址和目标地址是否与正在执行上目标相同*/
+// 		if ((psrc->LNode[psrc->Rptr].Source_Channel != src) || (psrc->LNode[psrc->Rptr].Target_Channel != dest))
+// 		{
+// 			// return;
+// 			goto BANK2;
+// 		}
+// 		/*标记该接收帧以进行处理*/
+// 		psrc->LNode[psrc->Rptr].Frame_Flag = false;
+// 		if (dest == CHANNEL_RS485)
+// 		{
+// 			/*允许485发送*/
+// 			USART3_EN = 1;
+// 			/*数据转发给RS485时，数据长度+1，可以保证MAX3485芯片能够最后一位数据刚好不停止在串口的停止位上*/
+// 			psrc->LNode[psrc->Rptr].Rx_Length += 1U;
+// 		}
+// 		/*启动对应端硬件数据转发*/
+// 		Uartx_SendStr(peuart, psrc->LNode[psrc->Rptr].Rx_Buffer, psrc->LNode[psrc->Rptr].Rx_Length);
+// 		/*接收到数据长度置为0*/
+// 		psrc->LNode[psrc->Rptr].Rx_Length = 0;
+// 		/*发送中断结束后，清空对应接收缓冲区*/
+// 		memset(&psrc->LNode[psrc->Rptr].Rx_Buffer[0], 0, MAX_SIZE);
+// 		if (dest == CHANNEL_RS485)
+// 		{
+// 			/*发送完一帧数据后拉低*/
+// 			USART3_EN = 0;
+// 		}
+// 		/*读指针指到下一个节点*/
+// 		psrc->Rptr = ((psrc->Rptr + 1U) % MAX_NODE);
+// 	}
+
+// BANK2:
+// 	// pdest = Get_Target_Channel(pdest->LNode[pdest->Rptr].Source_Channel);
+// 	// psuart = Get_Target_Uart(pdest->LNode[pdest->Rptr].Target_Channel);
+
+// 	// /*目标设备发出应答*/
+// 	// if ((pdest->LNode[pdest->Rptr].Frame_Flag))
+// 	// {
+// 	// 	printf("2->>source %bd, target %bd, pdest %d, ptr 0x%X\r\n\r\n",
+// 	// 		   pdest->LNode[pdest->Rptr].Source_Channel, pdest->LNode[pdest->Rptr].Target_Channel, pdest, pdest->Rptr);
+
+// 	// 	/*检查目标端是否与当前节点数据目标相同*/
+// 	// 	// if ((pdest->LNode[pdest->Rptr].Source_Channel != dest) || (pdest->LNode[pdest->Rptr].Target_Channel != src))
+// 	// 	// {
+// 	// 	// 	return;
+// 	// 	// 	// goto BANK1;
+// 	// 	// }
+// 	// 	/*标记该接收帧已经进行处理*/
+// 	// 	pdest->LNode[pdest->Rptr].Frame_Flag = false;
+// 	// 	if (src == CHANNEL_RS485)
+// 	// 	{
+// 	// 		/*允许485发送*/
+// 	// 		USART3_EN = 1;
+// 	// 		/*数据转发给RS485时，数据长度+1，可以保证MAX3485芯片能够最后一位数据刚好不停止在串口的停止位上*/
+// 	// 		pdest->LNode[pdest->Rptr].Rx_Length += 1U;
+// 	// 	}
+// 	// 	/*数据返回给请求对象*/
+// 	// 	Uartx_SendStr(psuart, pdest->LNode[pdest->Rptr].Rx_Buffer, pdest->LNode[pdest->Rptr].Rx_Length);
+// 	// 	/*接收到数据长度置为0*/
+// 	// 	pdest->LNode[pdest->Rptr].Rx_Length = 0;
+// 	// 	/*发送中断结束后，清空对应接收缓冲区*/
+// 	// 	memset(&pdest->LNode[pdest->Rptr].Rx_Buffer[0], 0, MAX_SIZE);
+// 	// 	if (src == CHANNEL_RS485)
+// 	// 	{
+// 	// 		/*发送完一帧数据后拉低*/
+// 	// 		USART3_EN = 0;
+// 	// 	}
+// 	// 	/*读指针指到下一个节点*/
+// 	// 	pdest->Rptr = ((pdest->Rptr + 1U) % MAX_NODE);
+// 	// }
+
+// 	for (i = 0; i < MAX_NODE; i++)
+// 	{
+// 		/*目标设备发出应答*/
+// 		if (pdest->LNode[i].Frame_Flag)
+// 		{
+// 			printf("2->>source %bd, target %bd, pdest %d, ptr 0x%X\r\n\r\n",
+// 			pdest->LNode[i].Source_Channel, pdest->LNode[i].Target_Channel, pdest, i);
+// 			if ((pdest->LNode[i].Source_Channel != dest) || (pdest->LNode[i].Target_Channel != src))
+// 			{
+// 				// break;
+// 				continue;
+// 				// goto BANK1;
+// 			}
+// 			/*标记该接收帧已经进行处理*/
+// 			pdest->LNode[i].Frame_Flag = false;
+// 			if (src == CHANNEL_RS485)
+// 			{
+// 				/*允许485发送*/
+// 				USART3_EN = 1;
+// 				/*数据转发给RS485时，数据长度+1，可以保证MAX3485芯片能够最后一位数据刚好不停止在串口的停止位上*/
+// 				pdest->LNode[i].Rx_Length += 1U;
+// 			}
+// 			/*数据返回给请求对象*/
+// 			Uartx_SendStr(psuart, pdest->LNode[i].Rx_Buffer, pdest->LNode[i].Rx_Length);
+// 			/*接收到数据长度置为0*/
+// 			pdest->LNode[i].Rx_Length = 0;
+// 			/*发送中断结束后，清空对应接收缓冲区*/
+// 			memset(&pdest->LNode[i].Rx_Buffer[0], 0, MAX_SIZE);
+// 			if (src == CHANNEL_RS485)
+// 			{
+// 				/*发送完一帧数据后拉低*/
+// 				USART3_EN = 0;
+// 			}
+// 			/*读指针指到下一个节点*/
+// 			// i = ((i + 1U) % MAX_NODE);
+// 		}
+// 	}
+// }
+
+/**
+ * @brief	数据帧公共转发
+ * @details
+ * @param	src 数据源请求通道
+ * @param   dest 数据交付通道
+ * @retval	None
+ */
+void Public_DataHandle(SEL_CHANNEL src, SEL_CHANNEL dest) 
 {
-	Uart_List *psrc = Get_Target_Channel(src);
-	Uart_List *pdest = Get_Target_Channel(dest);
-	Uart_HandleTypeDef *psuart = Get_Target_Uart(src);
-	Uart_HandleTypeDef *peuart = Get_Target_Uart(dest);
-	uint8_t i = 0;
+	Uart_List * const psrc = Get_Target_Channel(src);
+	Uart_List * const pdest = Get_Target_Channel(dest);
+	Uart_HandleTypeDef * const psuart = Get_Target_Uart(src);
+	Uart_HandleTypeDef * const peuart = Get_Target_Uart(dest);
+	static uint8_t i = 0;
 
 	if ((psrc == NULL) || (pdest == NULL) || (psuart == NULL) || (peuart == NULL))
 	{
 		return;
 	}
+#if (USE_PRINTF_DEBUG)
 	// printf ("psrc %d, pdest %d, %d, %d, %d, %d\r\n",
 	// (uint16_t)psrc, (uint16_t)pdest, (uint16_t)&COM_UART1, (uint16_t)&COM_UART2,
 	// (uint16_t)&COM_UART3, (uint16_t)&COM_UART4);
-
-	/*检测发起请求接收缓冲区*/
-	if ((psrc->LNode[psrc->Rptr].Frame_Flag))
+#endif
+	/*检查当前节点源地址和目标地址是否与正在执行上目标相同*/
+	if ((psrc->LNode[psrc->Rptr].Source_Channel == src) && (psrc->LNode[psrc->Rptr].Target_Channel == dest))
 	{
-		// printf("1->>source %bd, target %bd, pdest %d, ptr 0x%X\r\n",
-			//    psrc->LNode[psrc->Rptr].Source_Channel, psrc->LNode[psrc->Rptr].Target_Channel, psrc, psrc->Rptr);
-
-		/*检查当前节点源地址和目标地址是否与正在执行上目标相同*/
-		if ((psrc->LNode[psrc->Rptr].Source_Channel != src) || (psrc->LNode[psrc->Rptr].Target_Channel != dest))
+		/*检测发起请求接收缓冲区*/
+		if (psrc->LNode[psrc->Rptr].Frame_Flag)
 		{
-			// return;
-			goto BANK2;
+#if (USE_PRINTF_DEBUG)
+			printf("1->>source %bd, target %bd, pdest %d, ptr 0x%X\r\n",
+			psrc->LNode[psrc->Rptr].Source_Channel, psrc->LNode[psrc->Rptr].Target_Channel, psrc, psrc->Rptr);
+#endif
+			/*标记该接收帧以进行处理*/
+			psrc->LNode[psrc->Rptr].Frame_Flag = false;
+			if (dest == CHANNEL_RS485)
+			{
+				/*允许485发送*/
+				USART3_EN = 1;
+				/*数据转发给RS485时，数据长度+1，可以保证MAX3485芯片能够最后一位数据刚好不停止在串口的停止位上*/
+				psrc->LNode[psrc->Rptr].Rx_Length += 1U;
+			}
+			/*启动对应端硬件数据转发*/
+			Uartx_SendStr(peuart, psrc->LNode[psrc->Rptr].Rx_Buffer, psrc->LNode[psrc->Rptr].Rx_Length);
+			/*接收到数据长度置为0*/
+			psrc->LNode[psrc->Rptr].Rx_Length = 0;
+			/*发送中断结束后，清空对应接收缓冲区*/
+			memset(&psrc->LNode[psrc->Rptr].Rx_Buffer[0], 0, MAX_SIZE);
+			if (dest == CHANNEL_RS485)
+			{
+				/*发送完一帧数据后拉低*/
+				USART3_EN = 0;
+			}
+			/*读指针指到下一个节点*/
+			psrc->Rptr = ((psrc->Rptr + 1U) % MAX_NODE);
 		}
-		/*标记该接收帧以进行处理*/
-		psrc->LNode[psrc->Rptr].Frame_Flag = false;
-		if (dest == CHANNEL_RS485)
-		{
-			/*允许485发送*/
-			USART3_EN = 1;
-			/*数据转发给RS485时，数据长度+1，可以保证MAX3485芯片能够最后一位数据刚好不停止在串口的停止位上*/
-			psrc->LNode[psrc->Rptr].Rx_Length += 1U;
-		}
-		/*启动对应端硬件数据转发*/
-		Uartx_SendStr(peuart, psrc->LNode[psrc->Rptr].Rx_Buffer, psrc->LNode[psrc->Rptr].Rx_Length);
-		/*接收到数据长度置为0*/
-		psrc->LNode[psrc->Rptr].Rx_Length = 0;
-		/*发送中断结束后，清空对应接收缓冲区*/
-		memset(&psrc->LNode[psrc->Rptr].Rx_Buffer[0], 0, MAX_SIZE);
-		if (dest == CHANNEL_RS485)
-		{
-			/*发送完一帧数据后拉低*/
-			USART3_EN = 0;
-		}
-		/*读指针指到下一个节点*/
-		psrc->Rptr = ((psrc->Rptr + 1U) % MAX_NODE);
 	}
-
-BANK2:
-	// pdest = Get_Target_Channel(pdest->LNode[pdest->Rptr].Source_Channel);
-	// psuart = Get_Target_Uart(pdest->LNode[pdest->Rptr].Target_Channel);
-
-	// /*目标设备发出应答*/
-	// if ((pdest->LNode[pdest->Rptr].Frame_Flag))
-	// {
-	// 	printf("2->>source %bd, target %bd, pdest %d, ptr 0x%X\r\n\r\n",
-	// 		   pdest->LNode[pdest->Rptr].Source_Channel, pdest->LNode[pdest->Rptr].Target_Channel, pdest, pdest->Rptr);
-
-	// 	/*检查目标端是否与当前节点数据目标相同*/
-	// 	// if ((pdest->LNode[pdest->Rptr].Source_Channel != dest) || (pdest->LNode[pdest->Rptr].Target_Channel != src))
-	// 	// {
-	// 	// 	return;
-	// 	// 	// goto BANK1;
-	// 	// }
-	// 	/*标记该接收帧已经进行处理*/
-	// 	pdest->LNode[pdest->Rptr].Frame_Flag = false;
-	// 	if (src == CHANNEL_RS485)
-	// 	{
-	// 		/*允许485发送*/
-	// 		USART3_EN = 1;
-	// 		/*数据转发给RS485时，数据长度+1，可以保证MAX3485芯片能够最后一位数据刚好不停止在串口的停止位上*/
-	// 		pdest->LNode[pdest->Rptr].Rx_Length += 1U;
-	// 	}
-	// 	/*数据返回给请求对象*/
-	// 	Uartx_SendStr(psuart, pdest->LNode[pdest->Rptr].Rx_Buffer, pdest->LNode[pdest->Rptr].Rx_Length);
-	// 	/*接收到数据长度置为0*/
-	// 	pdest->LNode[pdest->Rptr].Rx_Length = 0;
-	// 	/*发送中断结束后，清空对应接收缓冲区*/
-	// 	memset(&pdest->LNode[pdest->Rptr].Rx_Buffer[0], 0, MAX_SIZE);
-	// 	if (src == CHANNEL_RS485)
-	// 	{
-	// 		/*发送完一帧数据后拉低*/
-	// 		USART3_EN = 0;
-	// 	}
-	// 	/*读指针指到下一个节点*/
-	// 	pdest->Rptr = ((pdest->Rptr + 1U) % MAX_NODE);
-	// }
 
 	for (i = 0; i < MAX_NODE; i++)
 	{
-		/*目标设备发出应答*/
-		if ((pdest->LNode[i].Frame_Flag))
+		if ((pdest->LNode[i].Source_Channel != dest) || (pdest->LNode[i].Target_Channel != src))
 		{
-			if ((pdest->LNode[i].Source_Channel != dest) || (pdest->LNode[i].Target_Channel != src))
-			{
-				break;
-				// goto BANK1;
-			}
+			continue;
+		}
+		/*目标设备发出应答*/
+		if (pdest->LNode[i].Frame_Flag)
+		{
+#if (USE_PRINTF_DEBUG)
+			printf("2->>source %bd, target %bd, pdest %d, ptr 0x%X\r\n\r\n",
+			pdest->LNode[i].Source_Channel, pdest->LNode[i].Target_Channel, pdest, i);
+#endif		
 			/*标记该接收帧已经进行处理*/
 			pdest->LNode[i].Frame_Flag = false;
 			if (src == CHANNEL_RS485)
@@ -294,8 +377,6 @@ BANK2:
 				/*发送完一帧数据后拉低*/
 				USART3_EN = 0;
 			}
-			/*读指针指到下一个节点*/
-			// i = ((i + 1U) % MAX_NODE);
 		}
 	}
 }

@@ -1,0 +1,300 @@
+C51 COMPILER V9.60.0.0   MEM_MALLOC                                                        12/20/2021 09:51:17 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE MEM_MALLOC
+OBJECT MODULE PLACED IN .\Objects\mem_malloc.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE Source\mem_malloc.c LARGE OPTIMIZE(9,SIZE) BROWSE INCDIR(.\Include;.\Fre
+                    -eModBus\Inc) DEBUG OBJECTEXTEND PRINT(.\Listings\mem_malloc.lst) OBJECT(.\Objects\mem_malloc.obj)
+
+line level    source
+
+   1          
+   2          #include "mem_malloc.h"
+*** WARNING C245 IN LINE 14 OF .\Include\mem_malloc.h: unknown #pragma, line ignored
+*** WARNING C245 IN LINE 20 OF .\Include\mem_malloc.h: unknown #pragma, line ignored
+*** ERROR C141 IN LINE 26 OF .\Include\mem_malloc.h: syntax error near ',', expected '<id>'
+   3          
+   4          static unsigned int sum = 0;
+   5          static char                     mem[MEM_SIZE];
+   6          
+   7          #define DEBUG_EN        0
+   8          #define MEM_START       &mem[0]
+   9          #define MEM_END         &mem[MEM_SIZE]  
+  10          #define BLK_SIZE        sizeof(mem_block) 
+  11          
+  12          void print_mem_info(void){
+  13   1              printf("------------mem_info--------------\n");
+  14   1              printf("sizeof(mem_block)=%d\n", BLK_SIZE);
+  15   1              printf("MEM_START = %d(0x%x)\n", (int)MEM_START, (int)MEM_START);
+  16   1              printf("MEM_END   = %d(0x%x)\n", (int)MEM_END, (int)MEM_END);
+  17   1              printf("MEM_SIZE  = %d(0x%x)\n", (int)MEM_SIZE, (int)MEM_SIZE);
+  18   1              printf("----------------------------------\n"); 
+  19   1      }
+  20          
+  21          void print_hex(char *data, int len){
+*** ERROR C141 IN LINE 21 OF Source\mem_malloc.c: syntax error near ',', expected '<id>'
+  22   1              for(int i=0; i<len; i++){
+*** ERROR C141 IN LINE 22 OF Source\mem_malloc.c: syntax error near 'int', expected 'sizeof'
+*** ERROR C202 IN LINE 22 OF Source\mem_malloc.c: 'i': undefined identifier
+*** ERROR C202 IN LINE 22 OF Source\mem_malloc.c: 'i': undefined identifier
+*** ERROR C202 IN LINE 22 OF Source\mem_malloc.c: 'i': undefined identifier
+*** ERROR C141 IN LINE 22 OF Source\mem_malloc.c: syntax error near ')', expected ';'
+  23   2                      printf("%02x ", (unsigned char)data[i]);
+*** ERROR C141 IN LINE 23 OF Source\mem_malloc.c: syntax error near 'data', expected 'sizeof'
+  24   2                      if((i+1)%12 == 0)   printf("\n");
+*** ERROR C202 IN LINE 24 OF Source\mem_malloc.c: 'i': undefined identifier
+  25   2              }
+  26   1              printf("\n");
+  27   1      }
+  28          
+  29          void print_mem_hex(int size){
+  30   1              print_hex(mem, size);
+*** ERROR C208 IN LINE 30 OF Source\mem_malloc.c: '_print_hex': too many actual parameters
+  31   1      }
+  32          
+  33          int mem_malloc(unsigned int msize){
+  34   1              unsigned int all_size = msize + sizeof(mem_block);
+  35   1              mem_block tmp_blk;
+  36   1              if(msize == 0) return 0;
+  37   1              if(sum){
+  38   2                      mem_block *ptr_blk = (mem_block *)(MEM_START + BLK_SIZE*(sum-1));
+  39   2                      int free_blk = (char *)ptr_blk->mem_ptr-(MEM_START + BLK_SIZE*sum);
+  40   2                      if(all_size <= free_blk){
+  41   3                              tmp_blk.mem_ptr = ptr_blk->mem_ptr - msize;
+  42   3                              tmp_blk.mem_size = msize;
+C51 COMPILER V9.60.0.0   MEM_MALLOC                                                        12/20/2021 09:51:17 PAGE 2   
+
+  43   3                              tmp_blk.mem_index = ptr_blk->mem_index + 1;
+  44   3                              memcpy(MEM_START + BLK_SIZE*sum, &tmp_blk, BLK_SIZE);
+  45   3                              sum = sum + 1;
+  46   3                      #if DEBUG_EN
+                                      printf("mem_ptr = 0x%x\n", (int)tmp_blk.mem_ptr);
+                                      printf("mem_size = 0x%x\n", tmp_blk.mem_size);
+                                      printf("mem_index = 0x%x\n", tmp_blk.mem_index);
+                              #endif
+  51   3                              return tmp_blk.mem_index;
+  52   3                      }
+  53   2              }else{
+  54   2                      if(all_size <= MEM_SIZE){
+  55   3                              tmp_blk.mem_ptr = MEM_END - msize;
+  56   3                              tmp_blk.mem_size = msize;
+  57   3                              tmp_blk.mem_index = 1;
+  58   3                              memcpy(MEM_START, &tmp_blk, BLK_SIZE);
+  59   3                              sum = 1;
+  60   3              #if DEBUG_EN
+                                      printf("mem_ptr = 0x%x\n", (int)tmp_blk.mem_ptr);
+                                      printf("mem_size = 0x%x\n", tmp_blk.mem_size);
+                                      printf("mem_index = 0x%x\n", tmp_blk.mem_index);
+                      #endif
+  65   3                              return 1;
+  66   3                      }
+  67   2              }
+  68   1              return 0;
+  69   1      }
+  70          
+  71          int mem_realloc(int id, unsigned int msize){
+  72   1              for(int i=0; i<sum; i++){
+*** ERROR C141 IN LINE 72 OF Source\mem_malloc.c: syntax error near 'int', expected 'sizeof'
+*** ERROR C202 IN LINE 72 OF Source\mem_malloc.c: 'i': undefined identifier
+*** ERROR C202 IN LINE 72 OF Source\mem_malloc.c: 'i': undefined identifier
+*** ERROR C202 IN LINE 72 OF Source\mem_malloc.c: 'i': undefined identifier
+*** ERROR C141 IN LINE 72 OF Source\mem_malloc.c: syntax error near ')', expected ';'
+  73   2                      mem_block *ptr_blk = (mem_block *)(MEM_START + BLK_SIZE*i);
+  74   2                      if(id == ptr_blk->mem_index){
+  75   3                              int free_blk = (char *)ptr_blk->mem_ptr-(MEM_START + BLK_SIZE*sum);
+  76   3                              int old_size = ptr_blk->mem_size;
+  77   3                              int offset = msize - old_size;
+  78   3                              int move_size = 0; 
+  79   3                              int n = sum - i;
+*** ERROR C202 IN LINE 79 OF Source\mem_malloc.c: 'i': undefined identifier
+  80   3                              mem_block *ptr_tmp;
+  81   3                              if(offset == 0){
+  82   4                                      return 0;
+  83   4                              }else if(offset < 0){
+  84   4                                      offset = old_size - msize;
+  85   4                                      for(int j=1; j<n; j++){
+*** ERROR C141 IN LINE 85 OF Source\mem_malloc.c: syntax error near 'int', expected 'sizeof'
+*** ERROR C202 IN LINE 85 OF Source\mem_malloc.c: 'j': undefined identifier
+*** ERROR C202 IN LINE 85 OF Source\mem_malloc.c: 'j': undefined identifier
+*** ERROR C202 IN LINE 85 OF Source\mem_malloc.c: 'j': undefined identifier
+*** ERROR C141 IN LINE 85 OF Source\mem_malloc.c: syntax error near ')', expected ';'
+  86   5                                              ptr_tmp = (mem_block *)(MEM_START + BLK_SIZE*(i+j));
+  87   5                                              move_size += ptr_tmp->mem_size;
+  88   5                                      }
+  89   4                                      if(n == 1){
+  90   5                                              ptr_tmp = (mem_block *)(MEM_START + BLK_SIZE*i);
+*** ERROR C202 IN LINE 90 OF Source\mem_malloc.c: 'i': undefined identifier
+  91   5                                      }
+  92   4                                      move_size += msize;
+C51 COMPILER V9.60.0.0   MEM_MALLOC                                                        12/20/2021 09:51:17 PAGE 3   
+
+  93   4                                      char *dst_addr = ptr_tmp->mem_ptr + move_size + offset - 1;
+*** ERROR C141 IN LINE 93 OF Source\mem_malloc.c: syntax error near 'char', expected '__asm'
+*** ERROR C202 IN LINE 93 OF Source\mem_malloc.c: 'dst_addr': undefined identifier
+  94   4                                      char *src_addr = ptr_tmp->mem_ptr + move_size - 1;
+*** ERROR C141 IN LINE 94 OF Source\mem_malloc.c: syntax error near 'char', expected '__asm'
+*** ERROR C202 IN LINE 94 OF Source\mem_malloc.c: 'src_addr': undefined identifier
+  95   4                                      for(int j=move_size; j>0; j--){
+*** ERROR C141 IN LINE 95 OF Source\mem_malloc.c: syntax error near 'int', expected 'sizeof'
+*** ERROR C202 IN LINE 95 OF Source\mem_malloc.c: 'j': undefined identifier
+*** ERROR C202 IN LINE 95 OF Source\mem_malloc.c: 'j': undefined identifier
+*** ERROR C202 IN LINE 95 OF Source\mem_malloc.c: 'j': undefined identifier
+*** ERROR C141 IN LINE 95 OF Source\mem_malloc.c: syntax error near ')', expected ';'
+  96   5                                              *dst_addr-- = *src_addr--;
+  97   5                                      }
+  98   4                                      memset(src_addr, 0, offset+1);
+*** ERROR C202 IN LINE 98 OF Source\mem_malloc.c: 'src_addr': undefined identifier
+  99   4                                      for(int j=0; j<n; j++){
+*** ERROR C141 IN LINE 99 OF Source\mem_malloc.c: syntax error near 'int', expected 'sizeof'
+*** ERROR C202 IN LINE 99 OF Source\mem_malloc.c: 'j': undefined identifier
+*** ERROR C202 IN LINE 99 OF Source\mem_malloc.c: 'j': undefined identifier
+*** ERROR C202 IN LINE 99 OF Source\mem_malloc.c: 'j': undefined identifier
+*** ERROR C141 IN LINE 99 OF Source\mem_malloc.c: syntax error near ')', expected ';'
+ 100   5                                              ptr_tmp = (mem_block *)(MEM_START + BLK_SIZE*(i+j));
+ 101   5                                              ptr_tmp->mem_ptr += offset;
+ 102   5                                              if(j == 0){
+*** ERROR C202 IN LINE 102 OF Source\mem_malloc.c: 'j': undefined identifier
+ 103   6                                                      ptr_tmp->mem_size = msize;
+ 104   6                                              }
+ 105   5                                      }
+ 106   4                                      return 1;
+ 107   4                              }else{
+ 108   4                                      if(offset <= free_blk){
+ 109   5                                              for(int j=1; j<n; j++){
+*** ERROR C141 IN LINE 109 OF Source\mem_malloc.c: syntax error near 'int', expected 'sizeof'
+*** ERROR C202 IN LINE 109 OF Source\mem_malloc.c: 'j': undefined identifier
+*** ERROR C202 IN LINE 109 OF Source\mem_malloc.c: 'j': undefined identifier
+*** ERROR C202 IN LINE 109 OF Source\mem_malloc.c: 'j': undefined identifier
+*** ERROR C141 IN LINE 109 OF Source\mem_malloc.c: syntax error near ')', expected ';'
+ 110   6                                                      ptr_tmp = (mem_block *)(MEM_START + BLK_SIZE*(i+j));
+ 111   6                                                      move_size += ptr_tmp->mem_size;
+ 112   6                                              }
+ 113   5                                              if(n == 1){
+ 114   6                                                      ptr_tmp = (mem_block *)(MEM_START + BLK_SIZE*i);
+*** ERROR C202 IN LINE 114 OF Source\mem_malloc.c: 'i': undefined identifier
+ 115   6                                              }
+ 116   5                                              move_size += old_size;
+ 117   5                                              char *dst_addr = ptr_tmp->mem_ptr - offset;
+*** ERROR C141 IN LINE 117 OF Source\mem_malloc.c: syntax error near 'char', expected '__asm'
+*** ERROR C202 IN LINE 117 OF Source\mem_malloc.c: 'dst_addr': undefined identifier
+ 118   5                                              char *src_addr = ptr_tmp->mem_ptr;
+*** ERROR C141 IN LINE 118 OF Source\mem_malloc.c: syntax error near 'char', expected '__asm'
+*** ERROR C202 IN LINE 118 OF Source\mem_malloc.c: 'src_addr': undefined identifier
+ 119   5                                              for(int j=0; j<move_size; j++){
+*** ERROR C141 IN LINE 119 OF Source\mem_malloc.c: syntax error near 'int', expected 'sizeof'
+*** ERROR C202 IN LINE 119 OF Source\mem_malloc.c: 'j': undefined identifier
+*** ERROR C202 IN LINE 119 OF Source\mem_malloc.c: 'j': undefined identifier
+*** ERROR C202 IN LINE 119 OF Source\mem_malloc.c: 'j': undefined identifier
+*** ERROR C141 IN LINE 119 OF Source\mem_malloc.c: syntax error near ')', expected ';'
+ 120   6                                                      *dst_addr++ = *src_addr++;
+ 121   6                                              }
+ 122   5                                              for(int j=0; j<n; j++){
+*** ERROR C141 IN LINE 122 OF Source\mem_malloc.c: syntax error near 'int', expected 'sizeof'
+C51 COMPILER V9.60.0.0   MEM_MALLOC                                                        12/20/2021 09:51:17 PAGE 4   
+
+*** ERROR C202 IN LINE 122 OF Source\mem_malloc.c: 'j': undefined identifier
+*** ERROR C202 IN LINE 122 OF Source\mem_malloc.c: 'j': undefined identifier
+*** ERROR C202 IN LINE 122 OF Source\mem_malloc.c: 'j': undefined identifier
+*** ERROR C141 IN LINE 122 OF Source\mem_malloc.c: syntax error near ')', expected ';'
+ 123   6                                                      ptr_tmp = (mem_block *)(MEM_START + BLK_SIZE*(i+j));
+ 124   6                                                      ptr_tmp->mem_ptr -= offset;
+ 125   6                                                      if(j == 0){
+*** ERROR C202 IN LINE 125 OF Source\mem_malloc.c: 'j': undefined identifier
+ 126   7                                                              ptr_tmp->mem_size = msize;
+ 127   7                                                      }
+ 128   6                                              }
+ 129   5                                              return 1;                               
+ 130   5                                      }
+ 131   4                              }
+ 132   3                      }
+ 133   2              }
+ 134   1              return 0;
+ 135   1      }
+ 136          
+ 137          void *mem_buffer(int id){
+ 138   1              for(int i=0; i<sum; i++){
+*** ERROR C141 IN LINE 138 OF Source\mem_malloc.c: syntax error near 'int', expected 'sizeof'
+*** ERROR C202 IN LINE 138 OF Source\mem_malloc.c: 'i': undefined identifier
+*** ERROR C202 IN LINE 138 OF Source\mem_malloc.c: 'i': undefined identifier
+*** ERROR C202 IN LINE 138 OF Source\mem_malloc.c: 'i': undefined identifier
+*** ERROR C141 IN LINE 138 OF Source\mem_malloc.c: syntax error near ')', expected ';'
+ 139   2                      mem_block *ptr_blk = (mem_block *)(MEM_START + BLK_SIZE*i);
+ 140   2                      if(id == ptr_blk->mem_index){
+ 141   3                              return ptr_blk->mem_ptr;
+ 142   3                      }
+ 143   2              }
+ 144   1              return NULL;
+ 145   1      }
+ 146          
+ 147          int mem_free(int id){
+ 148   1              for(int i=0; i<sum; i++){
+*** ERROR C141 IN LINE 148 OF Source\mem_malloc.c: syntax error near 'int', expected 'sizeof'
+*** ERROR C202 IN LINE 148 OF Source\mem_malloc.c: 'i': undefined identifier
+*** ERROR C202 IN LINE 148 OF Source\mem_malloc.c: 'i': undefined identifier
+*** ERROR C202 IN LINE 148 OF Source\mem_malloc.c: 'i': undefined identifier
+*** ERROR C141 IN LINE 148 OF Source\mem_malloc.c: syntax error near ')', expected ';'
+ 149   2                      mem_block *ptr_blk = (mem_block *)(MEM_START + BLK_SIZE*i);
+ 150   2                      if(id == ptr_blk->mem_index){
+ 151   3                              mem_block *ptr_old;
+ 152   3                              if(i != (sum-1)){
+*** ERROR C202 IN LINE 152 OF Source\mem_malloc.c: 'i': undefined identifier
+ 153   4                                      int offset = ptr_blk->mem_size;
+ 154   4                                      int move_size = 0; 
+ 155   4                                      int n = sum - i;
+*** ERROR C202 IN LINE 155 OF Source\mem_malloc.c: 'i': undefined identifier
+ 156   4                                      mem_block *ptr_tmp;
+ 157   4                                      for(int j=1; j<n; j++){
+*** ERROR C141 IN LINE 157 OF Source\mem_malloc.c: syntax error near 'int', expected 'sizeof'
+*** ERROR C202 IN LINE 157 OF Source\mem_malloc.c: 'j': undefined identifier
+*** ERROR C202 IN LINE 157 OF Source\mem_malloc.c: 'j': undefined identifier
+*** ERROR C202 IN LINE 157 OF Source\mem_malloc.c: 'j': undefined identifier
+*** ERROR C141 IN LINE 157 OF Source\mem_malloc.c: syntax error near ')', expected ';'
+ 158   5                                              ptr_tmp = (mem_block *)(MEM_START + BLK_SIZE*(i+j));
+ 159   5                                              move_size += ptr_tmp->mem_size;
+ 160   5                                      }
+ 161   4                                      //memmove();
+ 162   4                                      char *dst_addr = ptr_tmp->mem_ptr + move_size + offset - 1;
+C51 COMPILER V9.60.0.0   MEM_MALLOC                                                        12/20/2021 09:51:17 PAGE 5   
+
+*** ERROR C141 IN LINE 162 OF Source\mem_malloc.c: syntax error near 'char', expected '__asm'
+*** ERROR C202 IN LINE 162 OF Source\mem_malloc.c: 'dst_addr': undefined identifier
+ 163   4                                      char *src_addr = ptr_tmp->mem_ptr + move_size - 1;
+*** ERROR C141 IN LINE 163 OF Source\mem_malloc.c: syntax error near 'char', expected '__asm'
+*** ERROR C202 IN LINE 163 OF Source\mem_malloc.c: 'src_addr': undefined identifier
+ 164   4                                      for(int j=move_size; j>0; j--){
+*** ERROR C141 IN LINE 164 OF Source\mem_malloc.c: syntax error near 'int', expected 'sizeof'
+*** ERROR C202 IN LINE 164 OF Source\mem_malloc.c: 'j': undefined identifier
+*** ERROR C202 IN LINE 164 OF Source\mem_malloc.c: 'j': undefined identifier
+*** ERROR C202 IN LINE 164 OF Source\mem_malloc.c: 'j': undefined identifier
+*** ERROR C141 IN LINE 164 OF Source\mem_malloc.c: syntax error near ')', expected ';'
+ 165   5                                              *dst_addr-- = *src_addr--;
+ 166   5                                      }
+ 167   4                                      memset(src_addr, 0, offset+1);
+*** ERROR C202 IN LINE 167 OF Source\mem_malloc.c: 'src_addr': undefined identifier
+ 168   4                                      for(int j=0; j<(n-1); j++){
+*** ERROR C141 IN LINE 168 OF Source\mem_malloc.c: syntax error near 'int', expected 'sizeof'
+*** ERROR C202 IN LINE 168 OF Source\mem_malloc.c: 'j': undefined identifier
+*** ERROR C202 IN LINE 168 OF Source\mem_malloc.c: 'j': undefined identifier
+*** ERROR C202 IN LINE 168 OF Source\mem_malloc.c: 'j': undefined identifier
+*** ERROR C141 IN LINE 168 OF Source\mem_malloc.c: syntax error near ')', expected ';'
+ 169   5                                              ptr_tmp = (mem_block *)(MEM_START + BLK_SIZE*(i+j));
+ 170   5                                              ptr_old = (mem_block *)(MEM_START + BLK_SIZE*(i+j+1));
+*** ERROR C202 IN LINE 170 OF Source\mem_malloc.c: 'i': undefined identifier
+ 171   5                                              memcpy(ptr_tmp, ptr_old, BLK_SIZE);
+ 172   5                                              ptr_tmp->mem_ptr += offset;
+ 173   5                                      }
+ 174   4                              }else{
+ 175   4                                      ptr_old = (mem_block *)(MEM_START + BLK_SIZE*i);
+*** ERROR C202 IN LINE 175 OF Source\mem_malloc.c: 'i': undefined identifier
+ 176   4                                      memset(ptr_old->mem_ptr, 0, ptr_old->mem_size);
+ 177   4                              }
+ 178   3                              memset(ptr_old, 0, BLK_SIZE);
+ 179   3                              sum = sum - 1;
+ 180   3                              return 1;
+ 181   3                      }
+ 182   2              }
+ 183   1              return 0;
+ 184   1      }
+ 185          
+
+C51 COMPILATION COMPLETE.  2 WARNING(S),  93 ERROR(S)

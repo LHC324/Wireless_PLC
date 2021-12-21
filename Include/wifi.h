@@ -23,9 +23,9 @@ extern "C" {
 #define WIFI_RELOAD		P15
 
 /*定义设备ID*/
-#define DRIVERS_ID "51"
+#define DRIVERS_ID "56"
 /*定义热点ID*/
-#define AP_ID "PLC11_AP"
+#define AP_ID "PLC16_AP"
 /*转化为字符串*/
 #define SWITCH_STR(S) #S
 /*拼接一个宏定义和字符串*/
