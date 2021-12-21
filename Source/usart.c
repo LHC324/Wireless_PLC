@@ -124,7 +124,7 @@ void Uart2_Init(void) //串口2选择定时器2作为波特率发生器
     Uart2.RunUart_Enable = true;
     Uart2.Interrupt_Enable = 0x01;
     Uart2.Register_AUXR = 0x14;         //开启定时器2，1T模式
-    Uart2.Uart_NVIC.Register_IP = 0x01; // PS2=1,PS2H=0,串口2中断优先级为第1级
+    Uart2.Uart_NVIC.Register_IP = 0xFE; // PS2=0,PS2H=0,串口2中断优先级为第0级
     Uart2.Uart_NVIC.Register_IPH = 0xFE;
 
     Uart_Base_MspInit(&Uart2);

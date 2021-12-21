@@ -40,6 +40,22 @@ APSTRUCT Aplist[] =
 };
 uint8_t G_Aplist_Size = (sizeof(Aplist) / sizeof(APSTRUCT));
 
+/*工作模式设置*/
+MODESTRUCT Modelist[] =
+{
+	{"主机", Mode_Master},
+	{"从机", Mode_Slave}
+};
+uint8_t G_Modelist_Size = (sizeof(Modelist) / sizeof(MODESTRUCT));
+
+OBJCTSTRUCT Objlist[] = 
+{
+	{"Ethernet"},
+	{"WIFI/4G"},
+	{"RS485"}
+};
+uint8_t G_Objlist_Size = (sizeof(Objlist) / sizeof(OBJCTSTRUCT));
+
 void ControlInit(void)
 {
 	/*缺省控件类型*/
@@ -262,14 +278,38 @@ void ReloadSettingUIshow(void)
 
 void HotspotSettingUIshow(void)
 {
-	    clear_screen();
-		GUI_String(10,10,"热点", CH_12_12);
-		GUI_String(115,10,Aplist[System_Parameter.Apstate].pstring,CH_12_12);
-		GUI_Lattice(149,13,5,8,IconRight);
-		GUI_Lattice(97,13,5,8,Iconleft);
+	clear_screen();
+	GUI_String(10,10,"热点", CH_12_12);
+	GUI_String(115,10,Aplist[System_Parameter.Apstate].pstring,CH_12_12);
+	GUI_Lattice(149,13,5,8,IconRight);
+	GUI_Lattice(97,13,5,8,Iconleft);
 			
-		GUI_String(10,43,"AP ID",EN_5_8);
-		GUI_String(97,43,AP_ID,EN_5_8);	
+	GUI_String(10,43,"AP ID",EN_5_8);
+	GUI_String(97,43,AP_ID,EN_5_8);	
+}
+
+void WorkModeUIshow(void)
+{
+	clear_screen();
+	GUI_String(10,10,"模式", CH_12_12);
+	GUI_String(115,10,Modelist[System_Parameter.WorkMode].pstring,CH_12_12);
+	GUI_Lattice(149,13,5,8,IconRight);
+	GUI_Lattice(97,13,5,8,Iconleft);
+			
+	GUI_String(10,43,"object",EN_5_8);
+	GUI_String(97,43,Objlist[System_Parameter.CurrentSlave].pstring,EN_5_8);	
+}
+
+void Mode_Slave(void)
+{
+	System_Parameter.WorkMode = SLAVE;
+}
+
+void Mode_Master(void)
+{
+	System_Parameter.WorkMode = MASTER;
+	/*PLC工作在主站时，默认从站为RS485*/
+	System_Parameter.CurrentSlave = RS485_ID;
 }
 
 /**

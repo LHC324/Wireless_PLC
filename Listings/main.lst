@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.0.0   MAIN                                                              12/21/2021 14:13:58 PAGE 1   
+C51 COMPILER V9.60.0.0   MAIN                                                              12/21/2021 17:57:20 PAGE 1   
 
 
 C51 COMPILER V9.60.0.0, COMPILATION OF MODULE MAIN
@@ -25,7 +25,7 @@ line level    source
   15          
   16          /*系统参数*/
   17          SYSTEM_PARAMETER System_Parameter = {0, false, false, "\xFF\xFF\xFF\xFF", "\x08\x08\x02\x08", 0x01, 0x01, 
-             -0x00, 0x00,0x487e};
+             -0x00, 0x00, 0x01, 0x02, 0x3671};
   18          
   19          static void systemInit(void);
   20          static void UsartHandle(void);
@@ -62,7 +62,7 @@ line level    source
   51   1          Init_ListQueue(&COM_UART2);
   52   1              memset(&COM_UART2, 0, sizeof(COM_UART2));
   53   1              
-C51 COMPILER V9.60.0.0   MAIN                                                              12/21/2021 14:13:58 PAGE 2   
+C51 COMPILER V9.60.0.0   MAIN                                                              12/21/2021 17:57:20 PAGE 2   
 
   54   1              // RS485串口结构体初始化
   55   1          Init_ListQueue(&COM_UART3);
@@ -126,7 +126,7 @@ line level    source
  113   1          /*时钟不分频*/
  114   1          CLKDIV = 0x01;  
  115   1          /*选择外部晶振 */                    
-C51 COMPILER V9.60.0.0   MAIN                                                              12/21/2021 14:13:58 PAGE 3   
+C51 COMPILER V9.60.0.0   MAIN                                                              12/21/2021 17:57:20 PAGE 3   
 
  116   1          CKSEL = 0x01;                    
  117   1          P_SW2 = 0x00;
@@ -190,7 +190,7 @@ line level    source
  173   1              /*比较当前校验码和存储区校验码是否匹配*/
  174   1              if(CRC == System_Parameter.CRC16)
  175   1              {
-C51 COMPILER V9.60.0.0   MAIN                                                              12/21/2021 14:13:58 PAGE 4   
+C51 COMPILER V9.60.0.0   MAIN                                                              12/21/2021 17:57:20 PAGE 4   
 
  176   2                      return true;
  177   2              }
@@ -231,8 +231,8 @@ line level    source
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
    CODE SIZE        =    489    ----
-   CONSTANT SIZE    =     96    ----
-   XDATA SIZE       =     17       2
+   CONSTANT SIZE    =     98    ----
+   XDATA SIZE       =     19       2
    PDATA SIZE       =   ----    ----
    DATA SIZE        =   ----    ----
    IDATA SIZE       =   ----    ----

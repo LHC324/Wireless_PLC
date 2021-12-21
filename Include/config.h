@@ -54,7 +54,7 @@ typedef volatile __IO;
 /***********************************常用的数据类型***********************************/
 
 /***********************************系统上电参数***********************************/
-#define DEFAULT_SYSTEM_PARAMETER "\xFF\xFF\xFF\xFF\x08\x08\x02\x08\x01\x01\x00\x00\x48\x7E"
+#define DEFAULT_SYSTEM_PARAMETER "\xFF\xFF\xFF\xFF\x08\x08\x02\x08\x01\x01\x00\x00\x01\x02\x36\x71"
 #define START_SAVEADDRESS 0x0000         //参数存储开始地址
 #define BAUDRATE_SAVEADDRESS 0x0004      //波特率
 #define PLCSTAE_SAVEADDRESS 0x0005       // PLC状态
@@ -82,6 +82,8 @@ typedef struct
     uint8_t CommunicationType;        //通讯类型
     uint8_t WifiInitFlag;             // WIFI初始化标志
     uint8_t Apstate;                  //热点状态
+    uint8_t WorkMode;                 //工作模式
+    uint8_t CurrentSlave;             //当前从机
     uint16_t CRC16;                   // CRC校验码
 } SYSTEM_PARAMETER;                   //系统参数
 
@@ -100,6 +102,11 @@ extern SYSTEM_PARAMETER System_Parameter;
 /***********************************多串口通讯***********************************/
 #define FREE 0 // 不忙
 #define BUSY 1 // 忙
+#define MASTER 0x00
+#define SLAVE 0x01
+#define ETHERNET_ID 0x00
+#define WIFI_ID 0x01
+#define RS485_ID 0x02
 
 // 通信结构体用常量
 #define MAX_SIZE 64    // 缓冲区长度
@@ -125,7 +132,7 @@ typedef enum
 /*定义当前链队条数*/
 #define MAX_LQUEUE 4U
 /*定义每条链表最大节点数*/
-#define MAX_NODE 16U // 20
+#define MAX_NODE 24U // 20
 /*定义循环值*/
 //#define LOOP(x) (COM_UART##x.Wptr + 1U) % MAX_NODE)
 /*判断环形队列为空处理方式1*/

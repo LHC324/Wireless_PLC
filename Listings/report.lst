@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.0.0   REPORT                                                            12/21/2021 14:13:58 PAGE 1   
+C51 COMPILER V9.60.0.0   REPORT                                                            12/21/2021 17:57:20 PAGE 1   
 
 
 C51 COMPILER V9.60.0.0, COMPILATION OF MODULE REPORT
@@ -13,514 +13,320 @@ line level    source
    3          
    4          void Public_DataHandle(SEL_CHANNEL src, SEL_CHANNEL dest);
    5          void Uart_DataForward(SEL_CHANNEL Src, SEL_CHANNEL Dest);
-   6          void Plc_To_Rs485(void);
-   7          void Wifi_To_Plc(void);
-   8          void Rs485_to_Plc(void);
-   9          
-  10          /*定义当前串口交换序列*/
-  11          // const ComData_Handle ComData_Array[] =
-  12          //      {
-  13          //              {CHANNEL_PLC, CHANNEL_RS485, Plc_To_Rs485},
-  14          //              {CHANNEL_WIFI, CHANNEL_PLC, Wifi_To_Plc},
-  15          //              //      {CHANNEL_LAN,  CHANNEL_PLC,   Lan_To_Plc}
-  16          // };
-  17          
-  18          const ComData_Handle code ComData_Array[] =
-  19                  {
-  20                          // {CHANNEL_PLC, CHANNEL_RS485, Public_DataHandle},
-  21                          {CHANNEL_WIFI, CHANNEL_PLC, Public_DataHandle},
-  22                          {CHANNEL_LAN, CHANNEL_PLC, Public_DataHandle},
-  23                          {CHANNEL_RS485, CHANNEL_PLC, Public_DataHandle}
-  24                  };
-  25          
-  26          #define COMDATA_SIZE (sizeof(ComData_Array) / sizeof(ComData_Handle))
-  27          
-  28          /*创建4条链队*/
-  29          Uart_List xdata Uart_LinkList[MAX_LQUEUE] = {0};
-  30          
-  31          /**
-  32           * @brief       初始化静态链队
-  33           * @details
-  34           * @param       *List:当前链队指针
-  35           * @retval      None
-  36           */
-  37          void Init_ListQueue(Uart_List *List)
-  38          {
-  39   1              uint8_t j = 0;
-  40   1      
-  41   1              for (j = 0; j < MAX_NODE; j++)
-  42   1              {
-  43   2                      /*初始化队列数据域*/
-  44   2                      List->LNode[j].Source_Channel = CHANNEL_IDLE;
-  45   2                      List->LNode[j].Target_Channel = CHANNEL_IDLE;
-  46   2                      List->LNode[j].Frame_Flag = false;
-  47   2                      List->LNode[j].Timer_Flag = false;
-  48   2                      List->LNode[j].Rx_Length = 0;
-  49   2                      List->LNode[j].OverTime = MAX_SILENCE;
-  50   2                      memset(&List->LNode[j].Rx_Buffer[0], 0, MAX_SIZE);
-  51   2              }
-  52   1              // List->Buffer_Size = buf_size;
-  53   1              /*初始化链表节点读写指针*/
-  54   1              List->Wptr = List->Rptr = 0;
-C51 COMPILER V9.60.0.0   REPORT                                                            12/21/2021 14:13:58 PAGE 2   
+   6          
+   7          /*定义当前串口交换序列*/
+   8          const ComData_Handle code ComData_Array[] =
+   9                  {
+  10                          // {CHANNEL_PLC, CHANNEL_RS485, Public_DataHandle},
+  11                          {CHANNEL_WIFI, CHANNEL_PLC, Public_DataHandle},
+  12                          {CHANNEL_LAN, CHANNEL_PLC, Public_DataHandle},
+  13                          {CHANNEL_RS485, CHANNEL_PLC, Public_DataHandle},
+  14                          /*作为主机时情况*/
+  15                          {CHANNEL_PLC, CHANNEL_WIFI, Public_DataHandle},
+  16                          {CHANNEL_PLC, CHANNEL_LAN, Public_DataHandle},
+  17                          {CHANNEL_PLC, CHANNEL_RS485, Public_DataHandle}
+  18                  };
+  19          
+  20          #define COMDATA_SIZE (sizeof(ComData_Array) / sizeof(ComData_Handle))
+  21          
+  22          /*创建4条链队*/
+  23          Uart_List xdata Uart_LinkList[MAX_LQUEUE] = {0};
+  24          
+  25          /**
+  26           * @brief       初始化静态链队
+  27           * @details
+  28           * @param       *List:当前链队指针
+  29           * @retval      None
+  30           */
+  31          void Init_ListQueue(Uart_List *List)
+  32          {
+  33   1              uint8_t j = 0;
+  34   1      
+  35   1              for (j = 0; j < MAX_NODE; j++)
+  36   1              {
+  37   2                      /*初始化队列数据域*/
+  38   2                      List->LNode[j].Source_Channel = CHANNEL_IDLE;
+  39   2                      List->LNode[j].Target_Channel = CHANNEL_IDLE;
+  40   2                      List->LNode[j].Frame_Flag = false;
+  41   2                      List->LNode[j].Timer_Flag = false;
+  42   2                      List->LNode[j].Rx_Length = 0;
+  43   2                      List->LNode[j].OverTime = MAX_SILENCE;
+  44   2                      memset(&List->LNode[j].Rx_Buffer[0], 0, MAX_SIZE);
+  45   2              }
+  46   1              // List->Buffer_Size = buf_size;
+  47   1              /*初始化链表节点读写指针*/
+  48   1              List->Wptr = List->Rptr = 0;
+  49   1      }
+  50          
+  51          /**
+  52           * @brief       串口事件处理
+  53           * @details
+  54           * @param       None
+C51 COMPILER V9.60.0.0   REPORT                                                            12/21/2021 17:57:20 PAGE 2   
 
-  55   1      }
-  56          
-  57          /**
-  58           * @brief       串口1对1数据转发
-  59           * @details
-  60           * @param       None
-  61           * @retval      None
-  62           */
-  63          // void Uart_DataForward(SEL_CHANNEL Src, SEL_CHANNEL Dest)
-  64          // {
-  65          //      uint8_t i = 0;
-  66          
-  67          //      for (i = 0; i < COMDATA_SIZE; i++)
-  68          //      {
-  69          //              if ((Src == ComData_Array[i].Source_Channel) && (Dest == ComData_Array[i].Target_Channel))
-  70          //              {
-  71          //                      ComData_Array[i].pHandle();
-  72          //              }
-  73          //      }
-  74          // }
-  75          
-  76          /**
-  77           * @brief       串口事件处理
-  78           * @details
-  79           * @param       None
-  80           * @retval      None
-  81           */
-  82          void Uart_Handle(void)
-  83          {
-  84   1              static uint8_t i = 0;
-  85   1      
-  86   1              // /*关闭串口4接收中断*/
-  87   1              // // S4CON &= ~S4REN;
-  88   1      
-  89   1              for (i = 0; i < COMDATA_SIZE; i++)
-  90   1              {       
-  91   2                      ComData_Array[i].pHandle(ComData_Array[i].Source_Channel, ComData_Array[i].Target_Channel);
-  92   2              }
-  93   1              // ComData_Array[0].pHandle(ComData_Array[0].Source_Channel, ComData_Array[0].Target_Channel);
-  94   1              // ComData_Array[1].pHandle(ComData_Array[1].Source_Channel, ComData_Array[1].Target_Channel);
-  95   1              // ComData_Array[2].pHandle(ComData_Array[2].Source_Channel, ComData_Array[2].Target_Channel);
-  96   1              // USART3_EN = 1;
-  97   1              // Uartx_SendStr(&Uart3, "\x01\x02\x03", 3);
-  98   1              // USART3_EN = 0;
-  99   1              /*当前无请求通道*/
- 100   1              // current_request_channel = CHANNEL_IDLE;
- 101   1              // Rs485_to_Plc();
- 102   1      
- 103   1              // Public_DataHandle(CHANNEL_RS485, CHANNEL_PLC);
- 104   1      
- 105   1              // Public_DataHandle(CHANNEL_WIFI, CHANNEL_PLC);
- 106   1              // Public_DataHandle(CHANNEL_LAN, CHANNEL_PLC);
- 107   1      }
- 108          
- 109          /*禁止编译器优化该模块*/
- 110          // #pragma OPTIMIZE(2)
- 111          /**
- 112           * @brief       获得目标通道链表地址
- 113           * @details
- 114           * @param       channel 通道号
- 115           * @retval      p 指向链表的指针
- 116           */
-C51 COMPILER V9.60.0.0   REPORT                                                            12/21/2021 14:13:58 PAGE 3   
+  55           * @retval      None
+  56           */
+  57          void Uart_Handle(void)
+  58          {
+  59   1              static uint8_t i = 0;
+  60   1      
+  61   1              // /*关闭串口4接收中断*/
+  62   1              // // S4CON &= ~S4REN;
+  63   1              
+  64   1              if (System_Parameter.WorkMode == SLAVE)
+  65   1              {
+  66   2                      for (i = 0; i < COMDATA_SIZE - 3U; i++)
+  67   2                      {       
+  68   3                              ComData_Array[i].pHandle(ComData_Array[i].Source_Channel, ComData_Array[i].Target_Channel);
+  69   3                      }
+  70   2              }
+  71   1              else
+  72   1              {
+  73   2                      switch (System_Parameter.CurrentSlave)
+  74   2                      {
+  75   3                              case ETHERNET_ID: 
+  76   3                              {
+  77   4                                      ComData_Array[3].pHandle(ComData_Array[3].Source_Channel, ComData_Array[3].Target_Channel);
+  78   4                              }break;
+  79   3                              case WIFI_ID:
+  80   3                              {
+  81   4                                      ComData_Array[4].pHandle(ComData_Array[4].Source_Channel, ComData_Array[4].Target_Channel);
+  82   4                              }break;
+  83   3                              case RS485_ID:
+  84   3                              {
+  85   4                                      ComData_Array[5].pHandle(ComData_Array[5].Source_Channel, ComData_Array[5].Target_Channel);
+  86   4                              }break;
+  87   3                              default : break;
+  88   3                      }
+  89   2              }
+  90   1              // ComData_Array[0].pHandle(ComData_Array[0].Source_Channel, ComData_Array[0].Target_Channel);
+  91   1              // ComData_Array[1].pHandle(ComData_Array[1].Source_Channel, ComData_Array[1].Target_Channel);
+  92   1              // ComData_Array[2].pHandle(ComData_Array[2].Source_Channel, ComData_Array[2].Target_Channel);
+  93   1              // USART3_EN = 1;
+  94   1              // Uartx_SendStr(&Uart3, "\x01\x02\x03", 3);
+  95   1              // USART3_EN = 0;
+  96   1              /*当前无请求通道*/
+  97   1              // current_request_channel = CHANNEL_IDLE;
+  98   1              // Rs485_to_Plc();
+  99   1      
+ 100   1              // Public_DataHandle(CHANNEL_RS485, CHANNEL_PLC);
+ 101   1      
+ 102   1              // Public_DataHandle(CHANNEL_WIFI, CHANNEL_PLC);
+ 103   1              // Public_DataHandle(CHANNEL_LAN, CHANNEL_PLC);
+ 104   1      }
+ 105          
+ 106          /*禁止编译器优化该模块*/
+ 107          // #pragma OPTIMIZE(2)
+ 108          /**
+ 109           * @brief       获得目标通道链表地址
+ 110           * @details
+ 111           * @param       channel 通道号
+ 112           * @retval      p 指向链表的指针
+ 113           */
+ 114          static Uart_List *Get_Target_Channel(channel)
+ 115          {
+ 116   1              Uart_List *p = NULL;
+C51 COMPILER V9.60.0.0   REPORT                                                            12/21/2021 17:57:20 PAGE 3   
 
- 117          static Uart_List *Get_Target_Channel(channel)
- 118          {
- 119   1              Uart_List *p = NULL;
- 120   1              switch (channel)
- 121   1              {
- 122   2              case CHANNEL_LAN:
- 123   2                      p = &COM_UART1;
+ 117   1              switch (channel)
+ 118   1              {
+ 119   2              case CHANNEL_LAN:
+ 120   2                      p = &COM_UART1;
+ 121   2                      break;
+ 122   2              case CHANNEL_WIFI:
+ 123   2                      p = &COM_UART2;
  124   2                      break;
- 125   2              case CHANNEL_WIFI:
- 126   2                      p = &COM_UART2;
+ 125   2              case CHANNEL_RS485:
+ 126   2                      p = &COM_UART3;
  127   2                      break;
- 128   2              case CHANNEL_RS485:
- 129   2                      p = &COM_UART3;
+ 128   2              case CHANNEL_PLC:
+ 129   2                      p = &COM_UART4;
  130   2                      break;
- 131   2              case CHANNEL_PLC:
- 132   2                      p = &COM_UART4;
- 133   2                      break;
- 134   2              default:
- 135   2                      break;
- 136   2              }
- 137   1              return p;
- 138   1      }
- 139          
- 140          /**
- 141           * @brief       获得目标通道对应串口
- 142           * @details
- 143           * @param       channel 通道号
- 144           * @retval      p 指向链表的指针
- 145           */
- 146          static Uart_HandleTypeDef *Get_Target_Uart(channel)
- 147          {
- 148   1              Uart_HandleTypeDef *p = NULL;
- 149   1              switch (channel)
- 150   1              {
- 151   2              case CHANNEL_LAN:
- 152   2                      p = &Uart1;
+ 131   2              default:
+ 132   2                      break;
+ 133   2              }
+ 134   1              return p;
+ 135   1      }
+ 136          
+ 137          /**
+ 138           * @brief       获得目标通道对应串口
+ 139           * @details
+ 140           * @param       channel 通道号
+ 141           * @retval      p 指向链表的指针
+ 142           */
+ 143          static Uart_HandleTypeDef *Get_Target_Uart(channel)
+ 144          {
+ 145   1              Uart_HandleTypeDef *p = NULL;
+ 146   1              switch (channel)
+ 147   1              {
+ 148   2              case CHANNEL_LAN:
+ 149   2                      p = &Uart1;
+ 150   2                      break;
+ 151   2              case CHANNEL_WIFI:
+ 152   2                      p = &Uart2;
  153   2                      break;
- 154   2              case CHANNEL_WIFI:
- 155   2                      p = &Uart2;
+ 154   2              case CHANNEL_RS485:
+ 155   2                      p = &Uart3;
  156   2                      break;
- 157   2              case CHANNEL_RS485:
- 158   2                      p = &Uart3;
+ 157   2              case CHANNEL_PLC:
+ 158   2                      p = &Uart4;
  159   2                      break;
- 160   2              case CHANNEL_PLC:
- 161   2                      p = &Uart4;
- 162   2                      break;
- 163   2              default:
- 164   2                      break;
- 165   2              }
- 166   1              return p;
- 167   1      }
- 168          
- 169          /**
- 170           * @brief       数据帧公共转发
- 171           * @details
- 172           * @param       src 数据源请求通道
- 173           * @param   dest 数据交付通道
- 174           * @retval      None
- 175           */
- 176          // void Public_DataHandle(SEL_CHANNEL src, SEL_CHANNEL dest)
- 177          // {
- 178          //      Uart_List *psrc = Get_Target_Channel(src);
-C51 COMPILER V9.60.0.0   REPORT                                                            12/21/2021 14:13:58 PAGE 4   
+ 160   2              default:
+ 161   2                      break;
+ 162   2              }
+ 163   1              return p;
+ 164   1      }
+ 165          
+ 166          
+ 167          /**
+ 168           * @brief       数据帧公共转发
+ 169           * @details
+ 170           * @param       src 数据源请求通道
+ 171           * @param   dest 数据交付通道
+ 172           * @retval      None
+ 173           */
+ 174          void Public_DataHandle(SEL_CHANNEL src, SEL_CHANNEL dest) 
+ 175          {
+ 176   1              Uart_List * const psrc = Get_Target_Channel(src);
+ 177   1              Uart_List * const pdest = Get_Target_Channel(dest);
+ 178   1              Uart_HandleTypeDef * const psuart = Get_Target_Uart(src);
+C51 COMPILER V9.60.0.0   REPORT                                                            12/21/2021 17:57:20 PAGE 4   
 
- 179          //      Uart_List *pdest = Get_Target_Channel(dest);
- 180          //      Uart_HandleTypeDef *psuart = Get_Target_Uart(src);
- 181          //      Uart_HandleTypeDef *peuart = Get_Target_Uart(dest);
- 182          //      uint8_t i = 0;
- 183          
- 184          //      if ((psrc == NULL) || (pdest == NULL) || (psuart == NULL) || (peuart == NULL))
- 185          //      {
- 186          //              return;
- 187          //      }
- 188          //      // printf ("psrc %d, pdest %d, %d, %d, %d, %d\r\n",
- 189          //      // (uint16_t)psrc, (uint16_t)pdest, (uint16_t)&COM_UART1, (uint16_t)&COM_UART2,
- 190          //      // (uint16_t)&COM_UART3, (uint16_t)&COM_UART4);
- 191          
- 192          //      /*检测发起请求接收缓冲区*/
- 193          //      if (psrc->LNode[psrc->Rptr].Frame_Flag)
- 194          //      {
- 195          //              printf("1->>source %bd, target %bd, pdest %d, ptr 0x%X\r\n",
- 196          //                         psrc->LNode[psrc->Rptr].Source_Channel, psrc->LNode[psrc->Rptr].Target_Channel, psrc, psrc->Rptr)
-             -;
- 197          
- 198          //              /*检查当前节点源地址和目标地址是否与正在执行上目标相同*/
- 199          //              if ((psrc->LNode[psrc->Rptr].Source_Channel != src) || (psrc->LNode[psrc->Rptr].Target_Channel != des
-             -t))
- 200          //              {
- 201          //                      // return;
- 202          //                      goto BANK2;
- 203          //              }
- 204          //              /*标记该接收帧以进行处理*/
- 205          //              psrc->LNode[psrc->Rptr].Frame_Flag = false;
- 206          //              if (dest == CHANNEL_RS485)
- 207          //              {
- 208          //                      /*允许485发送*/
- 209          //                      USART3_EN = 1;
- 210          //                      /*数据转发给RS485时，数据长度+1，可以保证MAX3485芯片能够最后一位数据刚好
-             -不停止在串口的停止位上*/
- 211          //                      psrc->LNode[psrc->Rptr].Rx_Length += 1U;
- 212          //              }
- 213          //              /*启动对应端硬件数据转发*/
- 214          //              Uartx_SendStr(peuart, psrc->LNode[psrc->Rptr].Rx_Buffer, psrc->LNode[psrc->Rptr].Rx_Length);
- 215          //              /*接收到数据长度置为0*/
- 216          //              psrc->LNode[psrc->Rptr].Rx_Length = 0;
- 217          //              /*发送中断结束后，清空对应接收缓冲区*/
- 218          //              memset(&psrc->LNode[psrc->Rptr].Rx_Buffer[0], 0, MAX_SIZE);
- 219          //              if (dest == CHANNEL_RS485)
- 220          //              {
- 221          //                      /*发送完一帧数据后拉低*/
- 222          //                      USART3_EN = 0;
- 223          //              }
- 224          //              /*读指针指到下一个节点*/
- 225          //              psrc->Rptr = ((psrc->Rptr + 1U) % MAX_NODE);
- 226          //      }
- 227          
- 228          // BANK2:
- 229          //      // pdest = Get_Target_Channel(pdest->LNode[pdest->Rptr].Source_Channel);
- 230          //      // psuart = Get_Target_Uart(pdest->LNode[pdest->Rptr].Target_Channel);
- 231          
- 232          //      // /*目标设备发出应答*/
- 233          //      // if ((pdest->LNode[pdest->Rptr].Frame_Flag))
- 234          //      // {
- 235          //      //      printf("2->>source %bd, target %bd, pdest %d, ptr 0x%X\r\n\r\n",
- 236          //      //                 pdest->LNode[pdest->Rptr].Source_Channel, pdest->LNode[pdest->Rptr].Target_Channel, pdest, pde
-             -st->Rptr);
-C51 COMPILER V9.60.0.0   REPORT                                                            12/21/2021 14:13:58 PAGE 5   
-
- 237          
- 238          //      //      /*检查目标端是否与当前节点数据目标相同*/
- 239          //      //      // if ((pdest->LNode[pdest->Rptr].Source_Channel != dest) || (pdest->LNode[pdest->Rptr].Target_Cha
-             -nnel != src))
- 240          //      //      // {
- 241          //      //      //      return;
- 242          //      //      //      // goto BANK1;
- 243          //      //      // }
- 244          //      //      /*标记该接收帧已经进行处理*/
- 245          //      //      pdest->LNode[pdest->Rptr].Frame_Flag = false;
- 246          //      //      if (src == CHANNEL_RS485)
- 247          //      //      {
- 248          //      //              /*允许485发送*/
- 249          //      //              USART3_EN = 1;
- 250          //      //              /*数据转发给RS485时，数据长度+1，可以保证MAX3485芯片能够最后一位数据刚
-             -好不停止在串口的停止位上*/
- 251          //      //              pdest->LNode[pdest->Rptr].Rx_Length += 1U;
- 252          //      //      }
- 253          //      //      /*数据返回给请求对象*/
- 254          //      //      Uartx_SendStr(psuart, pdest->LNode[pdest->Rptr].Rx_Buffer, pdest->LNode[pdest->Rptr].Rx_Length);
- 255          //      //      /*接收到数据长度置为0*/
- 256          //      //      pdest->LNode[pdest->Rptr].Rx_Length = 0;
- 257          //      //      /*发送中断结束后，清空对应接收缓冲区*/
- 258          //      //      memset(&pdest->LNode[pdest->Rptr].Rx_Buffer[0], 0, MAX_SIZE);
- 259          //      //      if (src == CHANNEL_RS485)
- 260          //      //      {
- 261          //      //              /*发送完一帧数据后拉低*/
- 262          //      //              USART3_EN = 0;
- 263          //      //      }
- 264          //      //      /*读指针指到下一个节点*/
- 265          //      //      pdest->Rptr = ((pdest->Rptr + 1U) % MAX_NODE);
- 266          //      // }
- 267          
- 268          //      for (i = 0; i < MAX_NODE; i++)
- 269          //      {
- 270          //              /*目标设备发出应答*/
- 271          //              if (pdest->LNode[i].Frame_Flag)
- 272          //              {
- 273          //                      printf("2->>source %bd, target %bd, pdest %d, ptr 0x%X\r\n\r\n",
- 274          //                      pdest->LNode[i].Source_Channel, pdest->LNode[i].Target_Channel, pdest, i);
- 275          //                      if ((pdest->LNode[i].Source_Channel != dest) || (pdest->LNode[i].Target_Channel != src))
- 276          //                      {
- 277          //                              // break;
- 278          //                              continue;
- 279          //                              // goto BANK1;
- 280          //                      }
- 281          //                      /*标记该接收帧已经进行处理*/
- 282          //                      pdest->LNode[i].Frame_Flag = false;
- 283          //                      if (src == CHANNEL_RS485)
- 284          //                      {
- 285          //                              /*允许485发送*/
- 286          //                              USART3_EN = 1;
- 287          //                              /*数据转发给RS485时，数据长度+1，可以保证MAX3485芯片能够最后一位数据刚�
-             -�不停止在串口的停止位上*/
- 288          //                              pdest->LNode[i].Rx_Length += 1U;
- 289          //                      }
- 290          //                      /*数据返回给请求对象*/
- 291          //                      Uartx_SendStr(psuart, pdest->LNode[i].Rx_Buffer, pdest->LNode[i].Rx_Length);
- 292          //                      /*接收到数据长度置为0*/
- 293          //                      pdest->LNode[i].Rx_Length = 0;
- 294          //                      /*发送中断结束后，清空对应接收缓冲区*/
- 295          //                      memset(&pdest->LNode[i].Rx_Buffer[0], 0, MAX_SIZE);
-C51 COMPILER V9.60.0.0   REPORT                                                            12/21/2021 14:13:58 PAGE 6   
-
- 296          //                      if (src == CHANNEL_RS485)
- 297          //                      {
- 298          //                              /*发送完一帧数据后拉低*/
- 299          //                              USART3_EN = 0;
- 300          //                      }
- 301          //                      /*读指针指到下一个节点*/
- 302          //                      // i = ((i + 1U) % MAX_NODE);
- 303          //              }
- 304          //      }
- 305          // }
- 306          
- 307          /**
- 308           * @brief       数据帧公共转发
- 309           * @details
- 310           * @param       src 数据源请求通道
- 311           * @param   dest 数据交付通道
- 312           * @retval      None
- 313           */
- 314          void Public_DataHandle(SEL_CHANNEL src, SEL_CHANNEL dest) 
- 315          {
- 316   1              Uart_List * const psrc = Get_Target_Channel(src);
- 317   1              Uart_List * const pdest = Get_Target_Channel(dest);
- 318   1              Uart_HandleTypeDef * const psuart = Get_Target_Uart(src);
- 319   1              Uart_HandleTypeDef * const peuart = Get_Target_Uart(dest);
- 320   1              static uint8_t i = 0;
- 321   1      
- 322   1              if ((psrc == NULL) || (pdest == NULL) || (psuart == NULL) || (peuart == NULL))
- 323   1              {
- 324   2                      return;
- 325   2              }
- 326   1      #if (USE_PRINTF_DEBUG)
+ 179   1              Uart_HandleTypeDef * const peuart = Get_Target_Uart(dest);
+ 180   1              static uint8_t i = 0;
+ 181   1      
+ 182   1              if ((psrc == NULL) || (pdest == NULL) || (psuart == NULL) || (peuart == NULL))
+ 183   1              {
+ 184   2                      return;
+ 185   2              }
+ 186   1      #if (USE_PRINTF_DEBUG)
                       // printf ("psrc %d, pdest %d, %d, %d, %d, %d\r\n",
                       // (uint16_t)psrc, (uint16_t)pdest, (uint16_t)&COM_UART1, (uint16_t)&COM_UART2,
                       // (uint16_t)&COM_UART3, (uint16_t)&COM_UART4);
               #endif
- 331   1              /*检查当前节点源地址和目标地址是否与正在执行上目标相同*/
- 332   1              if ((psrc->LNode[psrc->Rptr].Source_Channel == src) && (psrc->LNode[psrc->Rptr].Target_Channel == dest))
- 333   1              {
- 334   2                      /*检测发起请求接收缓冲区*/
- 335   2                      if (psrc->LNode[psrc->Rptr].Frame_Flag)
- 336   2                      {
- 337   3      #if (USE_PRINTF_DEBUG)
+ 191   1              /*主机时plc目标通道无法确定*/
+ 192   1              if (System_Parameter.WorkMode == MASTER)
+ 193   1              {
+ 194   2                      psrc->LNode[psrc->Rptr].Target_Channel = dest;
+ 195   2              }
+ 196   1              /*检查当前节点源地址和目标地址是否与正在执行上目标相同*/
+ 197   1              if ((psrc->LNode[psrc->Rptr].Source_Channel == src) && (psrc->LNode[psrc->Rptr].Target_Channel == dest))
+ 198   1              {
+ 199   2                      /*检测发起请求接收缓冲区*/
+ 200   2                      if (psrc->LNode[psrc->Rptr].Frame_Flag)
+ 201   2                      {
+ 202   3      #if (USE_PRINTF_DEBUG)
                                       printf("1->>source %bd, target %bd, pdest %d, ptr 0x%X\r\n",
                                       psrc->LNode[psrc->Rptr].Source_Channel, psrc->LNode[psrc->Rptr].Target_Channel, psrc, psrc->Rptr);
               #endif
- 341   3                              /*标记该接收帧以进行处理*/
- 342   3                              psrc->LNode[psrc->Rptr].Frame_Flag = false;
- 343   3                              if (dest == CHANNEL_RS485)
- 344   3                              {
- 345   4                                      /*允许485发送*/
- 346   4                                      USART3_EN = 1;
- 347   4                                      /*数据转发给RS485时，数据长度+1，可以保证MAX3485芯片能够最后一位数据刚好�
+ 206   3                              /*标记该接收帧以进行处理*/
+ 207   3                              psrc->LNode[psrc->Rptr].Frame_Flag = false;
+ 208   3                              if (dest == CHANNEL_RS485)
+ 209   3                              {
+ 210   4                                      /*允许485发送*/
+ 211   4                                      USART3_EN = 1;
+ 212   4                                      /*数据转发给RS485时，数据长度+1，可以保证MAX3485芯片能够最后一位数据刚好�
              -�停止在串口的停止位上*/
- 348   4                                      psrc->LNode[psrc->Rptr].Rx_Length += 1U;
- 349   4                              }
- 350   3                              /*启动对应端硬件数据转发*/
- 351   3                              Uartx_SendStr(peuart, psrc->LNode[psrc->Rptr].Rx_Buffer, psrc->LNode[psrc->Rptr].Rx_Length);
- 352   3                              /*接收到数据长度置为0*/
- 353   3                              psrc->LNode[psrc->Rptr].Rx_Length = 0;
- 354   3                              /*发送中断结束后，清空对应接收缓冲区*/
- 355   3                              memset(&psrc->LNode[psrc->Rptr].Rx_Buffer[0], 0, MAX_SIZE);
- 356   3                              if (dest == CHANNEL_RS485)
-C51 COMPILER V9.60.0.0   REPORT                                                            12/21/2021 14:13:58 PAGE 7   
+ 213   4                                      psrc->LNode[psrc->Rptr].Rx_Length += 1U;
+ 214   4                              }
+ 215   3                              /*启动对应端硬件数据转发*/
+ 216   3                              Uartx_SendStr(peuart, psrc->LNode[psrc->Rptr].Rx_Buffer, psrc->LNode[psrc->Rptr].Rx_Length);
+ 217   3                              /*接收到数据长度置为0*/
+ 218   3                              psrc->LNode[psrc->Rptr].Rx_Length = 0;
+ 219   3                              /*发送中断结束后，清空对应接收缓冲区*/
+ 220   3                              memset(&psrc->LNode[psrc->Rptr].Rx_Buffer[0], 0, MAX_SIZE);
+ 221   3                              if (dest == CHANNEL_RS485)
+ 222   3                              {
+ 223   4                                      /*发送完一帧数据后拉低*/
+ 224   4                                      USART3_EN = 0;
+ 225   4                              }
+ 226   3                              /*读指针指到下一个节点*/
+ 227   3                              psrc->Rptr = ((psrc->Rptr + 1U) % MAX_NODE);
+ 228   3                      }
+ 229   2              }
+ 230   1      
+ 231   1              for (i = 0; i < MAX_NODE; i++)
+ 232   1              {
+ 233   2                      if ((pdest->LNode[i].Source_Channel != dest) || (pdest->LNode[i].Target_Channel != src))
+ 234   2                      {
+ 235   3                              continue;
+ 236   3                      }
+ 237   2                      /*目标设备发出应答*/
+ 238   2                      if (pdest->LNode[i].Frame_Flag)
+ 239   2                      {
+C51 COMPILER V9.60.0.0   REPORT                                                            12/21/2021 17:57:20 PAGE 5   
 
- 357   3                              {
- 358   4                                      /*发送完一帧数据后拉低*/
- 359   4                                      USART3_EN = 0;
- 360   4                              }
- 361   3                              /*读指针指到下一个节点*/
- 362   3                              psrc->Rptr = ((psrc->Rptr + 1U) % MAX_NODE);
- 363   3                      }
- 364   2              }
- 365   1      
- 366   1              for (i = 0; i < MAX_NODE; i++)
- 367   1              {
- 368   2                      if ((pdest->LNode[i].Source_Channel != dest) || (pdest->LNode[i].Target_Channel != src))
- 369   2                      {
- 370   3                              continue;
- 371   3                      }
- 372   2                      /*目标设备发出应答*/
- 373   2                      if (pdest->LNode[i].Frame_Flag)
- 374   2                      {
- 375   3      #if (USE_PRINTF_DEBUG)
+ 240   3      #if (USE_PRINTF_DEBUG)
                                       printf("2->>source %bd, target %bd, pdest %d, ptr 0x%X\r\n\r\n",
                                       pdest->LNode[i].Source_Channel, pdest->LNode[i].Target_Channel, pdest, i);
               #endif          
- 379   3                              /*标记该接收帧已经进行处理*/
- 380   3                              pdest->LNode[i].Frame_Flag = false;
- 381   3                              if (src == CHANNEL_RS485)
- 382   3                              {
- 383   4                                      /*允许485发送*/
- 384   4                                      USART3_EN = 1;
- 385   4                                      /*数据转发给RS485时，数据长度+1，可以保证MAX3485芯片能够最后一位数据刚好�
+ 244   3                              /*标记该接收帧已经进行处理*/
+ 245   3                              pdest->LNode[i].Frame_Flag = false;
+ 246   3                              if (src == CHANNEL_RS485)
+ 247   3                              {
+ 248   4                                      /*允许485发送*/
+ 249   4                                      USART3_EN = 1;
+ 250   4                                      /*数据转发给RS485时，数据长度+1，可以保证MAX3485芯片能够最后一位数据刚好�
              -�停止在串口的停止位上*/
- 386   4                                      pdest->LNode[i].Rx_Length += 1U;
- 387   4                              }
- 388   3                              /*数据返回给请求对象*/
- 389   3                              Uartx_SendStr(psuart, pdest->LNode[i].Rx_Buffer, pdest->LNode[i].Rx_Length);
- 390   3                              /*接收到数据长度置为0*/
- 391   3                              pdest->LNode[i].Rx_Length = 0;
- 392   3                              /*发送中断结束后，清空对应接收缓冲区*/
- 393   3                              memset(&pdest->LNode[i].Rx_Buffer[0], 0, MAX_SIZE);
- 394   3                              if (src == CHANNEL_RS485)
- 395   3                              {
- 396   4                                      /*发送完一帧数据后拉低*/
- 397   4                                      USART3_EN = 0;
- 398   4                              }
- 399   3                      }
- 400   2              }
- 401   1      }
- 402          
- 403          // void Rs485_to_Plc(void)
- 404          // {
- 405          //      /*STC串口4收到PLC发出的数据*/
- 406          //      if ((COM_UART3.LNode[COM_UART3.Rptr].Frame_Flag)) //&& (COM_UART4.LNode[COM_UART4.Rptr].Rx_Length)
- 407          //      {
- 408          //              /*如果串口4接收到的数据帧不是EBM所需的，过滤掉*/
- 409          //              // if (COM_UART3.LNode[COM_UART3.Rptr].Rx_Buffer[0] != MODBUS_SLAVEADDR)
- 410          //              { /*标记该接收帧以进行处理*/
- 411          //                      COM_UART3.LNode[COM_UART3.Rptr].Frame_Flag = false;
- 412          //                      /*允许485发送*/
- 413          //                      // USART3_EN = 1;
- 414          //                      /*数据转发给RS485时，数据长度+1，可以保证MAX3485芯片能够最后一位数据刚好
-             -不停止在串口的停止位上*/
- 415          //                      Uartx_SendStr(&Uart4, COM_UART3.LNode[COM_UART3.Rptr].Rx_Buffer, COM_UART3.LNode[COM_UART3.Rptr].Rx_
-             -Length + 1U);
-C51 COMPILER V9.60.0.0   REPORT                                                            12/21/2021 14:13:58 PAGE 8   
+ 251   4                                      pdest->LNode[i].Rx_Length += 1U;
+ 252   4                              }
+ 253   3                              /*数据返回给请求对象*/
+ 254   3                              Uartx_SendStr(psuart, pdest->LNode[i].Rx_Buffer, pdest->LNode[i].Rx_Length);
+ 255   3                              /*接收到数据长度置为0*/
+ 256   3                              pdest->LNode[i].Rx_Length = 0;
+ 257   3                              /*发送中断结束后，清空对应接收缓冲区*/
+ 258   3                              memset(&pdest->LNode[i].Rx_Buffer[0], 0, MAX_SIZE);
+ 259   3                              if (src == CHANNEL_RS485)
+ 260   3                              {
+ 261   4                                      /*发送完一帧数据后拉低*/
+ 262   4                                      USART3_EN = 0;
+ 263   4                              }
+ 264   3                      }
+ 265   2              }
+ 266   1      }
+ 267          
+ 268          
+ 269          /*禁止编译器优化该模块*/
+ 270          #pragma OPTIMIZE(9)
+ 271          
+ 272          /**
+ 273           * @brief       获取16bitCRC码
+ 274           * @details
+ 275           * @param       *ptr:参与校验数据指针,length:数据长度,init_dat:参与运算目标数据
+ 276           * @retval      None
+ 277           */
+ 278          uint16_t getCrc16(uint8_t *ptr, uint8_t length, uint16_t init_dat)
+ 279          {
+ 280   1              uint8_t i = 0;
+ 281   1              uint16_t j = 0;
+ 282   1              uint16_t crc16 = init_dat;
+ 283   1      
+ 284   1              for (i = 0; i < length; i++)
+ 285   1              {
+ 286   2                      crc16 ^= *ptr++;
+ 287   2      
+ 288   2                      for (j = 0; j < 8; j++)
+ 289   2                      {
+ 290   3                              if (crc16 & 0x0001)
+ 291   3                              {
+ 292   4                                      crc16 = (crc16 >> 1) ^ 0xa001;
+ 293   4                              }
+ 294   3                              else
+ 295   3                              {
+ 296   4                                      crc16 = crc16 >> 1;
+ 297   4                              }
+ 298   3                      }
+ 299   2              }
+ 300   1              return (crc16);
+C51 COMPILER V9.60.0.0   REPORT                                                            12/21/2021 17:57:20 PAGE 6   
 
- 416          //                      /*接收到数据长度置为0*/
- 417          //                      COM_UART3.LNode[COM_UART3.Rptr].Rx_Length = 0;
- 418          //                      /*发送中断结束后，清空对应接收缓冲区*/
- 419          //                      memset(&COM_UART3.LNode[COM_UART3.Rptr].Rx_Buffer[0], 0, MAX_SIZE);
- 420          //                      /*发送完一帧数据后拉低*/
- 421          //                      // USART3_EN = 0;
- 422          //                      /*读指针指到下一个节点*/
- 423          //                      SET_RPTR(3);
- 424          //              }
- 425          
- 426          //              /*目标设备发出应答*/
- 427          //              if ((COM_UART4.LNode[COM_UART4.Rptr].Frame_Flag)) //&& (COM_UART3.LNode[COM_UART3.Rptr].Rx_Length)
- 428          //              {
- 429          //                      /*标记该接收帧已经进行处理*/
- 430          //                      COM_UART4.LNode[COM_UART4.Rptr].Frame_Flag = false;
- 431          //                      /*允许485发送*/
- 432          //                      USART3_EN = 1;
- 433          //                      /*数据返回给请求对象*/
- 434          //                      Uartx_SendStr(&Uart3, COM_UART4.LNode[COM_UART4.Rptr].Rx_Buffer, COM_UART4.LNode[COM_UART4.Rptr].Rx_
-             -Length + 1U);
- 435          //                      /*接收到数据长度置为0*/
- 436          //                      COM_UART4.LNode[COM_UART4.Rptr].Rx_Length = 0;
- 437          //                      /*发送中断结束后，清空对应接收缓冲区*/
- 438          //                      memset(&COM_UART4.LNode[COM_UART4.Rptr].Rx_Buffer[0], 0, MAX_SIZE);
- 439          //                      /*发送完一帧数据后拉低*/
- 440          //                      USART3_EN = 0;
- 441          //                      /*读指针指到下一个节点*/
- 442          //                      SET_RPTR(4);
- 443          //              }
- 444          //      }
- 445          // }
- 446          
- 447          /*禁止编译器优化该模块*/
- 448          #pragma OPTIMIZE(9)
- 449          
- 450          /**
- 451           * @brief       获取16bitCRC码
- 452           * @details
- 453           * @param       *ptr:参与校验数据指针,length:数据长度,init_dat:参与运算目标数据
- 454           * @retval      None
- 455           */
- 456          uint16_t getCrc16(uint8_t *ptr, uint8_t length, uint16_t init_dat)
- 457          {
- 458   1              uint8_t i = 0;
- 459   1              uint16_t j = 0;
- 460   1              uint16_t crc16 = init_dat;
- 461   1      
- 462   1              for (i = 0; i < length; i++)
- 463   1              {
- 464   2                      crc16 ^= *ptr++;
- 465   2      
- 466   2                      for (j = 0; j < 8; j++)
- 467   2                      {
- 468   3                              if (crc16 & 0x0001)
- 469   3                              {
- 470   4                                      crc16 = (crc16 >> 1) ^ 0xa001;
- 471   4                              }
- 472   3                              else
- 473   3                              {
- 474   4                                      crc16 = crc16 >> 1;
- 475   4                              }
- 476   3                      }
-C51 COMPILER V9.60.0.0   REPORT                                                            12/21/2021 14:13:58 PAGE 9   
-
- 477   2              }
- 478   1              return (crc16);
- 479   1      }
+ 301   1      }
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =   1066    ----
-   CONSTANT SIZE    =     15    ----
-   XDATA SIZE       =   4618      27
+   CODE SIZE        =   1150    ----
+   CONSTANT SIZE    =     30    ----
+   XDATA SIZE       =   6922      27
    PDATA SIZE       =   ----    ----
    DATA SIZE        =   ----    ----
    IDATA SIZE       =   ----    ----

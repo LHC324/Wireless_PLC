@@ -7,6 +7,7 @@ OPTION Optionlist[] =
     {
         {"启停开关", CONTROL_PLCPOWER, PlcPowerUIshow},
         {"通信方式", CONTROL_COMMUNICA, CommunicaUIshow},
+        {"工作模式",CONTROL_WORKMODE, WorkModeUIshow},
         {"密码修改", CONTROL_PASSWORD_CHANGE, PassWordChangeUIShow},
         {"波特率设置", CONTROL_BAUDSETTING, Baud_Setting},
         {"本机热点", CONTROL_HOTSPOT, HotspotSettingUIshow},
@@ -483,6 +484,23 @@ void KeyControl_Enter(void) //控件状态--Enter
         Ui_Status.Ui = MENU_STATE;
         LcdShow(RefreshMenuDisp); //刷新显示
     }break;
+    /*工作模式选择*/
+    case CONTROL_WORKMODE:
+    {
+        /*检查函数指针非空*/
+        if(Modelist[System_Parameter.WorkMode].fun != NULL)
+        {
+            /*执行对应的功能函数*/
+            Modelist[System_Parameter.WorkMode].fun(); 
+        }
+        ControlSave(); //存盘工作模式设置
+        clear_screen();
+        GUI_String(70, 22, "修改成功", CH_12_12); //显示修改结果
+        Delay_ms(500);
+        /*返回菜单界面*/
+        Ui_Status.Ui = MENU_STATE;
+        LcdShow(RefreshMenuDisp); //刷新显示
+    }break;
     /*恢复出厂设置*/
     case CONTROL_RELOAD:
     {
@@ -660,6 +678,11 @@ void KeyControl_Up(void)
         System_Parameter.Apstate = LoopIndex(DOWMWORD, System_Parameter.Apstate, G_Aplist_Size);
         GUI_String(115, 10, Aplist[System_Parameter.Apstate].pstring, CH_12_12);
     }break;
+    case CONTROL_WORKMODE:
+    {
+        System_Parameter.WorkMode = LoopIndex(DOWMWORD, System_Parameter.WorkMode, G_Modelist_Size);
+        GUI_String(115, 10, Modelist[System_Parameter.WorkMode].pstring, CH_12_12);
+    }break;
     default:
         break;
     }
@@ -738,6 +761,12 @@ void KeyControl_Down(void) //控件状态--Down
     {
         System_Parameter.Apstate = LoopIndex(UPWORD, System_Parameter.Apstate, G_Aplist_Size);
         GUI_String(115, 10, Aplist[System_Parameter.Apstate].pstring, CH_12_12);
+    }break;
+    /*工作模式设置*/
+    case CONTROL_WORKMODE:
+    {
+        System_Parameter.WorkMode = LoopIndex(UPWORD, System_Parameter.WorkMode, G_Modelist_Size);
+        GUI_String(115, 10, Modelist[System_Parameter.WorkMode].pstring, CH_12_12);
     }break;
     default:
         break;

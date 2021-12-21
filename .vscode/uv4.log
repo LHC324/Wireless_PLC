@@ -15,7 +15,7 @@ linking...
 *** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
     SEGMENT: ?PR?_PUTCHAR?USART
 
-Program Size: data=25.0 xdata=5080 code=25711
+Program Size: data=25.0 xdata=7422 code=28599
 creating hex file from ".\Objects\WIRELESS_PLC"...
 ".\Objects\WIRELESS_PLC" - 0 Error(s), 2 Warning(s).
 Build Time Elapsed:  00:00:01

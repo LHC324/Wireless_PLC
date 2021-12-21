@@ -28,6 +28,7 @@ typedef enum //控件
 	CONTROL_PLCPOWER,		 //PLC开关控件
 	CONTROL_BAUDSETTING,	 //波特率设置控件
 	CONTROL_COMMUNICA,		 //通讯控件
+	CONTROL_WORKMODE,			 //工作模式
 	CONTROL_PASSWORD,		 //密码输入控件
 	CONTROL_PASSWORD_CHANGE, //密码修改控件
 	CONTROL_RELOAD,			 //恢复出厂设置
@@ -66,6 +67,7 @@ void PassWordCheak(void);															 //密码查询
 void PassWordDelete(SYSTEM_PARAMETER *Password);									 //密码归0
 void PassWordInputUIShow(void);														 //输入密码界面进入显示
 void PassWordChangeUIShow(void);													 //修改密码界面进入显示
+void WorkModeUIshow(void);
 /*屏保显示页面*/
 void ScreensaverUiShow(void);
 //********************************************************************//
@@ -109,6 +111,20 @@ typedef struct Control
 extern APSTRUCT Aplist[];
 extern uint8_t G_Aplist_Size;
 
+typedef struct 
+{
+	unsigned char *pstring;
+	void (*fun)(void);
+}MODESTRUCT;
+extern MODESTRUCT Modelist[];
+extern uint8_t G_Modelist_Size;
+
+typedef struct 
+{
+	unsigned char *pstring;
+}OBJCTSTRUCT;
+extern OBJCTSTRUCT Objlist[];
+extern uint8_t G_Objlist_Size;
 
 // void BaudSettingUIshow(void); //波特率设置界面显示
 void BaudSettingUI1show(void);
@@ -117,6 +133,8 @@ void BaudSettingUI3show(void);
 void BaudSettingUI4show(void);
 void BaudInit(void);
 void HotspotSettingUIshow(void);
+void Mode_Slave(void);
+void Mode_Master(void);
 //*********************************************************************//
 
 //****************************恢复出厂设置****************************//
