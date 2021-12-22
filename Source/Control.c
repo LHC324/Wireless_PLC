@@ -63,6 +63,8 @@ void ControlInit(void)
 	BaudInit();		 //串口3波特率初始化
 	PowerInit();	 //开关初始化
 	CommunicaInit(); //通信初始化
+	/*初始化临时副本*/
+	SYS_TEMP_PARA.WorkMode = System_Parameter.WorkMode;
 }
 
 void CommunicaInit(void)
@@ -296,8 +298,8 @@ void WorkModeUIshow(void)
 	GUI_Lattice(149,13,5,8,IconRight);
 	GUI_Lattice(97,13,5,8,Iconleft);
 			
-	GUI_String(5,43,"Master-Object",EN_5_8);
-	GUI_String(97,115,Objlist[System_Parameter.CurrentSlave].pstring,EN_5_8);	
+	GUI_String(5,115,"Master-Object",EN_5_8);
+	GUI_String(120,115,Objlist[System_Parameter.CurrentSlave].pstring,EN_5_8);	
 }
 
 void Mode_Slave(void)

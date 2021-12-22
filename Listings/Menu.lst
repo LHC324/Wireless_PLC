@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.0.0   MENU                                                              12/22/2021 11:18:20 PAGE 1   
+C51 COMPILER V9.60.0.0   MENU                                                              12/22/2021 16:04:17 PAGE 1   
 
 
 C51 COMPILER V9.60.0.0, COMPILATION OF MODULE MENU
@@ -62,7 +62,7 @@ line level    source
   52                  {KEY_CANCEL, MENU_STATE, KeyMenu_Cancel},
   53                  {KEY_MENU, MENU_STATE, KeyMenu_Menu},
   54                  /*CONTROL状态*/
-C51 COMPILER V9.60.0.0   MENU                                                              12/22/2021 11:18:20 PAGE 2   
+C51 COMPILER V9.60.0.0   MENU                                                              12/22/2021 16:04:17 PAGE 2   
 
   55                  {KEY_UP, CONTROL_STATE, KeyControl_Up},
   56                  {KEY_DOWN, CONTROL_STATE, KeyControl_Down},
@@ -126,7 +126,7 @@ line level    source
                   uint8_t temp = strncmp(System_Parameter.PSWNext.PassWordbuff, "\xFF\xFF\xFF\xFF", PASSWORDBITS);
               #endif
  116   1          if (Ui_Status.Widget == CONTROL_PASSWORD)
-C51 COMPILER V9.60.0.0   MENU                                                              12/22/2021 11:18:20 PAGE 3   
+C51 COMPILER V9.60.0.0   MENU                                                              12/22/2021 16:04:17 PAGE 3   
 
  117   1          {
  118   2              /*没有设置过密码或者密码正确*/
@@ -190,7 +190,7 @@ line level    source
  175   2          break;
  176   2          default:
  177   2              break;
-C51 COMPILER V9.60.0.0   MENU                                                              12/22/2021 11:18:20 PAGE 4   
+C51 COMPILER V9.60.0.0   MENU                                                              12/22/2021 16:04:17 PAGE 4   
 
  178   2          }
  179   1      
@@ -254,7 +254,7 @@ line level    source
  237   1      
  238   1          if (M_Show[MAIN_MENU].Option_Index == (OptionlistSize - 1)) //索引逻辑
  239   1          {
-C51 COMPILER V9.60.0.0   MENU                                                              12/22/2021 11:18:20 PAGE 5   
+C51 COMPILER V9.60.0.0   MENU                                                              12/22/2021 16:04:17 PAGE 5   
 
  240   2              M_Show[MAIN_MENU].Finger_Index = 2;
  241   2          }
@@ -318,7 +318,7 @@ line level    source
  298   1          {
  299   2              M_Show[MAIN_MENU].Finger_Index = 0;
  300   2          }
-C51 COMPILER V9.60.0.0   MENU                                                              12/22/2021 11:18:20 PAGE 6   
+C51 COMPILER V9.60.0.0   MENU                                                              12/22/2021 16:04:17 PAGE 6   
 
  301   1      
  302   1          if (M_Show[MAIN_MENU].Finger_Index == 0)
@@ -382,7 +382,7 @@ line level    source
  360   2          }
  361   1          return true;
  362   1      }
-C51 COMPILER V9.60.0.0   MENU                                                              12/22/2021 11:18:20 PAGE 7   
+C51 COMPILER V9.60.0.0   MENU                                                              12/22/2021 16:04:17 PAGE 7   
 
  363          
  364          void KeyControl_Enter(void) //控件状态--Enter
@@ -446,7 +446,7 @@ line level    source
  420   2          {
  421   3              System_Parameter.PlcState ^= 1;
  422   3              RUNKEY = System_Parameter.PlcState;
-C51 COMPILER V9.60.0.0   MENU                                                              12/22/2021 11:18:20 PAGE 8   
+C51 COMPILER V9.60.0.0   MENU                                                              12/22/2021 16:04:17 PAGE 8   
 
  423   3              ControlSave();           //存盘开关量
  424   3              LcdShow(PlcPowerUIshow); // PLC设置界面
@@ -510,7 +510,7 @@ line level    source
  482   3              Delay_ms(500);
  483   3              /*返回菜单界面*/
  484   3              Ui_Status.Ui = MENU_STATE;
-C51 COMPILER V9.60.0.0   MENU                                                              12/22/2021 11:18:20 PAGE 9   
+C51 COMPILER V9.60.0.0   MENU                                                              12/22/2021 16:04:17 PAGE 9   
 
  485   3              LcdShow(RefreshMenuDisp); //刷新显示
  486   3          }break;
@@ -574,7 +574,7 @@ line level    source
  542   2          case CONTROL_PASSWORD_CHANGE:
  543   2          {
  544   3              if (!System_Parameter.PSWNext.First_Input_Flag)
-C51 COMPILER V9.60.0.0   MENU                                                              12/22/2021 11:18:20 PAGE 10  
+C51 COMPILER V9.60.0.0   MENU                                                              12/22/2021 16:04:17 PAGE 10  
 
  545   3              {
  546   4      
@@ -638,7 +638,7 @@ line level    source
  604   2          }
  605   1      
  606   1          /*返回菜单界面*/
-C51 COMPILER V9.60.0.0   MENU                                                              12/22/2021 11:18:20 PAGE 11  
+C51 COMPILER V9.60.0.0   MENU                                                              12/22/2021 16:04:17 PAGE 11  
 
  607   1          Ui_Status.Ui = MENU_STATE;
  608   1          LcdShow(RefreshMenuDisp); //显示设置
@@ -702,7 +702,7 @@ line level    source
  665   4                  M_Show[SEC0_MENU].OptionIndex_buf[0] = M_Show[SEC0_MENU].Option_Index - 1;
  666   4                  M_Show[SEC0_MENU].OptionIndex_buf[1] = M_Show[SEC0_MENU].Option_Index;
  667   4                  M_Show[SEC0_MENU].OptionIndex_buf[2] = M_Show[SEC0_MENU].Option_Index + 1;
-C51 COMPILER V9.60.0.0   MENU                                                              12/22/2021 11:18:20 PAGE 12  
+C51 COMPILER V9.60.0.0   MENU                                                              12/22/2021 16:04:17 PAGE 12  
 
  668   4              }
  669   3              else
@@ -766,7 +766,7 @@ line level    source
  727   2          break;
  728   2      
  729   2          case CONTROL_BAUDSETTING:
-C51 COMPILER V9.60.0.0   MENU                                                              12/22/2021 11:18:20 PAGE 13  
+C51 COMPILER V9.60.0.0   MENU                                                              12/22/2021 16:04:17 PAGE 13  
 
  730   2          {
  731   3              if ((M_Show[SEC0_MENU].Finger_Index++) >= 2) //箭头索引增加
@@ -830,7 +830,7 @@ line level    source
  788   1          switch (Ui_Status.Widget)
  789   1          {
  790   2          case CONTROL_BAUD1:
-C51 COMPILER V9.60.0.0   MENU                                                              12/22/2021 11:18:20 PAGE 14  
+C51 COMPILER V9.60.0.0   MENU                                                              12/22/2021 16:04:17 PAGE 14  
 
  791   2          {
  792   3              System_Parameter.BaudIndex[0] = LoopIndex(DOWMWORD, System_Parameter.BaudIndex[0], G_BaudList_Size
@@ -894,7 +894,7 @@ line level    source
  846   2          {
  847   3              System_Parameter.BaudIndex[3] = LoopIndex(UPWORD, System_Parameter.BaudIndex[3], G_BaudList_Size);
  848   3              GUI_String(105, 31, Baudlist[System_Parameter.BaudIndex[3]].pstring, EN_5_8);
-C51 COMPILER V9.60.0.0   MENU                                                              12/22/2021 11:18:20 PAGE 15  
+C51 COMPILER V9.60.0.0   MENU                                                              12/22/2021 16:04:17 PAGE 15  
 
  849   3          }
  850   2          break;
@@ -958,7 +958,7 @@ line level    source
  908   3              // LcdShow(BaudSettingUI4show); //波特率设置界面
  909   3              /*修改成功后返回*/
  910   3              KeyBaud_Cancel();
-C51 COMPILER V9.60.0.0   MENU                                                              12/22/2021 11:18:20 PAGE 16  
+C51 COMPILER V9.60.0.0   MENU                                                              12/22/2021 16:04:17 PAGE 16  
 
  911   3          }
  912   2          break;
@@ -1022,7 +1022,7 @@ line level    source
  970          /**
  971           * @brief       波特率设置二级菜单
  972           * @details
-C51 COMPILER V9.60.0.0   MENU                                                              12/22/2021 11:18:20 PAGE 17  
+C51 COMPILER V9.60.0.0   MENU                                                              12/22/2021 16:04:17 PAGE 17  
 
  973           * @param       None
  974           * @retval      None

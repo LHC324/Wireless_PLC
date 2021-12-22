@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.0.0   USART                                                             12/22/2021 11:18:21 PAGE 1   
+C51 COMPILER V9.60.0.0   USART                                                             12/22/2021 16:04:18 PAGE 1   
 
 
 C51 COMPILER V9.60.0.0, COMPILATION OF MODULE USART
@@ -62,7 +62,7 @@ line level    source
              -                            \
   39                      }                                                                                             
              -                            \
-C51 COMPILER V9.60.0.0   USART                                                             12/22/2021 11:18:21 PAGE 2   
+C51 COMPILER V9.60.0.0   USART                                                             12/22/2021 16:04:18 PAGE 2   
 
   40                  }                                                                                                 
              -                            \
@@ -126,7 +126,7 @@ line level    source
   98   3                  {
   99   4                      COM_UART1.LNode[COM_UART1.Wptr].Rx_Buffer[COM_UART1.LNode[COM_UART1.Wptr].Rx_Length++] = S
              -BUF;
-C51 COMPILER V9.60.0.0   USART                                                             12/22/2021 11:18:21 PAGE 3   
+C51 COMPILER V9.60.0.0   USART                                                             12/22/2021 16:04:18 PAGE 3   
 
  100   4                      COM_UART1.LNode[COM_UART1.Wptr].Source_Channel = CHANNEL_LAN;
  101   4                      COM_UART1.LNode[COM_UART1.Wptr].Target_Channel = CHANNEL_PLC;
@@ -190,7 +190,7 @@ line level    source
  159   3                  {
  160   4                      COM_UART2.LNode[COM_UART2.Wptr].Rx_Buffer[COM_UART2.LNode[COM_UART2.Wptr].Rx_Length++] = S
              -2BUF;
-C51 COMPILER V9.60.0.0   USART                                                             12/22/2021 11:18:21 PAGE 4   
+C51 COMPILER V9.60.0.0   USART                                                             12/22/2021 16:04:18 PAGE 4   
 
  161   4                      COM_UART2.LNode[COM_UART2.Wptr].Source_Channel = CHANNEL_WIFI;
  162   4                      COM_UART2.LNode[COM_UART2.Wptr].Target_Channel = CHANNEL_PLC;
@@ -254,7 +254,7 @@ line level    source
  219   4                      COM_UART3.LNode[COM_UART3.Wptr].Source_Channel = CHANNEL_RS485;
  220   4                      COM_UART3.LNode[COM_UART3.Wptr].Target_Channel = CHANNEL_PLC;
  221   4                  }
-C51 COMPILER V9.60.0.0   USART                                                             12/22/2021 11:18:21 PAGE 5   
+C51 COMPILER V9.60.0.0   USART                                                             12/22/2021 16:04:18 PAGE 5   
 
  222   3              }
  223   2      
@@ -318,7 +318,7 @@ line level    source
  280   4                      COM_UART4.LNode[COM_UART4.Wptr].Target_Channel = current_request_channel;
  281   4                  }
  282   3              }
-C51 COMPILER V9.60.0.0   USART                                                             12/22/2021 11:18:21 PAGE 6   
+C51 COMPILER V9.60.0.0   USART                                                             12/22/2021 16:04:18 PAGE 6   
 
  283   2      
  284   2              /*判断当前PLC是主动发送还是被动请求*/
@@ -382,7 +382,7 @@ line level    source
  342   2          }
  343   1          else if (uart_baseHandle->Instance == UART4)
  344   1          {
-C51 COMPILER V9.60.0.0   USART                                                             12/22/2021 11:18:21 PAGE 7   
+C51 COMPILER V9.60.0.0   USART                                                             12/22/2021 16:04:18 PAGE 7   
 
  345   2              S4CON = uart_baseHandle->Register_SCON;
  346   2              T4T3M |= uart_baseHandle->Uart_Mode; //此处串口3和串口4共用
@@ -446,7 +446,7 @@ line level    source
  404   2          }
  405   1      }
  406          
-C51 COMPILER V9.60.0.0   USART                                                             12/22/2021 11:18:21 PAGE 8   
+C51 COMPILER V9.60.0.0   USART                                                             12/22/2021 16:04:18 PAGE 8   
 
  407          /*********************************************************
  408           * 函数名：char putchar(char str)
