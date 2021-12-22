@@ -488,10 +488,10 @@ void KeyControl_Enter(void) //控件状态--Enter
     case CONTROL_WORKMODE:
     {
         /*检查函数指针非空*/
-        if(Modelist[System_Parameter.WorkMode].fun != NULL)
+        if(Modelist[SYS_TEMP_PARA.WorkMode].fun != NULL)
         {
             /*执行对应的功能函数*/
-            Modelist[System_Parameter.WorkMode].fun(); 
+            Modelist[SYS_TEMP_PARA.WorkMode].fun(); 
         }
         ControlSave(); //存盘工作模式设置
         clear_screen();
@@ -588,7 +588,12 @@ void KeyControl_Cancel(void) //控件状态--Cancel
         // BaudWillIndex = BaudIndex; //如果没有确定,直接返回，则恢复当前状态索引
         break;
     }
-
+     /*工作模式选择*/
+    case CONTROL_WORKMODE:
+    {
+        SYS_TEMP_PARA.WorkMode = System_Parameter.WorkMode;
+    }break;
+    
     case CONTROL_RELOAD:
     {
         break;
@@ -680,8 +685,8 @@ void KeyControl_Up(void)
     }break;
     case CONTROL_WORKMODE:
     {
-        System_Parameter.WorkMode = LoopIndex(DOWMWORD, System_Parameter.WorkMode, G_Modelist_Size);
-        GUI_String(115, 10, Modelist[System_Parameter.WorkMode].pstring, CH_12_12);
+        SYS_TEMP_PARA.WorkMode = LoopIndex(DOWMWORD, SYS_TEMP_PARA.WorkMode, G_Modelist_Size);
+        GUI_String(115, 10, Modelist[SYS_TEMP_PARA.WorkMode].pstring, CH_12_12);
     }break;
     default:
         break;
@@ -765,8 +770,8 @@ void KeyControl_Down(void) //控件状态--Down
     /*工作模式设置*/
     case CONTROL_WORKMODE:
     {
-        System_Parameter.WorkMode = LoopIndex(UPWORD, System_Parameter.WorkMode, G_Modelist_Size);
-        GUI_String(115, 10, Modelist[System_Parameter.WorkMode].pstring, CH_12_12);
+        SYS_TEMP_PARA.WorkMode = LoopIndex(UPWORD, SYS_TEMP_PARA.WorkMode, G_Modelist_Size);
+        GUI_String(115, 10, Modelist[SYS_TEMP_PARA.WorkMode].pstring, CH_12_12);
     }break;
     default:
         break;

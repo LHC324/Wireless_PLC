@@ -292,24 +292,32 @@ void WorkModeUIshow(void)
 {
 	clear_screen();
 	GUI_String(10,10,"模式", CH_12_12);
-	GUI_String(115,10,Modelist[System_Parameter.WorkMode].pstring,CH_12_12);
+	GUI_String(115,10,Modelist[SYS_TEMP_PARA.WorkMode].pstring,CH_12_12);
 	GUI_Lattice(149,13,5,8,IconRight);
 	GUI_Lattice(97,13,5,8,Iconleft);
 			
-	GUI_String(10,43,"object",EN_5_8);
-	GUI_String(97,43,Objlist[System_Parameter.CurrentSlave].pstring,EN_5_8);	
+	GUI_String(5,43,"Master-Object",EN_5_8);
+	GUI_String(97,115,Objlist[System_Parameter.CurrentSlave].pstring,EN_5_8);	
 }
 
 void Mode_Slave(void)
 {
-	System_Parameter.WorkMode = SLAVE;
+	System_Parameter.WorkMode = SYS_TEMP_PARA.WorkMode;
+	/*从机模式下使能所有请求主机*/
+	REN = 1;
+	S2CON |= S2REN;
+	S3CON |= S3REN;
 }
 
 void Mode_Master(void)
 {
-	System_Parameter.WorkMode = MASTER;
+	System_Parameter.WorkMode = SYS_TEMP_PARA.WorkMode;
 	/*PLC工作在主站时，默认从站为RS485*/
 	System_Parameter.CurrentSlave = RS485_ID;
+	/*主机模式下关闭多余从机*/
+	REN = 0;
+	S2CON &= 0xEF;
+	S3CON &= 0xEF;
 }
 
 /**

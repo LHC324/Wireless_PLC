@@ -15,12 +15,12 @@
 #define true 1
 #define false 0
 /**********************布尔变量定义**********************/
-#define EXTERNAL_CRYSTAL 1 //使用外部晶振
+#define EXTERNAL_CRYSTAL 0 //使用外部晶振
 #define USE_PRINTF_DEBUG 0 //调试是否启用串口
 
 #define COUNTMAX 65536U
 /*(1/FOSC)*count =times(us)->count = time*FOSC/1000(ms)*/
-#define FOSC 11059200UL // 27000000UL
+#define FOSC  27000000UL// 11059200UL
 /*1ms(时钟频率越高，所能产生的时间越小)*/
 #define TIMES 10U
 /*定时器模式选择*/
@@ -149,27 +149,27 @@ typedef enum
 /*链队数据结构*/
 typedef struct
 {
-    SEL_CHANNEL Source_Channel;     /*数据起源通道*/
-    SEL_CHANNEL Target_Channel;     /*数据交付通道*/
-    uint8_t Frame_Flag;          /*帧标志*/
-    uint8_t Timer_Flag;          /*打开定时器标志*/
-    uint8_t Rx_Buffer[MAX_SIZE]; /*数据接收缓冲区*/
-    uint16_t Rx_Length;          /*数据接收长度*/
-    uint16_t OverTime;           /*目标设备响应超时时间*/
+    volatile SEL_CHANNEL Source_Channel;     /*数据起源通道*/
+    volatile SEL_CHANNEL Target_Channel;     /*数据交付通道*/
+    volatile uint8_t Frame_Flag;          /*帧标志*/
+    volatile uint8_t Timer_Flag;          /*打开定时器标志*/
+    volatile uint8_t Rx_Buffer[MAX_SIZE]; /*数据接收缓冲区*/
+    volatile uint16_t Rx_Length;          /*数据接收长度*/
+    volatile uint16_t OverTime;           /*目标设备响应超时时间*/
     // uint8_t Next;                   /*指向下一个节点*/
 } Uart_Queu;
 
 typedef struct
 {
-    Uart_Queu LNode[MAX_NODE];
+    volatile Uart_Queu LNode[MAX_NODE];
     //存储R ,W指针，表示一个队列
-    uint8_t Wptr;
-    uint8_t Rptr;
+    volatile uint8_t Wptr;
+    volatile uint8_t Rptr;
     // uint8_t Buffer_Size;
 } Uart_List;
 
 /*声明链队*/
-extern Uart_List Uart_LinkList[MAX_LQUEUE];
+extern Uart_List xdata Uart_LinkList[MAX_LQUEUE];
 
 typedef struct
 {

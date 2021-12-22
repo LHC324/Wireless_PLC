@@ -55,6 +55,8 @@ extern SYSTEM_PARAMETER PassWordI; //输入密码
 
 extern SYSTEM_PARAMETER PassWordChange1; //修改密码1
 extern SYSTEM_PARAMETER PassWordChange2; //修改密码2
+/*使用空闲的内存空间作为临时变量*/
+#define SYS_TEMP_PARA PassWordChange1
 
 extern unsigned char PassWordFirstChangeFlag;
 

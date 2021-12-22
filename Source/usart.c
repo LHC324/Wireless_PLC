@@ -412,7 +412,7 @@ void Uartx_SendStr(Uart_HandleTypeDef *const Uart, uint8_t *p, uint8_t length)
  * note：
  *		  使用printf函数将会占用1K 左右FLASH
  **********************************************************/
-#ifdef USEING_PRINTF
+#if (USEING_PRINTF)
 char putchar(char str)
 {
     ES = 0; //关闭串口1中断
