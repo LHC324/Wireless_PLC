@@ -14,7 +14,7 @@
 #include "wifi.h"
 
 /*系统参数*/
-SYSTEM_PARAMETER System_Parameter = {0, false, false, "\xFF\xFF\xFF\xFF", "\x08\x08\x02\x08", 0x01, 0x01, 0x00, 0x00, 0x01, 0x02, 0x3671};
+SYSTEM_PARAMETER System_Parameter = {0, false, false, "\xFF\xFF\xFF\xFF", "\x08\x08\x02\x08", 0x01, 0x01, 0x00, 0x00, 0x01, 0x02, 0x00, 0xF116};
 
 static void systemInit(void);
 static void UsartHandle(void);

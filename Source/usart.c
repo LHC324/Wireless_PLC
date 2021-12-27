@@ -180,7 +180,8 @@ void Uart2_ISR() interrupt 8 using 2
 void Uart3_Init(void) //串口3选择定时器3作为波特率发生器
 {
     Uart3.Instance = UART3;
-    Uart3.Register_SCON = 0x50; //模式1，8位数据，可变波特率；定时器3，1T模式
+    Uart3.Register_SCON = 0x50; //模式0，8位数据，可变波特率；定时器3，1T模式
+	// Uart3.Register_SCON = 0xD0; //模式1，9位数据，可变波特率；定时器3，1T模式
     Uart3.Uart_Mode = 0x0A;     //打开定时器3，1T模式
     Uart3.Uart_Count = UART3_BRT;
     Uart3.Interrupt_Enable = 0x08;
@@ -238,7 +239,8 @@ void Uart3_ISR() interrupt 17 using 2
 void Uart4_Init(void) //串口4选择定时器4作为波特率发生器
 {
     Uart4.Instance = UART4;
-    Uart4.Register_SCON = 0x50; //模式1，8位数据，可变波特率
+    Uart4.Register_SCON = 0x50; //模式0，8位数据，可变波特率
+	// Uart4.Register_SCON = 0xD0; //模式1，9位数据，可变波特率
     Uart4.Uart_Mode = 0xA0;     //定时器模式0，16bit自动重载;开启定时器4，1T模式
     Uart4.Uart_Count = UART4_BRT;
     Uart4.Interrupt_Enable = 0x10;
@@ -380,7 +382,9 @@ void Busy_Await(Uart_HandleTypeDef *const Uart, uint16_t overtime)
  **********************************************************/
 void Uartx_SendStr(Uart_HandleTypeDef *const Uart, uint8_t *p, uint8_t length)
 {
-
+	uint8_t psw_p = P;
+	psw_p <<= 3U;
+	
     while (length--)
     {
         Busy_Await(&(*Uart), UART_BYTE_SENDOVERTIME); //等待当前字节发送完成
@@ -393,9 +397,17 @@ void Uartx_SendStr(Uart_HandleTypeDef *const Uart, uint8_t *p, uint8_t length)
             S2BUF = *p++;
             break;
         case UART3:
+            // if (System_Parameter.Ppistate)
+            {
+                S3CON |= psw_p;
+            }
             S3BUF = *p++;
             break;
         case UART4:
+            // if (System_Parameter.Ppistate)
+            {
+                S4CON |= psw_p;
+            }
             S4BUF = *p++;
             break;
         default:

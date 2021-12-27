@@ -8,6 +8,7 @@ OPTION Optionlist[] =
         {"启停开关", CONTROL_PLCPOWER, PlcPowerUIshow},
         {"通信方式", CONTROL_COMMUNICA, CommunicaUIshow},
         {"工作模式",CONTROL_WORKMODE, WorkModeUIshow},
+        {"通信协议",CONTRL_PACT, PactUIshow},
         {"密码修改", CONTROL_PASSWORD_CHANGE, PassWordChangeUIShow},
         {"波特率设置", CONTROL_BAUDSETTING, Baud_Setting},
         {"本机热点", CONTROL_HOTSPOT, HotspotSettingUIshow},
@@ -493,6 +494,25 @@ void KeyControl_Enter(void) //控件状态--Enter
             /*执行对应的功能函数*/
             Modelist[SYS_TEMP_PARA.WorkMode].fun(); 
         }
+        System_Parameter.WorkMode = SYS_TEMP_PARA.WorkMode;
+        ControlSave(); //存盘工作模式设置
+        clear_screen();
+        GUI_String(70, 22, "修改成功", CH_12_12); //显示修改结果
+        Delay_ms(500);
+        /*返回菜单界面*/
+        Ui_Status.Ui = MENU_STATE;
+        LcdShow(RefreshMenuDisp); //刷新显示
+    }break;
+    /*通讯协议设置*/
+    case CONTRL_PACT:
+    {
+        /*检查函数指针非空*/
+        if(Pactlist[SYS_TEMP_PARA.Ppistate].fun != NULL)
+        {
+            /*执行对应的功能函数*/
+            Pactlist[SYS_TEMP_PARA.Ppistate].fun(); 
+        }
+        System_Parameter.Ppistate = SYS_TEMP_PARA.Ppistate;
         ControlSave(); //存盘工作模式设置
         clear_screen();
         GUI_String(70, 22, "修改成功", CH_12_12); //显示修改结果
@@ -593,7 +613,11 @@ void KeyControl_Cancel(void) //控件状态--Cancel
     {
         SYS_TEMP_PARA.WorkMode = System_Parameter.WorkMode;
     }break;
-    
+    /*通讯协议设置*/
+    case CONTRL_PACT:
+    {
+       SYS_TEMP_PARA.Ppistate = System_Parameter.Ppistate;
+    }break;
     case CONTROL_RELOAD:
     {
         break;
@@ -688,6 +712,12 @@ void KeyControl_Up(void)
         SYS_TEMP_PARA.WorkMode = LoopIndex(DOWMWORD, SYS_TEMP_PARA.WorkMode, G_Modelist_Size);
         GUI_String(115, 10, Modelist[SYS_TEMP_PARA.WorkMode].pstring, CH_12_12);
     }break;
+    /*通讯协议设置*/
+    case CONTRL_PACT:
+    {
+        SYS_TEMP_PARA.Ppistate = LoopIndex(DOWMWORD, SYS_TEMP_PARA.Ppistate, G_Pactlist_Size);
+        GUI_String(105, 31, Pactlist[SYS_TEMP_PARA.Ppistate].pstring, EN_5_8);
+    }break;
     default:
         break;
     }
@@ -772,6 +802,12 @@ void KeyControl_Down(void) //控件状态--Down
     {
         SYS_TEMP_PARA.WorkMode = LoopIndex(UPWORD, SYS_TEMP_PARA.WorkMode, G_Modelist_Size);
         GUI_String(115, 10, Modelist[SYS_TEMP_PARA.WorkMode].pstring, CH_12_12);
+    }break;
+    /*通讯协议设置*/
+    case CONTRL_PACT:
+    {
+        SYS_TEMP_PARA.Ppistate = LoopIndex(UPWORD, SYS_TEMP_PARA.Ppistate, G_Pactlist_Size);
+        GUI_String(105, 31, Pactlist[SYS_TEMP_PARA.Ppistate].pstring, EN_5_8);
     }break;
     default:
         break;

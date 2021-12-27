@@ -12,7 +12,7 @@ linking...
 *** WARNING L7: MODULE NAME NOT UNIQUE
     MODULE:  .\Objects\STARTUP.obj (?C_STARTUP)
 
-Program Size: data=25.0 xdata=7422 code=28602
+Program Size: data=25.0 xdata=7446 code=28997
 creating hex file from ".\Objects\WIRELESS_PLC"...
 ".\Objects\WIRELESS_PLC" - 0 Error(s), 1 Warning(s).
-Build Time Elapsed:  00:00:05
+Build Time Elapsed:  00:00:01

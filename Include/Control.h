@@ -28,7 +28,8 @@ typedef enum //控件
 	CONTROL_PLCPOWER,		 //PLC开关控件
 	CONTROL_BAUDSETTING,	 //波特率设置控件
 	CONTROL_COMMUNICA,		 //通讯控件
-	CONTROL_WORKMODE,			 //工作模式
+	CONTROL_WORKMODE,	     //工作模式
+	CONTRL_PACT,             //通讯协议
 	CONTROL_PASSWORD,		 //密码输入控件
 	CONTROL_PASSWORD_CHANGE, //密码修改控件
 	CONTROL_RELOAD,			 //恢复出厂设置
@@ -70,6 +71,7 @@ void PassWordDelete(SYSTEM_PARAMETER *Password);									 //密码归0
 void PassWordInputUIShow(void);														 //输入密码界面进入显示
 void PassWordChangeUIShow(void);													 //修改密码界面进入显示
 void WorkModeUIshow(void);
+void PactUIshow(void);
 /*屏保显示页面*/
 void ScreensaverUiShow(void);
 //********************************************************************//
@@ -128,6 +130,9 @@ typedef struct
 extern OBJCTSTRUCT Objlist[];
 extern uint8_t G_Objlist_Size;
 
+extern MODESTRUCT Pactlist[];
+extern uint8_t G_Pactlist_Size;
+
 // void BaudSettingUIshow(void); //波特率设置界面显示
 void BaudSettingUI1show(void);
 void BaudSettingUI2show(void);
@@ -137,6 +142,8 @@ void BaudInit(void);
 void HotspotSettingUIshow(void);
 void Mode_Slave(void);
 void Mode_Master(void);
+void Set_OtherPact(void);
+void Set_PpiPact(void);
 //*********************************************************************//
 
 //****************************恢复出厂设置****************************//

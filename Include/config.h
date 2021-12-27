@@ -54,7 +54,7 @@ typedef volatile __IO;
 /***********************************常用的数据类型***********************************/
 
 /***********************************系统上电参数***********************************/
-#define DEFAULT_SYSTEM_PARAMETER "\xFF\xFF\xFF\xFF\x08\x08\x02\x08\x01\x01\x00\x00\x01\x02\x36\x71"
+#define DEFAULT_SYSTEM_PARAMETER "\xFF\xFF\xFF\xFF\x08\x08\x02\x08\x01\x01\x00\x00\x01\x02\x00\xF1\x16"
 #define START_SAVEADDRESS 0x0000         //参数存储开始地址
 #define BAUDRATE_SAVEADDRESS 0x0004      //波特率
 #define PLCSTAE_SAVEADDRESS 0x0005       // PLC状态
@@ -84,6 +84,7 @@ typedef struct
     uint8_t Apstate;                  //热点状态
     uint8_t WorkMode;                 //工作模式
     uint8_t CurrentSlave;             //当前从机
+    uint8_t Ppistate;                 //ppi通讯协议
     uint16_t CRC16;                   // CRC校验码
 } SYSTEM_PARAMETER;                   //系统参数
 

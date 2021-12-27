@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.0.0   MENU                                                              12/22/2021 16:04:17 PAGE 1   
+C51 COMPILER V9.60.0.0   MENU                                                              12/27/2021 17:10:03 PAGE 1   
 
 
 C51 COMPILER V9.60.0.0, COMPILATION OF MODULE MENU
@@ -18,1056 +18,1094 @@ line level    source
    8                  {"启停开关", CONTROL_PLCPOWER, PlcPowerUIshow},
    9                  {"通信方式", CONTROL_COMMUNICA, CommunicaUIshow},
   10                  {"工作模式",CONTROL_WORKMODE, WorkModeUIshow},
-  11                  {"密码修改", CONTROL_PASSWORD_CHANGE, PassWordChangeUIShow},
-  12                  {"波特率设置", CONTROL_BAUDSETTING, Baud_Setting},
-  13                  {"本机热点", CONTROL_HOTSPOT, HotspotSettingUIshow},
-  14                  {"恢复出厂设置", CONTROL_RELOAD, ReloadSettingUIshow},
-  15          };
-  16          
-  17          #define OptionlistSize (sizeof(Optionlist) / sizeof(OPTION))
-  18          
-  19          /*二级菜单*/
-  20          OPTION Optionlist1[] =
-  21              {
-  22                  {"以太网", CONTROL_BAUD1, BaudSettingUI1show},
-  23                  {"无线网", CONTROL_BAUD2, BaudSettingUI2show},
-  24                  {"扩展网", CONTROL_BAUD3, BaudSettingUI3show},
-  25                  {"内部网", CONTROL_BAUD4, BaudSettingUI4show}};
-  26          
-  27          #define OptionlistSize1 (sizeof(Optionlist1) / sizeof(OPTION))
-  28          
-  29          /*当前多级菜单数量*/
-  30          Menu_Show M_Show[] =
-  31              {
-  32                  {0, 0, 0, {0, 1, 2}, Optionlist},
-  33                  {0, 0, 0, {0, 1, 2}, Optionlist1}
-  34          
-  35          };
-  36          
-  37          #define MENU_NUM (sizeof(M_Show) / sizeof(Menu_Show))
-  38          
-  39          /*函数映射表*/
-  40          const KEY_MAP keyStateEvent[] =
-  41              {
-  42                  /*Main状态*/
-  43                  {KEY_UP, MAIN_STATE, KeyMain_Up},
-  44                  {KEY_DOWN, MAIN_STATE, KeyMain_Down},
-  45                  {KEY_ENTER, MAIN_STATE, KeyMain_Enter},
-  46                  {KEY_CANCEL, MAIN_STATE, KeyMain_Cancel},
-  47                  {KEY_MENU, MAIN_STATE, KeyMain_Menu},
-  48                  /*Menu状态*/
-  49                  {KEY_UP, MENU_STATE, KeyMenu_Up},
-  50                  {KEY_DOWN, MENU_STATE, KeyMenu_Down},
-  51                  {KEY_ENTER, MENU_STATE, KeyMenu_Enter},
-  52                  {KEY_CANCEL, MENU_STATE, KeyMenu_Cancel},
-  53                  {KEY_MENU, MENU_STATE, KeyMenu_Menu},
-  54                  /*CONTROL状态*/
-C51 COMPILER V9.60.0.0   MENU                                                              12/22/2021 16:04:17 PAGE 2   
+  11                  {"通信协议",CONTRL_PACT, PactUIshow},
+  12                  {"密码修改", CONTROL_PASSWORD_CHANGE, PassWordChangeUIShow},
+  13                  {"波特率设置", CONTROL_BAUDSETTING, Baud_Setting},
+  14                  {"本机热点", CONTROL_HOTSPOT, HotspotSettingUIshow},
+  15                  {"恢复出厂设置", CONTROL_RELOAD, ReloadSettingUIshow},
+  16          };
+  17          
+  18          #define OptionlistSize (sizeof(Optionlist) / sizeof(OPTION))
+  19          
+  20          /*二级菜单*/
+  21          OPTION Optionlist1[] =
+  22              {
+  23                  {"以太网", CONTROL_BAUD1, BaudSettingUI1show},
+  24                  {"无线网", CONTROL_BAUD2, BaudSettingUI2show},
+  25                  {"扩展网", CONTROL_BAUD3, BaudSettingUI3show},
+  26                  {"内部网", CONTROL_BAUD4, BaudSettingUI4show}};
+  27          
+  28          #define OptionlistSize1 (sizeof(Optionlist1) / sizeof(OPTION))
+  29          
+  30          /*当前多级菜单数量*/
+  31          Menu_Show M_Show[] =
+  32              {
+  33                  {0, 0, 0, {0, 1, 2}, Optionlist},
+  34                  {0, 0, 0, {0, 1, 2}, Optionlist1}
+  35          
+  36          };
+  37          
+  38          #define MENU_NUM (sizeof(M_Show) / sizeof(Menu_Show))
+  39          
+  40          /*函数映射表*/
+  41          const KEY_MAP keyStateEvent[] =
+  42              {
+  43                  /*Main状态*/
+  44                  {KEY_UP, MAIN_STATE, KeyMain_Up},
+  45                  {KEY_DOWN, MAIN_STATE, KeyMain_Down},
+  46                  {KEY_ENTER, MAIN_STATE, KeyMain_Enter},
+  47                  {KEY_CANCEL, MAIN_STATE, KeyMain_Cancel},
+  48                  {KEY_MENU, MAIN_STATE, KeyMain_Menu},
+  49                  /*Menu状态*/
+  50                  {KEY_UP, MENU_STATE, KeyMenu_Up},
+  51                  {KEY_DOWN, MENU_STATE, KeyMenu_Down},
+  52                  {KEY_ENTER, MENU_STATE, KeyMenu_Enter},
+  53                  {KEY_CANCEL, MENU_STATE, KeyMenu_Cancel},
+  54                  {KEY_MENU, MENU_STATE, KeyMenu_Menu},
+C51 COMPILER V9.60.0.0   MENU                                                              12/27/2021 17:10:03 PAGE 2   
 
-  55                  {KEY_UP, CONTROL_STATE, KeyControl_Up},
-  56                  {KEY_DOWN, CONTROL_STATE, KeyControl_Down},
-  57                  {KEY_ENTER, CONTROL_STATE, KeyControl_Enter},
-  58                  {KEY_CANCEL, CONTROL_STATE, KeyControl_Cancel},
-  59                  {KEY_MENU, CONTROL_STATE, KeyControl_Menu},
-  60                  /*BAUD状态*/
-  61                  {KEY_UP, BAUD_STATE, KeyBaud_Up},
-  62                  {KEY_DOWN, BAUD_STATE, KeyBaud_Down},
-  63                  {KEY_ENTER, BAUD_STATE, KeyBaud_Enter},
-  64                  {KEY_CANCEL, BAUD_STATE, KeyBaud_Cancel},
-  65                  {KEY_MENU, BAUD_STATE, KeyBaud_Menu}};
-  66          
-  67          #define keyStateEventSize (sizeof(keyStateEvent) / sizeof(KEY_MAP))
-  68          
-  69          void KeyEvent(void) //按键事件
-  70          {
-  71   1          uint8_t i;
-  72   1          KEY_e KeyState = Key_Chick(); //获取按键状态
-  73   1      
-  74   1          LcdDly(KeyState); // 无按键操作返回函数
-  75   1      
-  76   1          if (KeyState == NO_KEY) //无按键直接返回
-  77   1          {
-  78   2              return;
-  79   2          }
-  80   1      
-  81   1          for (i = 0; i < keyStateEventSize; i++)
-  82   1          {
-  83   2              if (KeyState == keyStateEvent[i].Keycodel) //按键值
-  84   2              {   /*按键状态*/
-  85   3                  if (Ui_Status.Ui == keyStateEvent[i].Stage)
-  86   3                  {
-  87   4                      keyStateEvent[i].fun(); //执行按键状态对应函数
-  88   4                      break;
-  89   4                  }
-  90   3              }
-  91   2          }
-  92   1      }
-  93          
-  94          void LcdShowInit(void) //界面显示初始化
-  95          {
-  96   1          LcdShow(&ScreensaverUiShow);
-  97   1      }
-  98          
-  99          /*界面显示接口(回调函数思想)*/
- 100          void LcdShow(pshow InterfaceShow) 
- 101          {
- 102   1          InterfaceShow();
- 103   1      }
- 104          
- 105          /**
- 106           * @brief       主界面状态--enter
- 107           * @details     在主界面下按下enter按钮
- 108           * @param       None
- 109           * @retval      None
- 110           */
- 111          void KeyMain_Enter(void)
- 112          {
- 113   1      #if USE_PRINTF_DEBUG
+  55                  /*CONTROL状态*/
+  56                  {KEY_UP, CONTROL_STATE, KeyControl_Up},
+  57                  {KEY_DOWN, CONTROL_STATE, KeyControl_Down},
+  58                  {KEY_ENTER, CONTROL_STATE, KeyControl_Enter},
+  59                  {KEY_CANCEL, CONTROL_STATE, KeyControl_Cancel},
+  60                  {KEY_MENU, CONTROL_STATE, KeyControl_Menu},
+  61                  /*BAUD状态*/
+  62                  {KEY_UP, BAUD_STATE, KeyBaud_Up},
+  63                  {KEY_DOWN, BAUD_STATE, KeyBaud_Down},
+  64                  {KEY_ENTER, BAUD_STATE, KeyBaud_Enter},
+  65                  {KEY_CANCEL, BAUD_STATE, KeyBaud_Cancel},
+  66                  {KEY_MENU, BAUD_STATE, KeyBaud_Menu}};
+  67          
+  68          #define keyStateEventSize (sizeof(keyStateEvent) / sizeof(KEY_MAP))
+  69          
+  70          void KeyEvent(void) //按键事件
+  71          {
+  72   1          uint8_t i;
+  73   1          KEY_e KeyState = Key_Chick(); //获取按键状态
+  74   1      
+  75   1          LcdDly(KeyState); // 无按键操作返回函数
+  76   1      
+  77   1          if (KeyState == NO_KEY) //无按键直接返回
+  78   1          {
+  79   2              return;
+  80   2          }
+  81   1      
+  82   1          for (i = 0; i < keyStateEventSize; i++)
+  83   1          {
+  84   2              if (KeyState == keyStateEvent[i].Keycodel) //按键值
+  85   2              {   /*按键状态*/
+  86   3                  if (Ui_Status.Ui == keyStateEvent[i].Stage)
+  87   3                  {
+  88   4                      keyStateEvent[i].fun(); //执行按键状态对应函数
+  89   4                      break;
+  90   4                  }
+  91   3              }
+  92   2          }
+  93   1      }
+  94          
+  95          void LcdShowInit(void) //界面显示初始化
+  96          {
+  97   1          LcdShow(&ScreensaverUiShow);
+  98   1      }
+  99          
+ 100          /*界面显示接口(回调函数思想)*/
+ 101          void LcdShow(pshow InterfaceShow) 
+ 102          {
+ 103   1          InterfaceShow();
+ 104   1      }
+ 105          
+ 106          /**
+ 107           * @brief       主界面状态--enter
+ 108           * @details     在主界面下按下enter按钮
+ 109           * @param       None
+ 110           * @retval      None
+ 111           */
+ 112          void KeyMain_Enter(void)
+ 113          {
+ 114   1      #if USE_PRINTF_DEBUG
                   uint8_t temp = strncmp(System_Parameter.PSWNext.PassWordbuff, "\xFF\xFF\xFF\xFF", PASSWORDBITS);
               #endif
- 116   1          if (Ui_Status.Widget == CONTROL_PASSWORD)
-C51 COMPILER V9.60.0.0   MENU                                                              12/22/2021 16:04:17 PAGE 3   
+C51 COMPILER V9.60.0.0   MENU                                                              12/27/2021 17:10:03 PAGE 3   
 
- 117   1          {
- 118   2              /*没有设置过密码或者密码正确*/
- 119   2              if (PassWordjudge(PassWordI, System_Parameter) || (!strncmp(System_Parameter.PSWNext.PassWordbuff,
+ 117   1          if (Ui_Status.Widget == CONTROL_PASSWORD)
+ 118   1          {
+ 119   2              /*没有设置过密码或者密码正确*/
+ 120   2              if (PassWordjudge(PassWordI, System_Parameter) || (!strncmp(System_Parameter.PSWNext.PassWordbuff,
              - "\xFF\xFF\xFF\xFF", PASSWORDBITS)))
- 120   2              {
- 121   3                  LcdShow(RefreshMenuDisp); //刷新界面
- 122   3                  Ui_Status.Ui = MENU_STATE;
- 123   3                  // PublicTimer16.MenuDly16.Timer16Count = T_60S; //无操作返回定时器开启
- 124   3              }
- 125   2              else //如果密码错误
- 126   2              {
- 127   3                  PassWordDelete(&PassWordI);
- 128   3                  clear_screen();
- 129   3                  GUI_String(49, 31, "wrong password !", EN_5_8);
- 130   3                  Delay_ms(1000);
- 131   3                  // /*控件选项为屏保*/
- 132   3                  // Ui_Status.Widget = CONTROL_SCREENSAVE;
- 133   3                  LcdShow(PassWordInputUIShow); //重新输入
- 134   3              }
- 135   2          }
- 136   1      
- 137   1      #if USE_PRINTF_DEBUG
+ 121   2              {
+ 122   3                  LcdShow(RefreshMenuDisp); //刷新界面
+ 123   3                  Ui_Status.Ui = MENU_STATE;
+ 124   3                  // PublicTimer16.MenuDly16.Timer16Count = T_60S; //无操作返回定时器开启
+ 125   3              }
+ 126   2              else //如果密码错误
+ 127   2              {
+ 128   3                  PassWordDelete(&PassWordI);
+ 129   3                  clear_screen();
+ 130   3                  GUI_String(49, 31, "wrong password !", EN_5_8);
+ 131   3                  Delay_ms(1000);
+ 132   3                  // /*控件选项为屏保*/
+ 133   3                  // Ui_Status.Widget = CONTROL_SCREENSAVE;
+ 134   3                  LcdShow(PassWordInputUIShow); //重新输入
+ 135   3              }
+ 136   2          }
+ 137   1      
+ 138   1      #if USE_PRINTF_DEBUG
                   Uartx_SendStr(&Uart1, System_Parameter.PSWNext.PassWordbuff, 4);
                   Uartx_SendStr(&Uart1, &temp, 1);
                   printf("KeyMain_Enter\r\n");
               #endif
- 142   1      }
- 143          
- 144          void KeyMain_Up(void) //主界面状态--Up
- 145          {
- 146   1          if (Ui_Status.Widget == CONTROL_PASSWORD) //密码控件
- 147   1          {
- 148   2              uint8_t Value = PassWordInput(ADD, &PassWordI);
- 149   2              uint8_t temp[2] = {0}; //字符
- 150   2              GUI_String(PassWordI.PSWNext.Index * 20 + 97, 38, myitoa(Value, temp, 10), EN_5_8);
- 151   2          }
- 152   1      
- 153   1      #if USE_PRINTF_DEBUG
+ 143   1      }
+ 144          
+ 145          void KeyMain_Up(void) //主界面状态--Up
+ 146          {
+ 147   1          if (Ui_Status.Widget == CONTROL_PASSWORD) //密码控件
+ 148   1          {
+ 149   2              uint8_t Value = PassWordInput(ADD, &PassWordI);
+ 150   2              uint8_t temp[2] = {0}; //字符
+ 151   2              GUI_String(PassWordI.PSWNext.Index * 20 + 97, 38, myitoa(Value, temp, 10), EN_5_8);
+ 152   2          }
+ 153   1      
+ 154   1      #if USE_PRINTF_DEBUG
                   printf("KeyMain_Up\r\n");
               #endif
- 156   1      }
- 157          /*屏保界面到密码输入界面切换*/
- 158          void KeyMain_Menu(void) //主界面状态--Menu
- 159          {
- 160   1          switch (Ui_Status.Widget)
- 161   1          {
- 162   2          case CONTROL_SCREENSAVE:
- 163   2          {
- 164   3              /*切换到密码界面*/
- 165   3              Ui_Status.Widget = CONTROL_PASSWORD;
- 166   3              LcdShow(&PassWordInputUIShow);
- 167   3              /*无操作返回定时器开启*/
- 168   3              PublicTimer16.MenuDly16.Timer16Count = T_60S;
- 169   3          }
- 170   2          break;
- 171   2          case CONTROL_PASSWORD:
- 172   2          { /*改变当前密码输入位置*/
- 173   3              InputOffect(&PassWordI);
- 174   3          }
- 175   2          break;
- 176   2          default:
- 177   2              break;
-C51 COMPILER V9.60.0.0   MENU                                                              12/22/2021 16:04:17 PAGE 4   
+ 157   1      }
+ 158          /*屏保界面到密码输入界面切换*/
+ 159          void KeyMain_Menu(void) //主界面状态--Menu
+ 160          {
+ 161   1          switch (Ui_Status.Widget)
+ 162   1          {
+ 163   2          case CONTROL_SCREENSAVE:
+ 164   2          {
+ 165   3              /*切换到密码界面*/
+ 166   3              Ui_Status.Widget = CONTROL_PASSWORD;
+ 167   3              LcdShow(&PassWordInputUIShow);
+ 168   3              /*无操作返回定时器开启*/
+ 169   3              PublicTimer16.MenuDly16.Timer16Count = T_60S;
+ 170   3          }
+ 171   2          break;
+ 172   2          case CONTROL_PASSWORD:
+ 173   2          { /*改变当前密码输入位置*/
+ 174   3              InputOffect(&PassWordI);
+ 175   3          }
+ 176   2          break;
+ 177   2          default:
+C51 COMPILER V9.60.0.0   MENU                                                              12/27/2021 17:10:03 PAGE 4   
 
- 178   2          }
- 179   1      
- 180   1      #if USE_PRINTF_DEBUG
+ 178   2              break;
+ 179   2          }
+ 180   1      
+ 181   1      #if USE_PRINTF_DEBUG
                   printf("KeyMain_Menu\r\n");
               #endif
- 183   1      }
- 184          
- 185          void KeyMain_Cancel(void) //主界面状态--Cancel
- 186          {
- 187   1          /*主界面按下取消键，退到屏保界面*/
- 188   1          if (Ui_Status.Widget == CONTROL_PASSWORD)
- 189   1          {
- 190   2              LcdShow(&ScreensaverUiShow);
- 191   2              Ui_Status.Widget = CONTROL_SCREENSAVE;
- 192   2              PassWordDelete(&PassWordI);
- 193   2          }
- 194   1      
- 195   1      #if USE_PRINTF_DEBUG
+ 184   1      }
+ 185          
+ 186          void KeyMain_Cancel(void) //主界面状态--Cancel
+ 187          {
+ 188   1          /*主界面按下取消键，退到屏保界面*/
+ 189   1          if (Ui_Status.Widget == CONTROL_PASSWORD)
+ 190   1          {
+ 191   2              LcdShow(&ScreensaverUiShow);
+ 192   2              Ui_Status.Widget = CONTROL_SCREENSAVE;
+ 193   2              PassWordDelete(&PassWordI);
+ 194   2          }
+ 195   1      
+ 196   1      #if USE_PRINTF_DEBUG
                   printf("%s\r\n", System_Parameter.PSWNext.PassWordbuff); //防止忘记密码之后进不去PLC
               #endif
- 198   1      }
- 199          
- 200          void KeyMain_Down(void) //主界面状态--Down
- 201          {
- 202   1          if (Ui_Status.Widget == CONTROL_PASSWORD)
- 203   1          {
- 204   2              uint8_t Value = PassWordInput(SUB, &PassWordI);
- 205   2              uint8_t temp[2] = {0}; //字符
- 206   2              GUI_String(PassWordI.PSWNext.Index * 20 + 97, 38, myitoa(Value, temp, 10), EN_5_8);
- 207   2          }
- 208   1      
- 209   1      #if USE_PRINTF_DEBUG
+ 199   1      }
+ 200          
+ 201          void KeyMain_Down(void) //主界面状态--Down
+ 202          {
+ 203   1          if (Ui_Status.Widget == CONTROL_PASSWORD)
+ 204   1          {
+ 205   2              uint8_t Value = PassWordInput(SUB, &PassWordI);
+ 206   2              uint8_t temp[2] = {0}; //字符
+ 207   2              GUI_String(PassWordI.PSWNext.Index * 20 + 97, 38, myitoa(Value, temp, 10), EN_5_8);
+ 208   2          }
+ 209   1      
+ 210   1      #if USE_PRINTF_DEBUG
                   printf("KeyMain_Down\r\n");
               #endif
- 212   1      }
- 213          
- 214          void KeyMenu_Enter(void) //菜单状态--Enter
- 215          {
- 216   1          if (M_Show[MAIN_MENU].OptionNow->ControlShow == NULL)
- 217   1          {
- 218   2              return;
- 219   2          }
- 220   1      
- 221   1          Ui_Status.Ui = CONTROL_STATE;
- 222   1          Ui_Status.Widget = M_Show[MAIN_MENU].OptionNow->ControlType; //赋值控件
- 223   1          LcdShow(M_Show[MAIN_MENU].OptionNow->ControlShow);      //显示控制界面
- 224   1      #if USE_PRINTF_DEBUG
+ 213   1      }
+ 214          
+ 215          void KeyMenu_Enter(void) //菜单状态--Enter
+ 216          {
+ 217   1          if (M_Show[MAIN_MENU].OptionNow->ControlShow == NULL)
+ 218   1          {
+ 219   2              return;
+ 220   2          }
+ 221   1      
+ 222   1          Ui_Status.Ui = CONTROL_STATE;
+ 223   1          Ui_Status.Widget = M_Show[MAIN_MENU].OptionNow->ControlType; //赋值控件
+ 224   1          LcdShow(M_Show[MAIN_MENU].OptionNow->ControlShow);      //显示控制界面
+ 225   1      #if USE_PRINTF_DEBUG
                   printf("KeyMenu_Enter\r\n");
               #endif
- 227   1      }
- 228          
- 229          /*菜单状态--Up*/
- 230          void KeyMenu_Up(void)
- 231          {
- 232   1          /*箭头索引减小*/
- 233   1          if ((M_Show[MAIN_MENU].Finger_Index--) == 0)
- 234   1              M_Show[MAIN_MENU].Finger_Index = 0;
- 235   1      
- 236   1          M_Show[MAIN_MENU].Option_Index = LoopIndex(UPWORD, M_Show[MAIN_MENU].Option_Index, OptionlistSize);
- 237   1      
- 238   1          if (M_Show[MAIN_MENU].Option_Index == (OptionlistSize - 1)) //索引逻辑
- 239   1          {
-C51 COMPILER V9.60.0.0   MENU                                                              12/22/2021 16:04:17 PAGE 5   
+ 228   1      }
+ 229          
+ 230          /*菜单状态--Up*/
+ 231          void KeyMenu_Up(void)
+ 232          {
+ 233   1          /*箭头索引减小*/
+ 234   1          if ((M_Show[MAIN_MENU].Finger_Index--) == 0)
+ 235   1              M_Show[MAIN_MENU].Finger_Index = 0;
+ 236   1      
+ 237   1          M_Show[MAIN_MENU].Option_Index = LoopIndex(UPWORD, M_Show[MAIN_MENU].Option_Index, OptionlistSize);
+ 238   1      
+ 239   1          if (M_Show[MAIN_MENU].Option_Index == (OptionlistSize - 1)) //索引逻辑
+C51 COMPILER V9.60.0.0   MENU                                                              12/27/2021 17:10:03 PAGE 5   
 
- 240   2              M_Show[MAIN_MENU].Finger_Index = 2;
- 241   2          }
- 242   1          /*菜单滑动逻辑*/
- 243   1          if (M_Show[MAIN_MENU].Finger_Index == 0)
- 244   1          {
- 245   2              M_Show[MAIN_MENU].OptionIndex_buf[0] = M_Show[MAIN_MENU].Option_Index;
- 246   2              M_Show[MAIN_MENU].OptionIndex_buf[1] = M_Show[MAIN_MENU].Option_Index + 1;
- 247   2              M_Show[MAIN_MENU].OptionIndex_buf[2] = M_Show[MAIN_MENU].Option_Index + 2;
- 248   2          }
- 249   1          else if (M_Show[MAIN_MENU].Finger_Index == 1)
- 250   1          {
- 251   2              M_Show[MAIN_MENU].OptionIndex_buf[0] = M_Show[MAIN_MENU].Option_Index - 1;
- 252   2              M_Show[MAIN_MENU].OptionIndex_buf[1] = M_Show[MAIN_MENU].Option_Index;
- 253   2              M_Show[MAIN_MENU].OptionIndex_buf[2] = M_Show[MAIN_MENU].Option_Index + 1;
- 254   2          }
- 255   1          else
- 256   1          {
- 257   2              M_Show[MAIN_MENU].OptionIndex_buf[0] = M_Show[MAIN_MENU].Option_Index - 2;
- 258   2              M_Show[MAIN_MENU].OptionIndex_buf[1] = M_Show[MAIN_MENU].Option_Index - 1;
- 259   2              M_Show[MAIN_MENU].OptionIndex_buf[2] = M_Show[MAIN_MENU].Option_Index;
- 260   2          }
- 261   1      
- 262   1          LcdShow(RefreshMenuDisp);                                                  //刷新显示
- 263   1          M_Show[MAIN_MENU].OptionNow = &Optionlist[M_Show[MAIN_MENU].Option_Index]; //赋值当前选项
- 264   1      #if USE_PRINTF_DEBUG
+ 240   1          {
+ 241   2              M_Show[MAIN_MENU].Finger_Index = 2;
+ 242   2          }
+ 243   1          /*菜单滑动逻辑*/
+ 244   1          if (M_Show[MAIN_MENU].Finger_Index == 0)
+ 245   1          {
+ 246   2              M_Show[MAIN_MENU].OptionIndex_buf[0] = M_Show[MAIN_MENU].Option_Index;
+ 247   2              M_Show[MAIN_MENU].OptionIndex_buf[1] = M_Show[MAIN_MENU].Option_Index + 1;
+ 248   2              M_Show[MAIN_MENU].OptionIndex_buf[2] = M_Show[MAIN_MENU].Option_Index + 2;
+ 249   2          }
+ 250   1          else if (M_Show[MAIN_MENU].Finger_Index == 1)
+ 251   1          {
+ 252   2              M_Show[MAIN_MENU].OptionIndex_buf[0] = M_Show[MAIN_MENU].Option_Index - 1;
+ 253   2              M_Show[MAIN_MENU].OptionIndex_buf[1] = M_Show[MAIN_MENU].Option_Index;
+ 254   2              M_Show[MAIN_MENU].OptionIndex_buf[2] = M_Show[MAIN_MENU].Option_Index + 1;
+ 255   2          }
+ 256   1          else
+ 257   1          {
+ 258   2              M_Show[MAIN_MENU].OptionIndex_buf[0] = M_Show[MAIN_MENU].Option_Index - 2;
+ 259   2              M_Show[MAIN_MENU].OptionIndex_buf[1] = M_Show[MAIN_MENU].Option_Index - 1;
+ 260   2              M_Show[MAIN_MENU].OptionIndex_buf[2] = M_Show[MAIN_MENU].Option_Index;
+ 261   2          }
+ 262   1      
+ 263   1          LcdShow(RefreshMenuDisp);                                                  //刷新显示
+ 264   1          M_Show[MAIN_MENU].OptionNow = &Optionlist[M_Show[MAIN_MENU].Option_Index]; //赋值当前选项
+ 265   1      #if USE_PRINTF_DEBUG
                   printf("KeyMenu_Up\r\n");
               #endif
- 267   1      }
- 268          
- 269          /*菜单状态--Menu*/
- 270          void KeyMenu_Menu(void)
- 271          {
- 272   1      #if USE_PRINTF_DEBUG
+ 268   1      }
+ 269          
+ 270          /*菜单状态--Menu*/
+ 271          void KeyMenu_Menu(void)
+ 272          {
+ 273   1      #if USE_PRINTF_DEBUG
                   printf("KeyMenu_Menu\r\n");
               #endif
- 275   1      }
- 276          
- 277          void KeyMenu_Cancel(void) //菜单状态--Cancel
- 278          {
- 279   1          /*菜单界面按下取消键，直接锁屏*/
- 280   1          Ui_Status.Ui = MAIN_STATE;
- 281   1          Ui_Status.Widget = CONTROL_SCREENSAVE;
- 282   1          LcdShow(&ScreensaverUiShow);
- 283   1          PassWordDelete(&PassWordI);
- 284   1      
- 285   1      #if USE_PRINTF_DEBUG
+ 276   1      }
+ 277          
+ 278          void KeyMenu_Cancel(void) //菜单状态--Cancel
+ 279          {
+ 280   1          /*菜单界面按下取消键，直接锁屏*/
+ 281   1          Ui_Status.Ui = MAIN_STATE;
+ 282   1          Ui_Status.Widget = CONTROL_SCREENSAVE;
+ 283   1          LcdShow(&ScreensaverUiShow);
+ 284   1          PassWordDelete(&PassWordI);
+ 285   1      
+ 286   1      #if USE_PRINTF_DEBUG
                   printf("KeyMenu_Cancel\r\n");
               #endif
- 288   1      }
- 289          
- 290          void KeyMenu_Down(void) //菜单状态--Down
- 291          {
- 292   1          if ((M_Show[MAIN_MENU].Finger_Index++) == 2) //箭头索引增加
- 293   1              M_Show[MAIN_MENU].Finger_Index = 2;
- 294   1      
- 295   1          M_Show[MAIN_MENU].Option_Index = LoopIndex(DOWMWORD, M_Show[MAIN_MENU].Option_Index, OptionlistSize); 
+ 289   1      }
+ 290          
+ 291          void KeyMenu_Down(void) //菜单状态--Down
+ 292          {
+ 293   1          if ((M_Show[MAIN_MENU].Finger_Index++) == 2) //箭头索引增加
+ 294   1              M_Show[MAIN_MENU].Finger_Index = 2;
+ 295   1      
+ 296   1          M_Show[MAIN_MENU].Option_Index = LoopIndex(DOWMWORD, M_Show[MAIN_MENU].Option_Index, OptionlistSize); 
              -//选项索引
- 296   1      
- 297   1          if (M_Show[MAIN_MENU].Option_Index == 0) //索引逻辑
- 298   1          {
- 299   2              M_Show[MAIN_MENU].Finger_Index = 0;
- 300   2          }
-C51 COMPILER V9.60.0.0   MENU                                                              12/22/2021 16:04:17 PAGE 6   
+ 297   1      
+ 298   1          if (M_Show[MAIN_MENU].Option_Index == 0) //索引逻辑
+ 299   1          {
+ 300   2              M_Show[MAIN_MENU].Finger_Index = 0;
+C51 COMPILER V9.60.0.0   MENU                                                              12/27/2021 17:10:03 PAGE 6   
 
- 301   1      
- 302   1          if (M_Show[MAIN_MENU].Finger_Index == 0)
- 303   1          {
- 304   2              M_Show[MAIN_MENU].OptionIndex_buf[0] = M_Show[MAIN_MENU].Option_Index;
- 305   2              M_Show[MAIN_MENU].OptionIndex_buf[1] = M_Show[MAIN_MENU].Option_Index + 1;
- 306   2              M_Show[MAIN_MENU].OptionIndex_buf[2] = M_Show[MAIN_MENU].Option_Index + 2;
- 307   2          }
- 308   1          else if (M_Show[MAIN_MENU].Finger_Index == 1)
- 309   1          {
- 310   2              M_Show[MAIN_MENU].OptionIndex_buf[0] = M_Show[MAIN_MENU].Option_Index - 1;
- 311   2              M_Show[MAIN_MENU].OptionIndex_buf[1] = M_Show[MAIN_MENU].Option_Index;
- 312   2              M_Show[MAIN_MENU].OptionIndex_buf[2] = M_Show[MAIN_MENU].Option_Index + 1;
- 313   2          }
- 314   1          else
- 315   1          {
- 316   2              M_Show[MAIN_MENU].OptionIndex_buf[0] = M_Show[MAIN_MENU].Option_Index - 2;
- 317   2              M_Show[MAIN_MENU].OptionIndex_buf[1] = M_Show[MAIN_MENU].Option_Index - 1;
- 318   2              M_Show[MAIN_MENU].OptionIndex_buf[2] = M_Show[MAIN_MENU].Option_Index;
- 319   2          }
- 320   1      
- 321   1          LcdShow(RefreshMenuDisp);                                                  //刷新显示
- 322   1          M_Show[MAIN_MENU].OptionNow = &Optionlist[M_Show[MAIN_MENU].Option_Index]; //赋值当前选项
- 323   1      
- 324   1      #if USE_PRINTF_DEBUG
+ 301   2          }
+ 302   1      
+ 303   1          if (M_Show[MAIN_MENU].Finger_Index == 0)
+ 304   1          {
+ 305   2              M_Show[MAIN_MENU].OptionIndex_buf[0] = M_Show[MAIN_MENU].Option_Index;
+ 306   2              M_Show[MAIN_MENU].OptionIndex_buf[1] = M_Show[MAIN_MENU].Option_Index + 1;
+ 307   2              M_Show[MAIN_MENU].OptionIndex_buf[2] = M_Show[MAIN_MENU].Option_Index + 2;
+ 308   2          }
+ 309   1          else if (M_Show[MAIN_MENU].Finger_Index == 1)
+ 310   1          {
+ 311   2              M_Show[MAIN_MENU].OptionIndex_buf[0] = M_Show[MAIN_MENU].Option_Index - 1;
+ 312   2              M_Show[MAIN_MENU].OptionIndex_buf[1] = M_Show[MAIN_MENU].Option_Index;
+ 313   2              M_Show[MAIN_MENU].OptionIndex_buf[2] = M_Show[MAIN_MENU].Option_Index + 1;
+ 314   2          }
+ 315   1          else
+ 316   1          {
+ 317   2              M_Show[MAIN_MENU].OptionIndex_buf[0] = M_Show[MAIN_MENU].Option_Index - 2;
+ 318   2              M_Show[MAIN_MENU].OptionIndex_buf[1] = M_Show[MAIN_MENU].Option_Index - 1;
+ 319   2              M_Show[MAIN_MENU].OptionIndex_buf[2] = M_Show[MAIN_MENU].Option_Index;
+ 320   2          }
+ 321   1      
+ 322   1          LcdShow(RefreshMenuDisp);                                                  //刷新显示
+ 323   1          M_Show[MAIN_MENU].OptionNow = &Optionlist[M_Show[MAIN_MENU].Option_Index]; //赋值当前选项
+ 324   1      
+ 325   1      #if USE_PRINTF_DEBUG
                   printf("KeyMenu_Down\r\n");
               #endif
- 327   1      }
- 328          
- 329          /**
- 330           * @brief       检查密码输入位数是否达标
- 331           * @details     
- 332           * @param       counts 当前密码输入次数
- 333           * @return      true/false
- 334           */
- 335          uint8_t Check_PasswordBits(void)
- 336          {
- 337   1          /*密码位数不够，禁止修改*/
- 338   1          if (!System_Parameter.PSWNext.Bit_Efficient_Flag)
- 339   1          {
- 340   2              clear_screen();
- 341   2              if(!System_Parameter.PSWNext.First_Input_Flag)
- 342   2              {
- 343   3                  GUI_String(5, 20, "Invalid password!", EN_5_8);
- 344   3                  GUI_String(5, 32, "Current counts is 1.", EN_5_8);
- 345   3                  /*修改密码1清空 */
- 346   3                  PassWordDelete(&PassWordChange1);
- 347   3              }
- 348   2              else
- 349   2              {
- 350   3                  GUI_String(5, 20, "Invalid password!", EN_5_8);
- 351   3                  GUI_String(5, 32, "Current counts is 2.", EN_5_8);
- 352   3                  /*修改密码2清空 */
- 353   3                  PassWordDelete(&PassWordChange2);
- 354   3              }
- 355   2              Delay_ms(1000);
- 356   2              /*显示修改密码界面*/
- 357   2              LcdShow(PassWordChangeUIShow);
- 358   2         
- 359   2              return false;
- 360   2          }
- 361   1          return true;
- 362   1      }
-C51 COMPILER V9.60.0.0   MENU                                                              12/22/2021 16:04:17 PAGE 7   
+ 328   1      }
+ 329          
+ 330          /**
+ 331           * @brief       检查密码输入位数是否达标
+ 332           * @details     
+ 333           * @param       counts 当前密码输入次数
+ 334           * @return      true/false
+ 335           */
+ 336          uint8_t Check_PasswordBits(void)
+ 337          {
+ 338   1          /*密码位数不够，禁止修改*/
+ 339   1          if (!System_Parameter.PSWNext.Bit_Efficient_Flag)
+ 340   1          {
+ 341   2              clear_screen();
+ 342   2              if(!System_Parameter.PSWNext.First_Input_Flag)
+ 343   2              {
+ 344   3                  GUI_String(5, 20, "Invalid password!", EN_5_8);
+ 345   3                  GUI_String(5, 32, "Current counts is 1.", EN_5_8);
+ 346   3                  /*修改密码1清空 */
+ 347   3                  PassWordDelete(&PassWordChange1);
+ 348   3              }
+ 349   2              else
+ 350   2              {
+ 351   3                  GUI_String(5, 20, "Invalid password!", EN_5_8);
+ 352   3                  GUI_String(5, 32, "Current counts is 2.", EN_5_8);
+ 353   3                  /*修改密码2清空 */
+ 354   3                  PassWordDelete(&PassWordChange2);
+ 355   3              }
+ 356   2              Delay_ms(1000);
+ 357   2              /*显示修改密码界面*/
+ 358   2              LcdShow(PassWordChangeUIShow);
+ 359   2         
+ 360   2              return false;
+ 361   2          }
+ 362   1          return true;
+C51 COMPILER V9.60.0.0   MENU                                                              12/27/2021 17:10:03 PAGE 7   
 
- 363          
- 364          void KeyControl_Enter(void) //控件状态--Enter
- 365          {
- 366   1          switch (Ui_Status.Widget)
- 367   1          {
- 368   2          case CONTROL_PASSWORD_CHANGE:
- 369   2          {
- 370   3              if (!Check_PasswordBits())
- 371   3                  return;
- 372   3              /*如果是第一次输入修改密码*/
- 373   3              if (!System_Parameter.PSWNext.First_Input_Flag)
- 374   3              {
- 375   4                  uint8_t i;
- 376   4                  uint8_t temp[2];
- 377   4      
- 378   4                  for (i = 0; i < PASSWORDBITS; i++) //显示4位密码
- 379   4                  {
- 380   5                      GUI_String(i * 20 + 100, 18, myitoa(PassWordChange1.PSWNext.PassWordbuff[i], temp, 10), EN
+ 363   1      }
+ 364          
+ 365          void KeyControl_Enter(void) //控件状态--Enter
+ 366          {
+ 367   1          switch (Ui_Status.Widget)
+ 368   1          {
+ 369   2          case CONTROL_PASSWORD_CHANGE:
+ 370   2          {
+ 371   3              if (!Check_PasswordBits())
+ 372   3                  return;
+ 373   3              /*如果是第一次输入修改密码*/
+ 374   3              if (!System_Parameter.PSWNext.First_Input_Flag)
+ 375   3              {
+ 376   4                  uint8_t i;
+ 377   4                  uint8_t temp[2];
+ 378   4      
+ 379   4                  for (i = 0; i < PASSWORDBITS; i++) //显示4位密码
+ 380   4                  {
+ 381   5                      GUI_String(i * 20 + 100, 18, myitoa(PassWordChange1.PSWNext.PassWordbuff[i], temp, 10), EN
              -_5_8);
- 381   5                  }
- 382   4      
- 383   4                  GUI_Lattice(175, 16, 16, 12, dot);
- 384   4                  /*置标志位*/
- 385   4                  System_Parameter.PSWNext.First_Input_Flag = true;
- 386   4              }
- 387   3              else
- 388   3              {
- 389   4                  if (PassWordjudge(PassWordChange1, PassWordChange2)) //密码判断两次输入相同密码时修改成功
- 390   4                  {
- 391   5                      memcpy(&System_Parameter.PSWNext.PassWordbuff, &PassWordChange2.PSWNext.PassWordbuff, size
+ 382   5                  }
+ 383   4      
+ 384   4                  GUI_Lattice(175, 16, 16, 12, dot);
+ 385   4                  /*置标志位*/
+ 386   4                  System_Parameter.PSWNext.First_Input_Flag = true;
+ 387   4              }
+ 388   3              else
+ 389   3              {
+ 390   4                  if (PassWordjudge(PassWordChange1, PassWordChange2)) //密码判断两次输入相同密码时修改成功
+ 391   4                  {
+ 392   5                      memcpy(&System_Parameter.PSWNext.PassWordbuff, &PassWordChange2.PSWNext.PassWordbuff, size
              -of(PassWordChange2.PSWNext.PassWordbuff));
- 392   5                      ControlSave();
- 393   5                      PassWordDelete(&PassWordChange1); //修改密码1清0
- 394   5                      PassWordDelete(&PassWordChange2); //修改密码2清0
- 395   5                      /*返回菜单界面*/
- 396   5                      Ui_Status.Ui = MENU_STATE;
- 397   5      
- 398   5                      clear_screen();
- 399   5                      GUI_String(70, 22, "修改成功", CH_12_12); //显示修改结果
- 400   5                      Delay_ms(500);
- 401   5                      LcdShow(RefreshMenuDisp); //刷新显示
- 402   5                  }
- 403   4                  else //两次密码输入不一致时
- 404   4                  {
- 405   5      
- 406   5                      clear_screen();
- 407   5                      GUI_String(70, 22, "修改失败", CH_12_12); //显示修改结果
- 408   5                      Delay_ms(500);
- 409   5                      LcdShow(PassWordChangeUIShow); //修改密码
- 410   5                  }
- 411   4                  /*置标志位*/
- 412   4                  System_Parameter.PSWNext.First_Input_Flag = false;
- 413   4              }
- 414   3              /*清除密码有效标志*/
- 415   3              System_Parameter.PSWNext.Bit_Efficient_Flag = false;
- 416   3              break;
- 417   3          }
- 418   2      
- 419   2          case CONTROL_PLCPOWER:
- 420   2          {
- 421   3              System_Parameter.PlcState ^= 1;
- 422   3              RUNKEY = System_Parameter.PlcState;
-C51 COMPILER V9.60.0.0   MENU                                                              12/22/2021 16:04:17 PAGE 8   
+ 393   5                      ControlSave();
+ 394   5                      PassWordDelete(&PassWordChange1); //修改密码1清0
+ 395   5                      PassWordDelete(&PassWordChange2); //修改密码2清0
+ 396   5                      /*返回菜单界面*/
+ 397   5                      Ui_Status.Ui = MENU_STATE;
+ 398   5      
+ 399   5                      clear_screen();
+ 400   5                      GUI_String(70, 22, "修改成功", CH_12_12); //显示修改结果
+ 401   5                      Delay_ms(500);
+ 402   5                      LcdShow(RefreshMenuDisp); //刷新显示
+ 403   5                  }
+ 404   4                  else //两次密码输入不一致时
+ 405   4                  {
+ 406   5      
+ 407   5                      clear_screen();
+ 408   5                      GUI_String(70, 22, "修改失败", CH_12_12); //显示修改结果
+ 409   5                      Delay_ms(500);
+ 410   5                      LcdShow(PassWordChangeUIShow); //修改密码
+ 411   5                  }
+ 412   4                  /*置标志位*/
+ 413   4                  System_Parameter.PSWNext.First_Input_Flag = false;
+ 414   4              }
+ 415   3              /*清除密码有效标志*/
+ 416   3              System_Parameter.PSWNext.Bit_Efficient_Flag = false;
+ 417   3              break;
+ 418   3          }
+ 419   2      
+ 420   2          case CONTROL_PLCPOWER:
+ 421   2          {
+ 422   3              System_Parameter.PlcState ^= 1;
+C51 COMPILER V9.60.0.0   MENU                                                              12/27/2021 17:10:03 PAGE 8   
 
- 423   3              ControlSave();           //存盘开关量
- 424   3              LcdShow(PlcPowerUIshow); // PLC设置界面
- 425   3              break;
- 426   3          }
- 427   2      
- 428   2          case CONTROL_COMMUNICA:
- 429   2          {
- 430   3              if (System_Parameter.CommunicationType == LOCAL)
- 431   3              {
- 432   4                  Wifi_Enable(false);
- 433   4              }
- 434   3              else
- 435   3              {
- 436   4                  Wifi_Enable(true);
- 437   4                  clear_screen();
- 438   4                  GUI_String(30, 22, "Please wait a moment", EN_5_8);
- 439   4                  Delay_ms(500);
- 440   4                  // /*初始化WIIF模块*/
- 441   4                  // Wifi_Init();
- 442   4              }
- 443   3              ControlSave(); //存盘通信方式
- 444   3      
- 445   3              clear_screen();
- 446   3              GUI_String(70, 22, "修改成功", CH_12_12); //显示修改结果
- 447   3              Delay_ms(500);
- 448   3              // LcdShow(CommunicaUIshow); //通讯设置界面
- 449   3              /*返回菜单界面*/
- 450   3              Ui_Status.Ui = MENU_STATE;
- 451   3              LcdShow(RefreshMenuDisp); //刷新显示
- 452   3              break;
- 453   3          }
- 454   2      
- 455   2          case CONTROL_BAUDSETTING:
- 456   2          {
- 457   3              if (M_Show[SEC0_MENU].OptionNow->ControlShow == NULL)
- 458   3              {
- 459   4                  return;
- 460   4              }
- 461   3              /*切换到波特率设置界面*/
- 462   3              Ui_Status.Ui = BAUD_STATE;
- 463   3              /*赋值控件*/
- 464   3              Ui_Status.Widget = M_Show[SEC0_MENU].OptionNow->ControlType;
- 465   3              /*显示控制界面*/
- 466   3              LcdShow(M_Show[SEC0_MENU].OptionNow->ControlShow);
- 467   3              /*无操作返回定时器开启*/
- 468   3              // PublicTimer16.MenuDly16.Timer16Count = T_60S;
- 469   3          }
- 470   2          break;
- 471   2          /*本机热点设置*/
- 472   2          case CONTROL_HOTSPOT:
- 473   2          {   /*检查函数指针非空*/
- 474   3              if(Aplist[System_Parameter.Apstate].fun != NULL)
- 475   3              {
- 476   4                  /*执行对应的功能函数*/
- 477   4                  Aplist[System_Parameter.Apstate].fun(); 
- 478   4              }
- 479   3              ControlSave(); //存盘热点设置
- 480   3              clear_screen();
- 481   3              GUI_String(70, 22, "修改成功", CH_12_12); //显示修改结果
- 482   3              Delay_ms(500);
- 483   3              /*返回菜单界面*/
- 484   3              Ui_Status.Ui = MENU_STATE;
-C51 COMPILER V9.60.0.0   MENU                                                              12/22/2021 16:04:17 PAGE 9   
+ 423   3              RUNKEY = System_Parameter.PlcState;
+ 424   3              ControlSave();           //存盘开关量
+ 425   3              LcdShow(PlcPowerUIshow); // PLC设置界面
+ 426   3              break;
+ 427   3          }
+ 428   2      
+ 429   2          case CONTROL_COMMUNICA:
+ 430   2          {
+ 431   3              if (System_Parameter.CommunicationType == LOCAL)
+ 432   3              {
+ 433   4                  Wifi_Enable(false);
+ 434   4              }
+ 435   3              else
+ 436   3              {
+ 437   4                  Wifi_Enable(true);
+ 438   4                  clear_screen();
+ 439   4                  GUI_String(30, 22, "Please wait a moment", EN_5_8);
+ 440   4                  Delay_ms(500);
+ 441   4                  // /*初始化WIIF模块*/
+ 442   4                  // Wifi_Init();
+ 443   4              }
+ 444   3              ControlSave(); //存盘通信方式
+ 445   3      
+ 446   3              clear_screen();
+ 447   3              GUI_String(70, 22, "修改成功", CH_12_12); //显示修改结果
+ 448   3              Delay_ms(500);
+ 449   3              // LcdShow(CommunicaUIshow); //通讯设置界面
+ 450   3              /*返回菜单界面*/
+ 451   3              Ui_Status.Ui = MENU_STATE;
+ 452   3              LcdShow(RefreshMenuDisp); //刷新显示
+ 453   3              break;
+ 454   3          }
+ 455   2      
+ 456   2          case CONTROL_BAUDSETTING:
+ 457   2          {
+ 458   3              if (M_Show[SEC0_MENU].OptionNow->ControlShow == NULL)
+ 459   3              {
+ 460   4                  return;
+ 461   4              }
+ 462   3              /*切换到波特率设置界面*/
+ 463   3              Ui_Status.Ui = BAUD_STATE;
+ 464   3              /*赋值控件*/
+ 465   3              Ui_Status.Widget = M_Show[SEC0_MENU].OptionNow->ControlType;
+ 466   3              /*显示控制界面*/
+ 467   3              LcdShow(M_Show[SEC0_MENU].OptionNow->ControlShow);
+ 468   3              /*无操作返回定时器开启*/
+ 469   3              // PublicTimer16.MenuDly16.Timer16Count = T_60S;
+ 470   3          }
+ 471   2          break;
+ 472   2          /*本机热点设置*/
+ 473   2          case CONTROL_HOTSPOT:
+ 474   2          {   /*检查函数指针非空*/
+ 475   3              if(Aplist[System_Parameter.Apstate].fun != NULL)
+ 476   3              {
+ 477   4                  /*执行对应的功能函数*/
+ 478   4                  Aplist[System_Parameter.Apstate].fun(); 
+ 479   4              }
+ 480   3              ControlSave(); //存盘热点设置
+ 481   3              clear_screen();
+ 482   3              GUI_String(70, 22, "修改成功", CH_12_12); //显示修改结果
+ 483   3              Delay_ms(500);
+ 484   3              /*返回菜单界面*/
+C51 COMPILER V9.60.0.0   MENU                                                              12/27/2021 17:10:03 PAGE 9   
 
- 485   3              LcdShow(RefreshMenuDisp); //刷新显示
- 486   3          }break;
- 487   2          /*工作模式选择*/
- 488   2          case CONTROL_WORKMODE:
- 489   2          {
- 490   3              /*检查函数指针非空*/
- 491   3              if(Modelist[SYS_TEMP_PARA.WorkMode].fun != NULL)
- 492   3              {
- 493   4                  /*执行对应的功能函数*/
- 494   4                  Modelist[SYS_TEMP_PARA.WorkMode].fun(); 
- 495   4              }
- 496   3              ControlSave(); //存盘工作模式设置
- 497   3              clear_screen();
- 498   3              GUI_String(70, 22, "修改成功", CH_12_12); //显示修改结果
- 499   3              Delay_ms(500);
- 500   3              /*返回菜单界面*/
- 501   3              Ui_Status.Ui = MENU_STATE;
- 502   3              LcdShow(RefreshMenuDisp); //刷新显示
- 503   3          }break;
- 504   2          /*恢复出厂设置*/
- 505   2          case CONTROL_RELOAD:
- 506   2          {
- 507   3              CLOSE_GLOBAL_OUTAGE();
- 508   3              IapErase(START_SAVEADDRESS); //擦除密码区
- 509   3                                           /*把默认参数拷贝到当前数据结构*/
- 510   3              memcpy(&System_Parameter.PSWNext.PassWordbuff[0], DEFAULT_SYSTEM_PARAMETER, (sizeof(System_Paramet
+ 485   3              Ui_Status.Ui = MENU_STATE;
+ 486   3              LcdShow(RefreshMenuDisp); //刷新显示
+ 487   3          }break;
+ 488   2          /*工作模式选择*/
+ 489   2          case CONTROL_WORKMODE:
+ 490   2          {
+ 491   3              /*检查函数指针非空*/
+ 492   3              if(Modelist[SYS_TEMP_PARA.WorkMode].fun != NULL)
+ 493   3              {
+ 494   4                  /*执行对应的功能函数*/
+ 495   4                  Modelist[SYS_TEMP_PARA.WorkMode].fun(); 
+ 496   4              }
+ 497   3              System_Parameter.WorkMode = SYS_TEMP_PARA.WorkMode;
+ 498   3              ControlSave(); //存盘工作模式设置
+ 499   3              clear_screen();
+ 500   3              GUI_String(70, 22, "修改成功", CH_12_12); //显示修改结果
+ 501   3              Delay_ms(500);
+ 502   3              /*返回菜单界面*/
+ 503   3              Ui_Status.Ui = MENU_STATE;
+ 504   3              LcdShow(RefreshMenuDisp); //刷新显示
+ 505   3          }break;
+ 506   2          /*通讯协议设置*/
+ 507   2          case CONTRL_PACT:
+ 508   2          {
+ 509   3              /*检查函数指针非空*/
+ 510   3              if(Pactlist[SYS_TEMP_PARA.Ppistate].fun != NULL)
+ 511   3              {
+ 512   4                  /*执行对应的功能函数*/
+ 513   4                  Pactlist[SYS_TEMP_PARA.Ppistate].fun(); 
+ 514   4              }
+ 515   3              System_Parameter.Ppistate = SYS_TEMP_PARA.Ppistate;
+ 516   3              ControlSave(); //存盘工作模式设置
+ 517   3              clear_screen();
+ 518   3              GUI_String(70, 22, "修改成功", CH_12_12); //显示修改结果
+ 519   3              Delay_ms(500);
+ 520   3              /*返回菜单界面*/
+ 521   3              Ui_Status.Ui = MENU_STATE;
+ 522   3              LcdShow(RefreshMenuDisp); //刷新显示
+ 523   3          }break;
+ 524   2          /*恢复出厂设置*/
+ 525   2          case CONTROL_RELOAD:
+ 526   2          {
+ 527   3              CLOSE_GLOBAL_OUTAGE();
+ 528   3              IapErase(START_SAVEADDRESS); //擦除密码区
+ 529   3                                           /*把默认参数拷贝到当前数据结构*/
+ 530   3              memcpy(&System_Parameter.PSWNext.PassWordbuff[0], DEFAULT_SYSTEM_PARAMETER, (sizeof(System_Paramet
              -er) - 1U));
- 511   3              /*把数据进行存储*/
- 512   3              IapWrite_Buff(START_SAVEADDRESS, &System_Parameter.PSWNext.PassWordbuff[0], (sizeof(System_Paramet
+ 531   3              /*把数据进行存储*/
+ 532   3              IapWrite_Buff(START_SAVEADDRESS, &System_Parameter.PSWNext.PassWordbuff[0], (sizeof(System_Paramet
              -er) - 1U)); //使密码界面失效
- 513   3              OPEN_GLOBAL_OUTAGE();
- 514   3      
- 515   3              BaudInit();
- 516   3              PowerInit();
- 517   3              CommunicaInit();
- 518   3              Wifi_Init();
- 519   3      
- 520   3              clear_screen();
- 521   3              GUI_String(70, 22, "修改成功", CH_12_12); //显示修改结果
- 522   3              Delay_ms(500);
- 523   3              /*返回菜单界面*/
- 524   3              Ui_Status.Ui = MENU_STATE;
- 525   3              LcdShow(RefreshMenuDisp); //刷新显示
- 526   3              break;
- 527   3          }
- 528   2      
- 529   2          default:
- 530   2              break;
- 531   2          }
- 532   1      
- 533   1      #if USE_PRINTF_DEBUG
+ 533   3              OPEN_GLOBAL_OUTAGE();
+ 534   3      
+ 535   3              BaudInit();
+ 536   3              PowerInit();
+ 537   3              CommunicaInit();
+ 538   3              Wifi_Init();
+ 539   3      
+ 540   3              clear_screen();
+ 541   3              GUI_String(70, 22, "修改成功", CH_12_12); //显示修改结果
+ 542   3              Delay_ms(500);
+ 543   3              /*返回菜单界面*/
+ 544   3              Ui_Status.Ui = MENU_STATE;
+C51 COMPILER V9.60.0.0   MENU                                                              12/27/2021 17:10:03 PAGE 10  
+
+ 545   3              LcdShow(RefreshMenuDisp); //刷新显示
+ 546   3              break;
+ 547   3          }
+ 548   2      
+ 549   2          default:
+ 550   2              break;
+ 551   2          }
+ 552   1      
+ 553   1      #if USE_PRINTF_DEBUG
                   printf("KeyControl_Enter\r\n");
               #endif
- 536   1      }
- 537          
- 538          void KeyControl_Menu(void) //控件状态--Menu
- 539          {
- 540   1          switch (Ui_Status.Widget)
- 541   1          {
- 542   2          case CONTROL_PASSWORD_CHANGE:
- 543   2          {
- 544   3              if (!System_Parameter.PSWNext.First_Input_Flag)
-C51 COMPILER V9.60.0.0   MENU                                                              12/22/2021 16:04:17 PAGE 10  
-
- 545   3              {
- 546   4      
- 547   4                  InputOffect(&PassWordChange1);
- 548   4              }
- 549   3              else
- 550   3              {
- 551   4      
- 552   4                  InputOffect(&PassWordChange2);
- 553   4              }
- 554   3      
- 555   3              break;
- 556   3          }
- 557   2      
- 558   2          default:
- 559   2              break;
- 560   2          }
- 561   1      
- 562   1      #if USE_PRINTF_DEBUG
+ 556   1      }
+ 557          
+ 558          void KeyControl_Menu(void) //控件状态--Menu
+ 559          {
+ 560   1          switch (Ui_Status.Widget)
+ 561   1          {
+ 562   2          case CONTROL_PASSWORD_CHANGE:
+ 563   2          {
+ 564   3              if (!System_Parameter.PSWNext.First_Input_Flag)
+ 565   3              {
+ 566   4      
+ 567   4                  InputOffect(&PassWordChange1);
+ 568   4              }
+ 569   3              else
+ 570   3              {
+ 571   4      
+ 572   4                  InputOffect(&PassWordChange2);
+ 573   4              }
+ 574   3      
+ 575   3              break;
+ 576   3          }
+ 577   2      
+ 578   2          default:
+ 579   2              break;
+ 580   2          }
+ 581   1      
+ 582   1      #if USE_PRINTF_DEBUG
                   printf("KeyControl_Menu\r\n");
               #endif
- 565   1      }
- 566          
- 567          void KeyControl_Cancel(void) //控件状态--Cancel
- 568          {
- 569   1          switch (Ui_Status.Widget)
- 570   1          {
- 571   2          case CONTROL_PASSWORD_CHANGE:
- 572   2          {
- 573   3              PassWordDelete(&PassWordChange1); //清0数据
- 574   3                  PassWordDelete(&PassWordChange2);
- 575   3              System_Parameter.PSWNext.First_Input_Flag = false;
- 576   3              System_Parameter.PSWNext.Bit_Efficient_Flag = false;
- 577   3              break;
- 578   3          }
- 579   2      
- 580   2          case CONTROL_COMMUNICA:
- 581   2          {
- 582   3              // CommunciaIndex = CommunciaType; //如果没有确定,直接返回，则恢复当前状态索引
- 583   3              break;
- 584   3          }
- 585   2      
- 586   2          case CONTROL_BAUDSETTING:
- 587   2          {
- 588   3              // BaudWillIndex = BaudIndex; //如果没有确定,直接返回，则恢复当前状态索引
- 589   3              break;
- 590   3          }
- 591   2           /*工作模式选择*/
- 592   2          case CONTROL_WORKMODE:
- 593   2          {
- 594   3              SYS_TEMP_PARA.WorkMode = System_Parameter.WorkMode;
- 595   3          }break;
- 596   2          
- 597   2          case CONTROL_RELOAD:
- 598   2          {
- 599   3              break;
- 600   3          }
- 601   2      
- 602   2          default:
- 603   2              break;
- 604   2          }
- 605   1      
- 606   1          /*返回菜单界面*/
-C51 COMPILER V9.60.0.0   MENU                                                              12/22/2021 16:04:17 PAGE 11  
+ 585   1      }
+ 586          
+ 587          void KeyControl_Cancel(void) //控件状态--Cancel
+ 588          {
+ 589   1          switch (Ui_Status.Widget)
+ 590   1          {
+ 591   2          case CONTROL_PASSWORD_CHANGE:
+ 592   2          {
+ 593   3              PassWordDelete(&PassWordChange1); //清0数据
+ 594   3                  PassWordDelete(&PassWordChange2);
+ 595   3              System_Parameter.PSWNext.First_Input_Flag = false;
+ 596   3              System_Parameter.PSWNext.Bit_Efficient_Flag = false;
+ 597   3              break;
+ 598   3          }
+ 599   2      
+ 600   2          case CONTROL_COMMUNICA:
+ 601   2          {
+ 602   3              // CommunciaIndex = CommunciaType; //如果没有确定,直接返回，则恢复当前状态索引
+ 603   3              break;
+ 604   3          }
+ 605   2      
+ 606   2          case CONTROL_BAUDSETTING:
+C51 COMPILER V9.60.0.0   MENU                                                              12/27/2021 17:10:03 PAGE 11  
 
- 607   1          Ui_Status.Ui = MENU_STATE;
- 608   1          LcdShow(RefreshMenuDisp); //显示设置
- 609   1      
- 610   1      #if USE_PRINTF_DEBUG
+ 607   2          {
+ 608   3              // BaudWillIndex = BaudIndex; //如果没有确定,直接返回，则恢复当前状态索引
+ 609   3              break;
+ 610   3          }
+ 611   2           /*工作模式选择*/
+ 612   2          case CONTROL_WORKMODE:
+ 613   2          {
+ 614   3              SYS_TEMP_PARA.WorkMode = System_Parameter.WorkMode;
+ 615   3          }break;
+ 616   2          /*通讯协议设置*/
+ 617   2          case CONTRL_PACT:
+ 618   2          {
+ 619   3             SYS_TEMP_PARA.Ppistate = System_Parameter.Ppistate;
+ 620   3          }break;
+ 621   2          case CONTROL_RELOAD:
+ 622   2          {
+ 623   3              break;
+ 624   3          }
+ 625   2      
+ 626   2          default:
+ 627   2              break;
+ 628   2          }
+ 629   1      
+ 630   1          /*返回菜单界面*/
+ 631   1          Ui_Status.Ui = MENU_STATE;
+ 632   1          LcdShow(RefreshMenuDisp); //显示设置
+ 633   1      
+ 634   1      #if USE_PRINTF_DEBUG
                   printf("KeyControl_Cancel\r\n");
               #endif
- 613   1      }
- 614          
- 615          /*控件状态--Up*/
- 616          void KeyControl_Up(void)
- 617          {
- 618   1          switch (Ui_Status.Widget)
- 619   1          {
- 620   2          case CONTROL_PASSWORD_CHANGE:
- 621   2          {
- 622   3              if (!System_Parameter.PSWNext.First_Input_Flag)
- 623   3              {
- 624   4                  uint8_t Value = PassWordInput(ADD, &PassWordChange1);
- 625   4                  uint8_t temp[2] = {0}; //字符
- 626   4                  GUI_String(PassWordChange1.PSWNext.Index * 20 + 100, 18, myitoa(Value, temp, 10), EN_5_8);
- 627   4              }
- 628   3              else
- 629   3              {
- 630   4                  uint8_t Value = PassWordInput(ADD, &PassWordChange2);
- 631   4                  uint8_t temp[2] = {0}; //字符
- 632   4                  GUI_String(PassWordChange2.PSWNext.Index * 20 + 100, 38, myitoa(Value, temp, 10), EN_5_8);
- 633   4              }
- 634   3          }
- 635   2          break;
- 636   2      
- 637   2          case CONTROL_COMMUNICA:
- 638   2          {
- 639   3              System_Parameter.CommunicationType ^= 1;
- 640   3              LcdShow(CommunicaUIshow); //通讯设置界面
- 641   3          }
- 642   2          break;
- 643   2      
- 644   2          case CONTROL_BAUDSETTING:
+ 637   1      }
+ 638          
+ 639          /*控件状态--Up*/
+ 640          void KeyControl_Up(void)
+ 641          {
+ 642   1          switch (Ui_Status.Widget)
+ 643   1          {
+ 644   2          case CONTROL_PASSWORD_CHANGE:
  645   2          {
- 646   3              /*箭头索引减小*/
- 647   3              if ((M_Show[SEC0_MENU].Finger_Index--) == 0)
- 648   3                  M_Show[SEC0_MENU].Finger_Index = 0;
- 649   3      
- 650   3              M_Show[SEC0_MENU].Option_Index = LoopIndex(UPWORD, M_Show[SEC0_MENU].Option_Index, OptionlistSize1
-             -);
- 651   3      
- 652   3              if (M_Show[SEC0_MENU].Option_Index == (OptionlistSize1 - 1)) //索引逻辑
+ 646   3              if (!System_Parameter.PSWNext.First_Input_Flag)
+ 647   3              {
+ 648   4                  uint8_t Value = PassWordInput(ADD, &PassWordChange1);
+ 649   4                  uint8_t temp[2] = {0}; //字符
+ 650   4                  GUI_String(PassWordChange1.PSWNext.Index * 20 + 100, 18, myitoa(Value, temp, 10), EN_5_8);
+ 651   4              }
+ 652   3              else
  653   3              {
- 654   4                  M_Show[SEC0_MENU].Finger_Index = 2;
- 655   4              }
- 656   3              /*菜单滑动逻辑*/
- 657   3              if (M_Show[SEC0_MENU].Finger_Index == 0)
- 658   3              {
- 659   4                  M_Show[SEC0_MENU].OptionIndex_buf[0] = M_Show[SEC0_MENU].Option_Index;
- 660   4                  M_Show[SEC0_MENU].OptionIndex_buf[1] = M_Show[SEC0_MENU].Option_Index + 1;
- 661   4                  M_Show[SEC0_MENU].OptionIndex_buf[2] = M_Show[SEC0_MENU].Option_Index + 2;
- 662   4              }
- 663   3              else if (M_Show[SEC0_MENU].Finger_Index == 1)
- 664   3              {
- 665   4                  M_Show[SEC0_MENU].OptionIndex_buf[0] = M_Show[SEC0_MENU].Option_Index - 1;
- 666   4                  M_Show[SEC0_MENU].OptionIndex_buf[1] = M_Show[SEC0_MENU].Option_Index;
- 667   4                  M_Show[SEC0_MENU].OptionIndex_buf[2] = M_Show[SEC0_MENU].Option_Index + 1;
-C51 COMPILER V9.60.0.0   MENU                                                              12/22/2021 16:04:17 PAGE 12  
+ 654   4                  uint8_t Value = PassWordInput(ADD, &PassWordChange2);
+ 655   4                  uint8_t temp[2] = {0}; //字符
+ 656   4                  GUI_String(PassWordChange2.PSWNext.Index * 20 + 100, 38, myitoa(Value, temp, 10), EN_5_8);
+ 657   4              }
+ 658   3          }
+ 659   2          break;
+ 660   2      
+ 661   2          case CONTROL_COMMUNICA:
+ 662   2          {
+ 663   3              System_Parameter.CommunicationType ^= 1;
+ 664   3              LcdShow(CommunicaUIshow); //通讯设置界面
+ 665   3          }
+ 666   2          break;
+ 667   2      
+ 668   2          case CONTROL_BAUDSETTING:
+C51 COMPILER V9.60.0.0   MENU                                                              12/27/2021 17:10:03 PAGE 12  
 
- 668   4              }
- 669   3              else
- 670   3              {
- 671   4                  M_Show[SEC0_MENU].OptionIndex_buf[0] = M_Show[SEC0_MENU].Option_Index - 2;
- 672   4                  M_Show[SEC0_MENU].OptionIndex_buf[1] = M_Show[SEC0_MENU].Option_Index - 1;
- 673   4                  M_Show[SEC0_MENU].OptionIndex_buf[2] = M_Show[SEC0_MENU].Option_Index;
- 674   4              }
+ 669   2          {
+ 670   3              /*箭头索引减小*/
+ 671   3              if ((M_Show[SEC0_MENU].Finger_Index--) == 0)
+ 672   3                  M_Show[SEC0_MENU].Finger_Index = 0;
+ 673   3      
+ 674   3              M_Show[SEC0_MENU].Option_Index = LoopIndex(UPWORD, M_Show[SEC0_MENU].Option_Index, OptionlistSize1
+             -);
  675   3      
- 676   3              LcdShow(RefreshBaudDisp);                                                   //刷新显示
- 677   3              M_Show[SEC0_MENU].OptionNow = &Optionlist1[M_Show[SEC0_MENU].Option_Index]; //赋值当前选项
- 678   3          }
- 679   2          break;
- 680   2          /*本机热点设置*/
- 681   2          case CONTROL_HOTSPOT:
- 682   2          {
- 683   3              System_Parameter.Apstate = LoopIndex(DOWMWORD, System_Parameter.Apstate, G_Aplist_Size);
- 684   3              GUI_String(115, 10, Aplist[System_Parameter.Apstate].pstring, CH_12_12);
- 685   3          }break;
- 686   2          case CONTROL_WORKMODE:
- 687   2          {
- 688   3              SYS_TEMP_PARA.WorkMode = LoopIndex(DOWMWORD, SYS_TEMP_PARA.WorkMode, G_Modelist_Size);
- 689   3              GUI_String(115, 10, Modelist[SYS_TEMP_PARA.WorkMode].pstring, CH_12_12);
- 690   3          }break;
- 691   2          default:
- 692   2              break;
- 693   2          }
- 694   1      
- 695   1      #if USE_PRINTF_DEBUG
+ 676   3              if (M_Show[SEC0_MENU].Option_Index == (OptionlistSize1 - 1)) //索引逻辑
+ 677   3              {
+ 678   4                  M_Show[SEC0_MENU].Finger_Index = 2;
+ 679   4              }
+ 680   3              /*菜单滑动逻辑*/
+ 681   3              if (M_Show[SEC0_MENU].Finger_Index == 0)
+ 682   3              {
+ 683   4                  M_Show[SEC0_MENU].OptionIndex_buf[0] = M_Show[SEC0_MENU].Option_Index;
+ 684   4                  M_Show[SEC0_MENU].OptionIndex_buf[1] = M_Show[SEC0_MENU].Option_Index + 1;
+ 685   4                  M_Show[SEC0_MENU].OptionIndex_buf[2] = M_Show[SEC0_MENU].Option_Index + 2;
+ 686   4              }
+ 687   3              else if (M_Show[SEC0_MENU].Finger_Index == 1)
+ 688   3              {
+ 689   4                  M_Show[SEC0_MENU].OptionIndex_buf[0] = M_Show[SEC0_MENU].Option_Index - 1;
+ 690   4                  M_Show[SEC0_MENU].OptionIndex_buf[1] = M_Show[SEC0_MENU].Option_Index;
+ 691   4                  M_Show[SEC0_MENU].OptionIndex_buf[2] = M_Show[SEC0_MENU].Option_Index + 1;
+ 692   4              }
+ 693   3              else
+ 694   3              {
+ 695   4                  M_Show[SEC0_MENU].OptionIndex_buf[0] = M_Show[SEC0_MENU].Option_Index - 2;
+ 696   4                  M_Show[SEC0_MENU].OptionIndex_buf[1] = M_Show[SEC0_MENU].Option_Index - 1;
+ 697   4                  M_Show[SEC0_MENU].OptionIndex_buf[2] = M_Show[SEC0_MENU].Option_Index;
+ 698   4              }
+ 699   3      
+ 700   3              LcdShow(RefreshBaudDisp);                                                   //刷新显示
+ 701   3              M_Show[SEC0_MENU].OptionNow = &Optionlist1[M_Show[SEC0_MENU].Option_Index]; //赋值当前选项
+ 702   3          }
+ 703   2          break;
+ 704   2          /*本机热点设置*/
+ 705   2          case CONTROL_HOTSPOT:
+ 706   2          {
+ 707   3              System_Parameter.Apstate = LoopIndex(DOWMWORD, System_Parameter.Apstate, G_Aplist_Size);
+ 708   3              GUI_String(115, 10, Aplist[System_Parameter.Apstate].pstring, CH_12_12);
+ 709   3          }break;
+ 710   2          case CONTROL_WORKMODE:
+ 711   2          {
+ 712   3              SYS_TEMP_PARA.WorkMode = LoopIndex(DOWMWORD, SYS_TEMP_PARA.WorkMode, G_Modelist_Size);
+ 713   3              GUI_String(115, 10, Modelist[SYS_TEMP_PARA.WorkMode].pstring, CH_12_12);
+ 714   3          }break;
+ 715   2          /*通讯协议设置*/
+ 716   2          case CONTRL_PACT:
+ 717   2          {
+ 718   3              SYS_TEMP_PARA.Ppistate = LoopIndex(DOWMWORD, SYS_TEMP_PARA.Ppistate, G_Pactlist_Size);
+ 719   3              GUI_String(105, 31, Pactlist[SYS_TEMP_PARA.Ppistate].pstring, EN_5_8);
+ 720   3          }break;
+ 721   2          default:
+ 722   2              break;
+ 723   2          }
+ 724   1      
+ 725   1      #if USE_PRINTF_DEBUG
                   printf("KeyControl_Up\r\n");
               #endif
- 698   1      }
- 699          
- 700          void KeyControl_Down(void) //控件状态--Down
- 701          {
- 702   1          switch (Ui_Status.Widget)
- 703   1          {
- 704   2          case CONTROL_PASSWORD_CHANGE:
- 705   2          {
- 706   3              if (!System_Parameter.PSWNext.First_Input_Flag)
- 707   3              {
- 708   4                  uint8_t Value = PassWordInput(SUB, &PassWordChange1);
- 709   4                  uint8_t temp[2] = {0}; //字符
- 710   4                  GUI_String(PassWordChange1.PSWNext.Index * 20 + 100, 18, myitoa(Value, temp, 10), EN_5_8);
- 711   4              }
- 712   3              else
- 713   3              {
- 714   4      
- 715   4                  uint8_t Value = PassWordInput(SUB, &PassWordChange2);
- 716   4                  uint8_t temp[2]= {0}; //字符
- 717   4                  GUI_String(PassWordChange2.PSWNext.Index * 20 + 100, 38, myitoa(Value, temp, 10), EN_5_8);
- 718   4              }
- 719   3          }
- 720   2          break;
- 721   2      
- 722   2          case CONTROL_COMMUNICA:
- 723   2          {
- 724   3              System_Parameter.CommunicationType ^= 1;
- 725   3              LcdShow(CommunicaUIshow); //通讯设置界面
- 726   3          }
- 727   2          break;
- 728   2      
- 729   2          case CONTROL_BAUDSETTING:
-C51 COMPILER V9.60.0.0   MENU                                                              12/22/2021 16:04:17 PAGE 13  
+ 728   1      }
+ 729          
+C51 COMPILER V9.60.0.0   MENU                                                              12/27/2021 17:10:03 PAGE 13  
 
- 730   2          {
- 731   3              if ((M_Show[SEC0_MENU].Finger_Index++) >= 2) //箭头索引增加
- 732   3                  M_Show[SEC0_MENU].Finger_Index = 2;
- 733   3      
- 734   3              M_Show[SEC0_MENU].Option_Index = LoopIndex(DOWMWORD, M_Show[SEC0_MENU].Option_Index, OptionlistSiz
-             -e1); //选项索引
- 735   3      
- 736   3              if (M_Show[SEC0_MENU].Option_Index == 0) //索引逻辑
+ 730          void KeyControl_Down(void) //控件状态--Down
+ 731          {
+ 732   1          switch (Ui_Status.Widget)
+ 733   1          {
+ 734   2          case CONTROL_PASSWORD_CHANGE:
+ 735   2          {
+ 736   3              if (!System_Parameter.PSWNext.First_Input_Flag)
  737   3              {
- 738   4                  M_Show[SEC0_MENU].Finger_Index = 0;
- 739   4              }
- 740   3      
- 741   3              if (M_Show[SEC0_MENU].Finger_Index == 0)
- 742   3              {
- 743   4                  M_Show[SEC0_MENU].OptionIndex_buf[0] = M_Show[SEC0_MENU].Option_Index;
- 744   4                  M_Show[SEC0_MENU].OptionIndex_buf[1] = M_Show[SEC0_MENU].Option_Index + 1;
- 745   4                  M_Show[SEC0_MENU].OptionIndex_buf[2] = M_Show[SEC0_MENU].Option_Index + 2;
- 746   4              }
- 747   3              else if (M_Show[SEC0_MENU].Finger_Index == 1)
- 748   3              {
- 749   4                  M_Show[SEC0_MENU].OptionIndex_buf[0] = M_Show[SEC0_MENU].Option_Index - 1;
- 750   4                  M_Show[SEC0_MENU].OptionIndex_buf[1] = M_Show[SEC0_MENU].Option_Index;
- 751   4                  M_Show[SEC0_MENU].OptionIndex_buf[2] = M_Show[SEC0_MENU].Option_Index + 1;
- 752   4              }
- 753   3              else
- 754   3              {
- 755   4                  M_Show[SEC0_MENU].OptionIndex_buf[0] = M_Show[SEC0_MENU].Option_Index - 2;
- 756   4                  M_Show[SEC0_MENU].OptionIndex_buf[1] = M_Show[SEC0_MENU].Option_Index - 1;
- 757   4                  M_Show[SEC0_MENU].OptionIndex_buf[2] = M_Show[SEC0_MENU].Option_Index;
- 758   4              }
- 759   3              /*刷新当前选项卡*/
- 760   3              LcdShow(RefreshBaudDisp);
- 761   3              M_Show[SEC0_MENU].OptionNow = &Optionlist1[M_Show[SEC0_MENU].Option_Index]; //赋值当前选项
- 762   3          }
- 763   2          break;
- 764   2          /*本机热点设置*/
- 765   2          case CONTROL_HOTSPOT:
- 766   2          {
- 767   3              System_Parameter.Apstate = LoopIndex(UPWORD, System_Parameter.Apstate, G_Aplist_Size);
- 768   3              GUI_String(115, 10, Aplist[System_Parameter.Apstate].pstring, CH_12_12);
- 769   3          }break;
- 770   2          /*工作模式设置*/
- 771   2          case CONTROL_WORKMODE:
- 772   2          {
- 773   3              SYS_TEMP_PARA.WorkMode = LoopIndex(UPWORD, SYS_TEMP_PARA.WorkMode, G_Modelist_Size);
- 774   3              GUI_String(115, 10, Modelist[SYS_TEMP_PARA.WorkMode].pstring, CH_12_12);
- 775   3          }break;
- 776   2          default:
- 777   2              break;
- 778   2          }
- 779   1      
- 780   1      #if USE_PRINTF_DEBUG
+ 738   4                  uint8_t Value = PassWordInput(SUB, &PassWordChange1);
+ 739   4                  uint8_t temp[2] = {0}; //字符
+ 740   4                  GUI_String(PassWordChange1.PSWNext.Index * 20 + 100, 18, myitoa(Value, temp, 10), EN_5_8);
+ 741   4              }
+ 742   3              else
+ 743   3              {
+ 744   4      
+ 745   4                  uint8_t Value = PassWordInput(SUB, &PassWordChange2);
+ 746   4                  uint8_t temp[2]= {0}; //字符
+ 747   4                  GUI_String(PassWordChange2.PSWNext.Index * 20 + 100, 38, myitoa(Value, temp, 10), EN_5_8);
+ 748   4              }
+ 749   3          }
+ 750   2          break;
+ 751   2      
+ 752   2          case CONTROL_COMMUNICA:
+ 753   2          {
+ 754   3              System_Parameter.CommunicationType ^= 1;
+ 755   3              LcdShow(CommunicaUIshow); //通讯设置界面
+ 756   3          }
+ 757   2          break;
+ 758   2      
+ 759   2          case CONTROL_BAUDSETTING:
+ 760   2          {
+ 761   3              if ((M_Show[SEC0_MENU].Finger_Index++) >= 2) //箭头索引增加
+ 762   3                  M_Show[SEC0_MENU].Finger_Index = 2;
+ 763   3      
+ 764   3              M_Show[SEC0_MENU].Option_Index = LoopIndex(DOWMWORD, M_Show[SEC0_MENU].Option_Index, OptionlistSiz
+             -e1); //选项索引
+ 765   3      
+ 766   3              if (M_Show[SEC0_MENU].Option_Index == 0) //索引逻辑
+ 767   3              {
+ 768   4                  M_Show[SEC0_MENU].Finger_Index = 0;
+ 769   4              }
+ 770   3      
+ 771   3              if (M_Show[SEC0_MENU].Finger_Index == 0)
+ 772   3              {
+ 773   4                  M_Show[SEC0_MENU].OptionIndex_buf[0] = M_Show[SEC0_MENU].Option_Index;
+ 774   4                  M_Show[SEC0_MENU].OptionIndex_buf[1] = M_Show[SEC0_MENU].Option_Index + 1;
+ 775   4                  M_Show[SEC0_MENU].OptionIndex_buf[2] = M_Show[SEC0_MENU].Option_Index + 2;
+ 776   4              }
+ 777   3              else if (M_Show[SEC0_MENU].Finger_Index == 1)
+ 778   3              {
+ 779   4                  M_Show[SEC0_MENU].OptionIndex_buf[0] = M_Show[SEC0_MENU].Option_Index - 1;
+ 780   4                  M_Show[SEC0_MENU].OptionIndex_buf[1] = M_Show[SEC0_MENU].Option_Index;
+ 781   4                  M_Show[SEC0_MENU].OptionIndex_buf[2] = M_Show[SEC0_MENU].Option_Index + 1;
+ 782   4              }
+ 783   3              else
+ 784   3              {
+ 785   4                  M_Show[SEC0_MENU].OptionIndex_buf[0] = M_Show[SEC0_MENU].Option_Index - 2;
+ 786   4                  M_Show[SEC0_MENU].OptionIndex_buf[1] = M_Show[SEC0_MENU].Option_Index - 1;
+ 787   4                  M_Show[SEC0_MENU].OptionIndex_buf[2] = M_Show[SEC0_MENU].Option_Index;
+ 788   4              }
+ 789   3              /*刷新当前选项卡*/
+ 790   3              LcdShow(RefreshBaudDisp);
+C51 COMPILER V9.60.0.0   MENU                                                              12/27/2021 17:10:03 PAGE 14  
+
+ 791   3              M_Show[SEC0_MENU].OptionNow = &Optionlist1[M_Show[SEC0_MENU].Option_Index]; //赋值当前选项
+ 792   3          }
+ 793   2          break;
+ 794   2          /*本机热点设置*/
+ 795   2          case CONTROL_HOTSPOT:
+ 796   2          {
+ 797   3              System_Parameter.Apstate = LoopIndex(UPWORD, System_Parameter.Apstate, G_Aplist_Size);
+ 798   3              GUI_String(115, 10, Aplist[System_Parameter.Apstate].pstring, CH_12_12);
+ 799   3          }break;
+ 800   2          /*工作模式设置*/
+ 801   2          case CONTROL_WORKMODE:
+ 802   2          {
+ 803   3              SYS_TEMP_PARA.WorkMode = LoopIndex(UPWORD, SYS_TEMP_PARA.WorkMode, G_Modelist_Size);
+ 804   3              GUI_String(115, 10, Modelist[SYS_TEMP_PARA.WorkMode].pstring, CH_12_12);
+ 805   3          }break;
+ 806   2          /*通讯协议设置*/
+ 807   2          case CONTRL_PACT:
+ 808   2          {
+ 809   3              SYS_TEMP_PARA.Ppistate = LoopIndex(UPWORD, SYS_TEMP_PARA.Ppistate, G_Pactlist_Size);
+ 810   3              GUI_String(105, 31, Pactlist[SYS_TEMP_PARA.Ppistate].pstring, EN_5_8);
+ 811   3          }break;
+ 812   2          default:
+ 813   2              break;
+ 814   2          }
+ 815   1      
+ 816   1      #if USE_PRINTF_DEBUG
                   printf("KeyControl_Down\r\n");
               #endif
- 783   1      }
- 784          
- 785          /*波特率控件状态--up*/
- 786          void KeyBaud_Up(void)
- 787          {
- 788   1          switch (Ui_Status.Widget)
- 789   1          {
- 790   2          case CONTROL_BAUD1:
-C51 COMPILER V9.60.0.0   MENU                                                              12/22/2021 16:04:17 PAGE 14  
+ 819   1      }
+ 820          
+ 821          /*波特率控件状态--up*/
+ 822          void KeyBaud_Up(void)
+ 823          {
+ 824   1          switch (Ui_Status.Widget)
+ 825   1          {
+ 826   2          case CONTROL_BAUD1:
+ 827   2          {
+ 828   3              System_Parameter.BaudIndex[0] = LoopIndex(DOWMWORD, System_Parameter.BaudIndex[0], G_BaudList_Size
+             -);
+ 829   3              GUI_String(105, 31, Baudlist[System_Parameter.BaudIndex[0]].pstring, EN_5_8);
+ 830   3          }
+ 831   2          break;
+ 832   2          case CONTROL_BAUD2:
+ 833   2          {
+ 834   3              System_Parameter.BaudIndex[1] = LoopIndex(DOWMWORD, System_Parameter.BaudIndex[1], G_BaudList_Size
+             -);
+ 835   3              GUI_String(105, 31, Baudlist[System_Parameter.BaudIndex[1]].pstring, EN_5_8);
+ 836   3          }
+ 837   2          break;
+ 838   2          case CONTROL_BAUD3:
+ 839   2          {
+ 840   3              System_Parameter.BaudIndex[2] = LoopIndex(DOWMWORD, System_Parameter.BaudIndex[2], G_BaudList_Size
+             -);
+ 841   3              GUI_String(105, 31, Baudlist[System_Parameter.BaudIndex[2]].pstring, EN_5_8);
+ 842   3          }
+ 843   2          break;
+ 844   2          case CONTROL_BAUD4:
+ 845   2          {
+ 846   3              System_Parameter.BaudIndex[3] = LoopIndex(DOWMWORD, System_Parameter.BaudIndex[3], G_BaudList_Size
+             -);
+ 847   3              GUI_String(105, 31, Baudlist[System_Parameter.BaudIndex[3]].pstring, EN_5_8);
+ 848   3          }
+C51 COMPILER V9.60.0.0   MENU                                                              12/27/2021 17:10:03 PAGE 15  
 
- 791   2          {
- 792   3              System_Parameter.BaudIndex[0] = LoopIndex(DOWMWORD, System_Parameter.BaudIndex[0], G_BaudList_Size
-             -);
- 793   3              GUI_String(105, 31, Baudlist[System_Parameter.BaudIndex[0]].pstring, EN_5_8);
- 794   3          }
- 795   2          break;
- 796   2          case CONTROL_BAUD2:
- 797   2          {
- 798   3              System_Parameter.BaudIndex[1] = LoopIndex(DOWMWORD, System_Parameter.BaudIndex[1], G_BaudList_Size
-             -);
- 799   3              GUI_String(105, 31, Baudlist[System_Parameter.BaudIndex[1]].pstring, EN_5_8);
- 800   3          }
- 801   2          break;
- 802   2          case CONTROL_BAUD3:
- 803   2          {
- 804   3              System_Parameter.BaudIndex[2] = LoopIndex(DOWMWORD, System_Parameter.BaudIndex[2], G_BaudList_Size
-             -);
- 805   3              GUI_String(105, 31, Baudlist[System_Parameter.BaudIndex[2]].pstring, EN_5_8);
- 806   3          }
- 807   2          break;
- 808   2          case CONTROL_BAUD4:
- 809   2          {
- 810   3              System_Parameter.BaudIndex[3] = LoopIndex(DOWMWORD, System_Parameter.BaudIndex[3], G_BaudList_Size
-             -);
- 811   3              GUI_String(105, 31, Baudlist[System_Parameter.BaudIndex[3]].pstring, EN_5_8);
- 812   3          }
- 813   2          break;
- 814   2          default:
- 815   2              break;
- 816   2          }
- 817   1      #if USE_PRINTF_DEBUG
+ 849   2          break;
+ 850   2          default:
+ 851   2              break;
+ 852   2          }
+ 853   1      #if USE_PRINTF_DEBUG
                   printf("KeyBaud_Up\r\n");
               #endif
- 820   1      }
- 821          
- 822          /*波特率控件状态--Down*/
- 823          void KeyBaud_Down(void)
- 824          {
- 825   1          switch (Ui_Status.Widget)
- 826   1          {
- 827   2          case CONTROL_BAUD1:
- 828   2          {
- 829   3              System_Parameter.BaudIndex[0] = LoopIndex(UPWORD, System_Parameter.BaudIndex[0], G_BaudList_Size);
- 830   3              GUI_String(105, 31, Baudlist[System_Parameter.BaudIndex[0]].pstring, EN_5_8);
- 831   3          }
- 832   2          break;
- 833   2          case CONTROL_BAUD2:
- 834   2          {
- 835   3              System_Parameter.BaudIndex[1] = LoopIndex(UPWORD, System_Parameter.BaudIndex[1], G_BaudList_Size);
- 836   3              GUI_String(105, 31, Baudlist[System_Parameter.BaudIndex[1]].pstring, EN_5_8);
- 837   3          }
- 838   2          break;
- 839   2          case CONTROL_BAUD3:
- 840   2          {
- 841   3              System_Parameter.BaudIndex[2] = LoopIndex(UPWORD, System_Parameter.BaudIndex[2], G_BaudList_Size);
- 842   3              GUI_String(105, 31, Baudlist[System_Parameter.BaudIndex[2]].pstring, EN_5_8);
- 843   3          }
- 844   2          break;
- 845   2          case CONTROL_BAUD4:
- 846   2          {
- 847   3              System_Parameter.BaudIndex[3] = LoopIndex(UPWORD, System_Parameter.BaudIndex[3], G_BaudList_Size);
- 848   3              GUI_String(105, 31, Baudlist[System_Parameter.BaudIndex[3]].pstring, EN_5_8);
-C51 COMPILER V9.60.0.0   MENU                                                              12/22/2021 16:04:17 PAGE 15  
-
- 849   3          }
- 850   2          break;
- 851   2          default:
- 852   2              break;
- 853   2          }
- 854   1      #if USE_PRINTF_DEBUG
+ 856   1      }
+ 857          
+ 858          /*波特率控件状态--Down*/
+ 859          void KeyBaud_Down(void)
+ 860          {
+ 861   1          switch (Ui_Status.Widget)
+ 862   1          {
+ 863   2          case CONTROL_BAUD1:
+ 864   2          {
+ 865   3              System_Parameter.BaudIndex[0] = LoopIndex(UPWORD, System_Parameter.BaudIndex[0], G_BaudList_Size);
+ 866   3              GUI_String(105, 31, Baudlist[System_Parameter.BaudIndex[0]].pstring, EN_5_8);
+ 867   3          }
+ 868   2          break;
+ 869   2          case CONTROL_BAUD2:
+ 870   2          {
+ 871   3              System_Parameter.BaudIndex[1] = LoopIndex(UPWORD, System_Parameter.BaudIndex[1], G_BaudList_Size);
+ 872   3              GUI_String(105, 31, Baudlist[System_Parameter.BaudIndex[1]].pstring, EN_5_8);
+ 873   3          }
+ 874   2          break;
+ 875   2          case CONTROL_BAUD3:
+ 876   2          {
+ 877   3              System_Parameter.BaudIndex[2] = LoopIndex(UPWORD, System_Parameter.BaudIndex[2], G_BaudList_Size);
+ 878   3              GUI_String(105, 31, Baudlist[System_Parameter.BaudIndex[2]].pstring, EN_5_8);
+ 879   3          }
+ 880   2          break;
+ 881   2          case CONTROL_BAUD4:
+ 882   2          {
+ 883   3              System_Parameter.BaudIndex[3] = LoopIndex(UPWORD, System_Parameter.BaudIndex[3], G_BaudList_Size);
+ 884   3              GUI_String(105, 31, Baudlist[System_Parameter.BaudIndex[3]].pstring, EN_5_8);
+ 885   3          }
+ 886   2          break;
+ 887   2          default:
+ 888   2              break;
+ 889   2          }
+ 890   1      #if USE_PRINTF_DEBUG
                   printf("KeyBaud_Down\r\n");
               #endif
- 857   1      }
- 858          
- 859          /*波特率控件状态--Enter*/
- 860          void KeyBaud_Enter(void)
- 861          {
- 862   1          switch (Ui_Status.Widget)
- 863   1          {
- 864   2          case CONTROL_BAUD1:
- 865   2          {
- 866   3              SET_BRT1(1, Baudlist[System_Parameter.BaudIndex[0]].BaudValue);
- 867   3              ControlSave();
- 868   3      
- 869   3              clear_screen();
- 870   3              GUI_String(70, 22, "修改成功", CH_12_12); //显示修改结果
- 871   3              Delay_ms(500);
- 872   3              /*修改成功后返回*/
- 873   3              KeyBaud_Cancel();
- 874   3          }
- 875   2          break;
- 876   2          case CONTROL_BAUD2:
- 877   2          {
- 878   3              SET_BRT1(2, Baudlist[System_Parameter.BaudIndex[1]].BaudValue);
- 879   3              ControlSave();
- 880   3      
- 881   3              clear_screen();
- 882   3              GUI_String(70, 22, "修改成功", CH_12_12); //显示修改结果
- 883   3              Delay_ms(500);
- 884   3              /*修改成功后返回*/
- 885   3              KeyBaud_Cancel();
- 886   3          }
- 887   2          break;
- 888   2          case CONTROL_BAUD3:
- 889   2          {
- 890   3              SET_BRT1(3, Baudlist[System_Parameter.BaudIndex[2]].BaudValue);
- 891   3              ControlSave();
- 892   3      
- 893   3              clear_screen();
- 894   3              GUI_String(70, 22, "修改成功", CH_12_12); //显示修改结果
- 895   3              Delay_ms(500);
- 896   3              /*修改成功后返回*/
- 897   3              KeyBaud_Cancel();
- 898   3          }
- 899   2          break;
- 900   2          case CONTROL_BAUD4:
+ 893   1      }
+ 894          
+ 895          /*波特率控件状态--Enter*/
+ 896          void KeyBaud_Enter(void)
+ 897          {
+ 898   1          switch (Ui_Status.Widget)
+ 899   1          {
+ 900   2          case CONTROL_BAUD1:
  901   2          {
- 902   3              SET_BRT1(4, Baudlist[System_Parameter.BaudIndex[3]].BaudValue);
+ 902   3              SET_BRT1(1, Baudlist[System_Parameter.BaudIndex[0]].BaudValue);
  903   3              ControlSave();
  904   3      
  905   3              clear_screen();
  906   3              GUI_String(70, 22, "修改成功", CH_12_12); //显示修改结果
  907   3              Delay_ms(500);
- 908   3              // LcdShow(BaudSettingUI4show); //波特率设置界面
- 909   3              /*修改成功后返回*/
- 910   3              KeyBaud_Cancel();
-C51 COMPILER V9.60.0.0   MENU                                                              12/22/2021 16:04:17 PAGE 16  
+ 908   3              /*修改成功后返回*/
+ 909   3              KeyBaud_Cancel();
+ 910   3          }
+C51 COMPILER V9.60.0.0   MENU                                                              12/27/2021 17:10:03 PAGE 16  
 
- 911   3          }
- 912   2          break;
- 913   2          default:
- 914   2              break;
- 915   2          }
- 916   1      #if USE_PRINTF_DEBUG
+ 911   2          break;
+ 912   2          case CONTROL_BAUD2:
+ 913   2          {
+ 914   3              SET_BRT1(2, Baudlist[System_Parameter.BaudIndex[1]].BaudValue);
+ 915   3              ControlSave();
+ 916   3      
+ 917   3              clear_screen();
+ 918   3              GUI_String(70, 22, "修改成功", CH_12_12); //显示修改结果
+ 919   3              Delay_ms(500);
+ 920   3              /*修改成功后返回*/
+ 921   3              KeyBaud_Cancel();
+ 922   3          }
+ 923   2          break;
+ 924   2          case CONTROL_BAUD3:
+ 925   2          {
+ 926   3              SET_BRT1(3, Baudlist[System_Parameter.BaudIndex[2]].BaudValue);
+ 927   3              ControlSave();
+ 928   3      
+ 929   3              clear_screen();
+ 930   3              GUI_String(70, 22, "修改成功", CH_12_12); //显示修改结果
+ 931   3              Delay_ms(500);
+ 932   3              /*修改成功后返回*/
+ 933   3              KeyBaud_Cancel();
+ 934   3          }
+ 935   2          break;
+ 936   2          case CONTROL_BAUD4:
+ 937   2          {
+ 938   3              SET_BRT1(4, Baudlist[System_Parameter.BaudIndex[3]].BaudValue);
+ 939   3              ControlSave();
+ 940   3      
+ 941   3              clear_screen();
+ 942   3              GUI_String(70, 22, "修改成功", CH_12_12); //显示修改结果
+ 943   3              Delay_ms(500);
+ 944   3              // LcdShow(BaudSettingUI4show); //波特率设置界面
+ 945   3              /*修改成功后返回*/
+ 946   3              KeyBaud_Cancel();
+ 947   3          }
+ 948   2          break;
+ 949   2          default:
+ 950   2              break;
+ 951   2          }
+ 952   1      #if USE_PRINTF_DEBUG
                   printf("KeyBaud_Enter\r\n");
               #endif
- 919   1      }
- 920          
- 921          /*波特率控件状态--Cancel*/
- 922          void KeyBaud_Cancel(void)
- 923          { /*返回上级菜单界面*/
- 924   1          Ui_Status.Ui = CONTROL_STATE;
- 925   1          /*赋值控件*/
- 926   1          Ui_Status.Widget = CONTROL_BAUDSETTING;
- 927   1          LcdShow(RefreshBaudDisp);
- 928   1      
- 929   1      #if USE_PRINTF_DEBUG
+ 955   1      }
+ 956          
+ 957          /*波特率控件状态--Cancel*/
+ 958          void KeyBaud_Cancel(void)
+ 959          { /*返回上级菜单界面*/
+ 960   1          Ui_Status.Ui = CONTROL_STATE;
+ 961   1          /*赋值控件*/
+ 962   1          Ui_Status.Widget = CONTROL_BAUDSETTING;
+ 963   1          LcdShow(RefreshBaudDisp);
+ 964   1      
+ 965   1      #if USE_PRINTF_DEBUG
                   printf("KeyBaud_Cancel\r\n");
               #endif
- 932   1      }
- 933          
- 934          /*波特率控件状态--Menue*/
- 935          void KeyBaud_Menu(void)
- 936          {
- 937   1      #if USE_PRINTF_DEBUG
-                  printf("KeyBaud_Menu\r\n");
-              #endif
- 940   1      }
- 941          
- 942          /*一级菜单界面刷新显示*/
- 943          void RefreshMenuDisp(void)
- 944          {
- 945   1          uint8_t i = 0;
- 946   1          clear_screen(); //清屏
- 947   1      
- 948   1          for (; i < 3; i++)
- 949   1          {
- 950   2              GUI_String(70, 20 * i + 5, Optionlist[M_Show[MAIN_MENU].OptionIndex_buf[i]].pString, CH_12_12);
- 951   2          }
- 952   1      
- 953   1          GUI_Lattice(50, 6 + M_Show[MAIN_MENU].Finger_Index * 20, 16, 12, finger);
- 954   1      }
- 955          
- 956          /*菜单界面下二级菜单刷新显示*/
- 957          void RefreshBaudDisp(void)
- 958          {
- 959   1          uint8_t i = 0;
- 960   1          clear_screen(); //清屏
- 961   1      
- 962   1          for (; i < 3U; i++)
- 963   1          {
- 964   2              GUI_String(70, 20 * i + 5, Optionlist1[M_Show[SEC0_MENU].OptionIndex_buf[i]].pString, CH_12_12);
- 965   2          }
- 966   1      
- 967   1          GUI_Lattice(50, 6 + M_Show[SEC0_MENU].Finger_Index * 20, 16, 12, finger);
  968   1      }
  969          
- 970          /**
- 971           * @brief       波特率设置二级菜单
- 972           * @details
-C51 COMPILER V9.60.0.0   MENU                                                              12/22/2021 16:04:17 PAGE 17  
+ 970          /*波特率控件状态--Menue*/
+ 971          void KeyBaud_Menu(void)
+ 972          {
+C51 COMPILER V9.60.0.0   MENU                                                              12/27/2021 17:10:03 PAGE 17  
 
- 973           * @param       None
- 974           * @retval      None
- 975           */
- 976          void Baud_Setting(void)
- 977          {
- 978   1          /*刷新界面*/
- 979   1          LcdShow(RefreshBaudDisp);
- 980   1          // /*切换到波特率设置界面*/
- 981   1          // UI_STATE = BAUD_STATE;
- 982   1          // /*无操作返回定时器开启*/
- 983   1          // PublicTimer16.MenuDly16.Timer16Count = T_60S;
- 984   1      }
- 985          
- 986          void LcdDly(KEY_e key)
- 987          { /*如果已经在密码输入界面*/
- 988   1          if (Ui_Status.Ui == MAIN_STATE)
- 989   1          { /*并且当前控件为屏保，不启用定时器*/
- 990   2              if (Ui_Status.Widget == CONTROL_SCREENSAVE)
- 991   2                  return;
- 992   2          }
- 993   1      
- 994   1          if (key == NO_KEY)
- 995   1          {
- 996   2              if (PublicTimer16.MenuDly16.Timer16Flag)
- 997   2              {
- 998   3                  PublicTimer16.MenuDly16.Timer16Flag = false;
- 999   3                  Ui_Status.Ui = MAIN_STATE;
-1000   3                  Ui_Status.Widget = CONTROL_SCREENSAVE;
-1001   3                  /*屏保界面界面*/
-1002   3                  LcdShow(&ScreensaverUiShow);
-1003   3                  PassWordDelete(&PassWordI);
-1004   3              }
-1005   2          }
-1006   1          else
-1007   1          {
-1008   2              PublicTimer16.MenuDly16.Timer16Count = T_60S;
-1009   2          }
-1010   1      }
+ 973   1      #if USE_PRINTF_DEBUG
+                  printf("KeyBaud_Menu\r\n");
+              #endif
+ 976   1      }
+ 977          
+ 978          /*一级菜单界面刷新显示*/
+ 979          void RefreshMenuDisp(void)
+ 980          {
+ 981   1          uint8_t i = 0;
+ 982   1          clear_screen(); //清屏
+ 983   1      
+ 984   1          for (; i < 3; i++)
+ 985   1          {
+ 986   2              GUI_String(70, 20 * i + 5, Optionlist[M_Show[MAIN_MENU].OptionIndex_buf[i]].pString, CH_12_12);
+ 987   2          }
+ 988   1      
+ 989   1          GUI_Lattice(50, 6 + M_Show[MAIN_MENU].Finger_Index * 20, 16, 12, finger);
+ 990   1      }
+ 991          
+ 992          /*菜单界面下二级菜单刷新显示*/
+ 993          void RefreshBaudDisp(void)
+ 994          {
+ 995   1          uint8_t i = 0;
+ 996   1          clear_screen(); //清屏
+ 997   1      
+ 998   1          for (; i < 3U; i++)
+ 999   1          {
+1000   2              GUI_String(70, 20 * i + 5, Optionlist1[M_Show[SEC0_MENU].OptionIndex_buf[i]].pString, CH_12_12);
+1001   2          }
+1002   1      
+1003   1          GUI_Lattice(50, 6 + M_Show[SEC0_MENU].Finger_Index * 20, 16, 12, finger);
+1004   1      }
+1005          
+1006          /**
+1007           * @brief       波特率设置二级菜单
+1008           * @details
+1009           * @param       None
+1010           * @retval      None
+1011           */
+1012          void Baud_Setting(void)
+1013          {
+1014   1          /*刷新界面*/
+1015   1          LcdShow(RefreshBaudDisp);
+1016   1          // /*切换到波特率设置界面*/
+1017   1          // UI_STATE = BAUD_STATE;
+1018   1          // /*无操作返回定时器开启*/
+1019   1          // PublicTimer16.MenuDly16.Timer16Count = T_60S;
+1020   1      }
+1021          
+1022          void LcdDly(KEY_e key)
+1023          { /*如果已经在密码输入界面*/
+1024   1          if (Ui_Status.Ui == MAIN_STATE)
+1025   1          { /*并且当前控件为屏保，不启用定时器*/
+1026   2              if (Ui_Status.Widget == CONTROL_SCREENSAVE)
+1027   2                  return;
+1028   2          }
+1029   1      
+1030   1          if (key == NO_KEY)
+1031   1          {
+1032   2              if (PublicTimer16.MenuDly16.Timer16Flag)
+1033   2              {
+1034   3                  PublicTimer16.MenuDly16.Timer16Flag = false;
+C51 COMPILER V9.60.0.0   MENU                                                              12/27/2021 17:10:03 PAGE 18  
+
+1035   3                  Ui_Status.Ui = MAIN_STATE;
+1036   3                  Ui_Status.Widget = CONTROL_SCREENSAVE;
+1037   3                  /*屏保界面界面*/
+1038   3                  LcdShow(&ScreensaverUiShow);
+1039   3                  PassWordDelete(&PassWordI);
+1040   3              }
+1041   2          }
+1042   1          else
+1043   1          {
+1044   2              PublicTimer16.MenuDly16.Timer16Count = T_60S;
+1045   2          }
+1046   1      }
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =   2948    ----
-   CONSTANT SIZE    =    247    ----
-   XDATA SIZE       =    197      19
+   CODE SIZE        =   3124    ----
+   CONSTANT SIZE    =    257    ----
+   XDATA SIZE       =    204      19
    PDATA SIZE       =   ----    ----
    DATA SIZE        =   ----    ----
    IDATA SIZE       =   ----    ----

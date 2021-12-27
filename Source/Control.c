@@ -56,6 +56,14 @@ OBJCTSTRUCT Objlist[] =
 };
 uint8_t G_Objlist_Size = (sizeof(Objlist) / sizeof(OBJCTSTRUCT));
 
+/*通讯协议设置*/
+MODESTRUCT Pactlist[] =
+{
+	{"Other",Set_OtherPact},
+	{"PPI_p", Set_PpiPact}
+};
+uint8_t G_Pactlist_Size = (sizeof(Pactlist) / sizeof(MODESTRUCT));
+
 void ControlInit(void)
 {
 	/*缺省控件类型*/
@@ -65,6 +73,7 @@ void ControlInit(void)
 	CommunicaInit(); //通信初始化
 	/*初始化临时副本*/
 	SYS_TEMP_PARA.WorkMode = System_Parameter.WorkMode;
+	SYS_TEMP_PARA.Ppistate = System_Parameter.Ppistate;
 }
 
 void CommunicaInit(void)
@@ -302,9 +311,18 @@ void WorkModeUIshow(void)
 	GUI_String(120,115,Objlist[System_Parameter.CurrentSlave].pstring,EN_5_8);	
 }
 
+void PactUIshow(void)
+{
+	clear_screen();
+	GUI_String(5, 29, "扩展网协议", CH_12_12);
+	GUI_String(105, 31, Pactlist[SYS_TEMP_PARA.Ppistate].pstring, EN_5_8);
+	GUI_Lattice(149, 31, 5, 8, IconRight);
+	GUI_Lattice(97, 31, 5, 8, Iconleft);
+}
+
 void Mode_Slave(void)
 {
-	System_Parameter.WorkMode = SYS_TEMP_PARA.WorkMode;
+	// System_Parameter.WorkMode = SYS_TEMP_PARA.WorkMode;
 	/*从机模式下使能所有请求主机*/
 	REN = 1;
 	S2CON |= S2REN;
@@ -313,13 +331,25 @@ void Mode_Slave(void)
 
 void Mode_Master(void)
 {
-	System_Parameter.WorkMode = SYS_TEMP_PARA.WorkMode;
+	// System_Parameter.WorkMode = SYS_TEMP_PARA.WorkMode;
 	/*PLC工作在主站时，默认从站为RS485*/
 	System_Parameter.CurrentSlave = RS485_ID;
 	/*主机模式下关闭多余从机*/
 	REN = 0;
 	S2CON &= 0xEF;
 	S3CON &= 0xEF;
+}
+
+void Set_OtherPact(void)
+{
+	S3CON &= 0x7F;
+	S4CON &= 0x7F;
+}
+
+void Set_PpiPact(void)
+{
+	S3CON |= 0x80;
+	S4CON |= 0x80;
 }
 
 /**

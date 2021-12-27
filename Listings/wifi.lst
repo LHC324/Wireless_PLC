@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.0.0   WIFI                                                              12/22/2021 16:04:19 PAGE 1   
+C51 COMPILER V9.60.0.0   WIFI                                                              12/27/2021 17:10:03 PAGE 1   
 
 
 C51 COMPILER V9.60.0.0, COMPILATION OF MODULE WIFI
@@ -62,7 +62,7 @@ line level    source
   52          };
   53          
   54          #define WIFI_CMDSIZE sizeof(Wifi_Cmd) / sizeof(AT_Command)
-C51 COMPILER V9.60.0.0   WIFI                                                              12/22/2021 16:04:19 PAGE 2   
+C51 COMPILER V9.60.0.0   WIFI                                                              12/27/2021 17:10:03 PAGE 2   
 
   55          
   56          /**
@@ -126,7 +126,7 @@ line level    source
  114          
  115          //      if(strlen(key) < 8)
  116          //      {
-C51 COMPILER V9.60.0.0   WIFI                                                              12/22/2021 16:04:19 PAGE 3   
+C51 COMPILER V9.60.0.0   WIFI                                                              12/27/2021 17:10:03 PAGE 3   
 
  117          //              AT_error("length too short");
  118          //              return;
@@ -190,7 +190,7 @@ line level    source
  176          //      Uartx_SendStr(&Uart2, error, strlen(error));
  177          // }
  178          
-C51 COMPILER V9.60.0.0   WIFI                                                              12/22/2021 16:04:19 PAGE 4   
+C51 COMPILER V9.60.0.0   WIFI                                                              12/27/2021 17:10:03 PAGE 4   
 
  179          
  180          /**
@@ -254,7 +254,7 @@ line level    source
  237   2                      Uartx_SendStr(&Uart2, str, strlen(str));
  238   2                      Delay_ms(times);
  239   2              }
-C51 COMPILER V9.60.0.0   WIFI                                                              12/22/2021 16:04:19 PAGE 5   
+C51 COMPILER V9.60.0.0   WIFI                                                              12/27/2021 17:10:03 PAGE 5   
 
  240   1      }
  241          
@@ -318,7 +318,7 @@ line level    source
  299   1              Exe_Appoint_Cmd(RESTART_CMD, 200);
  300   1      }
 
-C51 COMPILER V9.60.0.0   WIFI                                                              12/22/2021 16:04:19 PAGE 6   
+C51 COMPILER V9.60.0.0   WIFI                                                              12/27/2021 17:10:03 PAGE 6   
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
