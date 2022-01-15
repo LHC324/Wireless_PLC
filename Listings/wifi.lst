@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.0.0   WIFI                                                              12/27/2021 17:10:03 PAGE 1   
+C51 COMPILER V9.60.0.0   WIFI                                                              01/15/2022 12:19:58 PAGE 1   
 
 
 C51 COMPILER V9.60.0.0, COMPILATION OF MODULE WIFI
@@ -62,268 +62,140 @@ line level    source
   52          };
   53          
   54          #define WIFI_CMDSIZE sizeof(Wifi_Cmd) / sizeof(AT_Command)
-C51 COMPILER V9.60.0.0   WIFI                                                              12/27/2021 17:10:03 PAGE 2   
+C51 COMPILER V9.60.0.0   WIFI                                                              01/15/2022 12:19:58 PAGE 2   
 
   55          
   56          /**
-  57           * @brief       WIFI模块从透传模式退出到命令模式
+  57           * @brief       WIFI模块启停
   58           * @details     
-  59           * @param       None
+  59           * @param       status:状态
   60           * @retval      None
   61           */
-  62          // void wifi_cmd_mode(void)
-  63          // {
-  64          //      char str[] = "+++";
-  65          //      wifi_sendcmd((uint8_t*)str,strlen(str));
-  66          // }
-  67          
-  68          // void wifi_ReciveNew(uint8_t* rxBuf,uint16_t Len)
-  69          // {
-  70          //      uint16_t i;
-  71          //      for(i = 0;i<Len;i++)
-  72          //      {
-  73          //              g_Wifi.RxBuf[i] = rxBuf[i];
-  74          //      }
-  75          //      g_Wifi.RxCount = Len;
-  76          // }
+  62          void Wifi_Enable(uint8_t status)
+  63          {
+  64   1              switch(status)
+  65   1              {
+  66   2                      case true:
+  67   2                      {
+  68   3                              WIFI_RESET  = 1;
+  69   3                      }break;
+  70   2                      case false:
+  71   2                      {
+  72   3                              WIFI_RESET  = 0;
+  73   3                      }break;
+  74   2                      default : break;
+  75   2              }
+  76   1      }
   77          
-  78          // void wifi_Poll(void)
-  79          // {
-  80          //      wifi_AnalyzeApp();
-  81          //      g_Wifi.RxCount = 0;
-  82          // }
-  83          
-  84          // void wifi_AnalyzeApp(void)
-  85          // {
-  86          //      if(g_Wifi.RxBuf[0] == 0x61 && g_Wifi.RxCount == 1)
-  87          //      {
-  88          //              cmdmodeflag = 1;
-  89          //              wifisend_a();
-  90          // //           WifiCmdLight(0);     /*这一段可以不用，有点耦合*/
-  91          //      }
-  92          //      if(cmdmodeflag)  /*如果是在命令模式下*/
-  93          //      {
-  94          
-  95          //      }
-  96          // }
-  97          
-  98          // void wifisend_a(void)
-  99          // {
- 100          //      char str = 'a';
- 101          //      wifi_sendcmd((uint8_t*)&str, 1U);
- 102          // }
- 103          
- 104          // void wifi_sendcmd(uint8_t * dat,uint8_t length)
- 105          // {
- 106          //      Uartx_SendStr(&Uart2, dat, length);
- 107          // }
- 108          
- 109          // void AT_SetWap(char* ssid,char* key)
- 110          // {
- 111          //      char str[50] = "AT+WAP=";
- 112          //      char*pstr = str;
- 113          //      // assert_param((ssid!=NULL)&&(key!=NULL)); //检查参数是否正确
- 114          
- 115          //      if(strlen(key) < 8)
- 116          //      {
-C51 COMPILER V9.60.0.0   WIFI                                                              12/27/2021 17:10:03 PAGE 3   
-
- 117          //              AT_error("length too short");
- 118          //              return;
- 119          //      }
- 120          
- 121          //      while(*pstr)
- 122          //      {
- 123          //              pstr++;
- 124          //      }
- 125          //      while(*ssid)
- 126          //      {
- 127          //              *pstr++ = *ssid++;
- 128          //      }
- 129          //      *pstr++ = ',';
- 130          //      while(*key)
- 131          //      {
- 132          //              *pstr++ = *key++;
- 133          //      }
- 134          //      *pstr++ = '\r';
- 135          //      *pstr++ = '\n';
- 136          //      wifi_sendcmd((uint8_t*)str,strlen(str));
- 137          // }
- 138          
- 139          // void SetUpWifi(char*ssid,char* key)
- 140          // {
- 141          //      char str[100] = "AT+WSTA=";
- 142          //      char*pstr = str;
- 143          //      // assert_param((ssid!=NULL)&&(key!=NULL)); //检查参数是否正确
- 144          
- 145          //      if(strlen(ssid)> 32U)
- 146          //      {
- 147          //              AT_error("length too long");
- 148          //      }
- 149          
- 150          //      while(*pstr)
- 151          //      {
- 152          //              pstr++;
- 153          //      }
- 154          //      while(*ssid)
- 155          //      {
- 156          //              *pstr++ = *ssid++;
- 157          //      }
- 158          //      *pstr++ = ',';
- 159          //      while(*key)
- 160          //      {
- 161          //              *pstr++ = *key++;
- 162          //      }
- 163          //      *pstr++ = '\r';
- 164          //      *pstr++ = '\n';
- 165          //      wifi_sendcmd((uint8_t*)str,strlen(str));
- 166          // }
- 167          
- 168          // void AT_Reload(void)
- 169          // {
- 170          //      char str[20] = "AT+Z\r\n";
- 171          //      wifi_sendcmd((uint8_t*)str,strlen(str));
- 172          // }
- 173          
- 174          // void AT_error(char* error)
- 175          // {
- 176          //      Uartx_SendStr(&Uart2, error, strlen(error));
- 177          // }
- 178          
-C51 COMPILER V9.60.0.0   WIFI                                                              12/27/2021 17:10:03 PAGE 4   
-
- 179          
- 180          /**
- 181           * @brief       WIFI模块启停
- 182           * @details     
- 183           * @param       status:状态
- 184           * @retval      None
- 185           */
- 186          void Wifi_Enable(uint8_t status)
- 187          {
- 188   1              switch(status)
- 189   1              {
- 190   2                      case true:
- 191   2                      {
- 192   3                              WIFI_RESET  = 1;
- 193   3                      }break;
- 194   2                      case false:
- 195   2                      {
- 196   3                              WIFI_RESET  = 0;
- 197   3                      }break;
- 198   2                      default : break;
- 199   2              }
- 200   1      }
- 201          
- 202          /**
- 203           * @brief       初始化WIFI模块
- 204           * @details     WIFI模块复位需要一定延时；在退出透传模式时延时必须>500ms,每条指令�
+  78          /**
+  79           * @brief       初始化WIFI模块
+  80           * @details     WIFI模块复位需要一定延时；在退出透传模式时延时必须>500ms,每条指令�
              -�间隔必须>100ms
- 205           * @param       None
- 206           * @retval      None
- 207           */
- 208          void Wifi_Init(void)
- 209          {
- 210   1              uint8_t i = 0;
- 211   1      
- 212   1              /*WIFI硬件引脚不复位*/
- 213   1              WIFI_RESET  = 1;
- 214   1              WIFI_RELOAD = 1;
- 215   1              /*等待模块复位*/
- 216   1              Delay_ms(500);
- 217   1      
- 218   1              for(i = 0; i < WIFI_CMDSIZE; i++)
- 219   1              {
- 220   2                      // Uartx_SendStr(&Uart2, (uint8_t *)Wifi_Cmd[i].pSend, strlen(Wifi_Cmd[i].pSend));
- 221   2                      // /*执行对应的等待时间*/
- 222   2                      // Delay_ms(Wifi_Cmd[i].WaitTimes);
- 223   2                      Exe_Appoint_Cmd((uint8_t *)Wifi_Cmd[i].pSend, Wifi_Cmd[i].WaitTimes);
- 224   2              }
- 225   1      }
- 226          
- 227          /**
- 228           * @brief       WIFI模块执行指令表中特定指令
- 229           * @details     
- 230           * @param       None
- 231           * @retval      None
- 232           */
- 233          static void Exe_Appoint_Cmd(uint8_t *str, uint16_t times)
- 234          {
- 235   1              if((str != NULL) && (times))
- 236   1              {
- 237   2                      Uartx_SendStr(&Uart2, str, strlen(str));
- 238   2                      Delay_ms(times);
- 239   2              }
-C51 COMPILER V9.60.0.0   WIFI                                                              12/27/2021 17:10:03 PAGE 5   
+  81           * @param       None
+  82           * @retval      None
+  83           */
+  84          void Wifi_Init(void)
+  85          {
+  86   1              uint8_t i = 0;
+  87   1      
+  88   1              /*WIFI硬件引脚不复位*/
+  89   1              WIFI_RESET  = 1;
+  90   1              WIFI_RELOAD = 1;
+  91   1              /*等待模块复位*/
+  92   1              Delay_ms(500);
+  93   1      
+  94   1              for(i = 0; i < WIFI_CMDSIZE; i++)
+  95   1              {
+  96   2                      // Uartx_SendStr(&Uart2, (uint8_t *)Wifi_Cmd[i].pSend, strlen(Wifi_Cmd[i].pSend));
+  97   2                      // /*执行对应的等待时间*/
+  98   2                      // Delay_ms(Wifi_Cmd[i].WaitTimes);
+  99   2                      Exe_Appoint_Cmd((uint8_t *)Wifi_Cmd[i].pSend, Wifi_Cmd[i].WaitTimes);
+ 100   2              }
+ 101   1      }
+ 102          
+ 103          /**
+ 104           * @brief       WIFI模块执行指令表中特定指令
+ 105           * @details     
+ 106           * @param       None
+ 107           * @retval      None
+ 108           */
+ 109          static void Exe_Appoint_Cmd(uint8_t *str, uint16_t times)
+ 110          {
+ 111   1              if((str != NULL) && (times))
+ 112   1              {
+ 113   2                      Uartx_SendStr(&Uart2, str, strlen(str));
+ 114   2                      Delay_ms(times);
+ 115   2              }
+C51 COMPILER V9.60.0.0   WIFI                                                              01/15/2022 12:19:58 PAGE 3   
 
- 240   1      }
- 241          
- 242          
- 243          /**
- 244           * @brief       WIFI模块退出透传模式
- 245           * @details     
- 246           * @param       None
- 247           * @retval      None
- 248           */
- 249          static void Wifi_Exit_Trt(void)
- 250          {
- 251   1              
- 252   1              uint8_t i = 0;
- 253   1      
- 254   1              for(i = 0; i < 2U; i++)
- 255   1              {
- 256   2                      if((Wifi_Cmd[i].pSend != '\0') && (Wifi_Cmd[i].WaitTimes))
- 257   2                      {
- 258   3                              // Uartx_SendStr(&Uart2, (uint8_t *)Wifi_Cmd[i].pSend, strlen(Wifi_Cmd[i].pSend));
- 259   3                              // /*执行对应的等待时间*/
- 260   3                              // Delay_ms(Wifi_Cmd[i].WaitTimes);
- 261   3                              Exe_Appoint_Cmd((uint8_t *)Wifi_Cmd[i].pSend, Wifi_Cmd[i].WaitTimes);
- 262   3                      }
- 263   2              }
- 264   1      }
- 265          
- 266          /**
- 267           * @brief       打开WIFI模块热点
- 268           * @details     
- 269           * @param       None
- 270           * @retval      None
- 271           */
- 272          void Wifi_Open_Ap(void)
- 273          {
- 274   1              /*退出透传模式*/
- 275   1              Wifi_Exit_Trt();
- 276   1              /*发送配置指令*/
- 277   1              Exe_Appoint_Cmd(AP_STA_MODE, 200);
- 278   1              /*进入透传模式*/
- 279   1              Exe_Appoint_Cmd(ENTM_CMD, 200);
- 280   1              /*重启模块*/
- 281   1              Exe_Appoint_Cmd(RESTART_CMD, 200);
- 282   1      }
- 283          
- 284          /**
- 285           * @brief       关闭WIFI模块热点
- 286           * @details     
- 287           * @param       None
- 288           * @retval      None
- 289           */
- 290          void Wifi_Close_Ap(void)
- 291          {       
- 292   1              /*退出透传模式*/
- 293   1              Wifi_Exit_Trt();
- 294   1              /*发送配置指令*/
- 295   1              Exe_Appoint_Cmd(STA_MODE, 200);
- 296   1              /*进入透传模式*/
- 297   1              Exe_Appoint_Cmd(ENTM_CMD, 200);
- 298   1              /*重启模块*/
- 299   1              Exe_Appoint_Cmd(RESTART_CMD, 200);
- 300   1      }
+ 116   1      }
+ 117          
+ 118          
+ 119          /**
+ 120           * @brief       WIFI模块退出透传模式
+ 121           * @details     
+ 122           * @param       None
+ 123           * @retval      None
+ 124           */
+ 125          static void Wifi_Exit_Trt(void)
+ 126          {
+ 127   1              
+ 128   1              uint8_t i = 0;
+ 129   1      
+ 130   1              for(i = 0; i < 2U; i++)
+ 131   1              {
+ 132   2                      if((Wifi_Cmd[i].pSend != '\0') && (Wifi_Cmd[i].WaitTimes))
+ 133   2                      {
+ 134   3                              // Uartx_SendStr(&Uart2, (uint8_t *)Wifi_Cmd[i].pSend, strlen(Wifi_Cmd[i].pSend));
+ 135   3                              // /*执行对应的等待时间*/
+ 136   3                              // Delay_ms(Wifi_Cmd[i].WaitTimes);
+ 137   3                              Exe_Appoint_Cmd((uint8_t *)Wifi_Cmd[i].pSend, Wifi_Cmd[i].WaitTimes);
+ 138   3                      }
+ 139   2              }
+ 140   1      }
+ 141          
+ 142          /**
+ 143           * @brief       打开WIFI模块热点
+ 144           * @details     
+ 145           * @param       None
+ 146           * @retval      None
+ 147           */
+ 148          void Wifi_Open_Ap(void)
+ 149          {
+ 150   1              /*退出透传模式*/
+ 151   1              Wifi_Exit_Trt();
+ 152   1              /*发送配置指令*/
+ 153   1              Exe_Appoint_Cmd(AP_STA_MODE, 200);
+ 154   1              /*进入透传模式*/
+ 155   1              Exe_Appoint_Cmd(ENTM_CMD, 200);
+ 156   1              /*重启模块*/
+ 157   1              Exe_Appoint_Cmd(RESTART_CMD, 200);
+ 158   1      }
+ 159          
+ 160          /**
+ 161           * @brief       关闭WIFI模块热点
+ 162           * @details     
+ 163           * @param       None
+ 164           * @retval      None
+ 165           */
+ 166          void Wifi_Close_Ap(void)
+ 167          {       
+ 168   1              /*退出透传模式*/
+ 169   1              Wifi_Exit_Trt();
+ 170   1              /*发送配置指令*/
+ 171   1              Exe_Appoint_Cmd(STA_MODE, 200);
+ 172   1              /*进入透传模式*/
+ 173   1              Exe_Appoint_Cmd(ENTM_CMD, 200);
+ 174   1              /*重启模块*/
+ 175   1              Exe_Appoint_Cmd(RESTART_CMD, 200);
+ 176   1      }
 
-C51 COMPILER V9.60.0.0   WIFI                                                              12/27/2021 17:10:03 PAGE 6   
+C51 COMPILER V9.60.0.0   WIFI                                                              01/15/2022 12:19:58 PAGE 4   
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
    CODE SIZE        =    303    ----
-   CONSTANT SIZE    =    427    ----
+   CONSTANT SIZE    =    433    ----
    XDATA SIZE       =   ----       7
    PDATA SIZE       =   ----    ----
    DATA SIZE        =   ----    ----

@@ -24,7 +24,8 @@ static void Iap_Flash_Iinit(void);
 // uint8_t mempool[5U * 1024] = {0};
 
 void main(void)
-{   /*注意传递的是数组名地址*/
+{   
+	/*注意传递的是数组名地址*/
     // init_mempool (mempool, sizeof(mempool)); 
     systemInit(); //系统初始化
 
@@ -41,7 +42,8 @@ void main(void)
 void systemInit(void)
 {
     Init_All(); //初始化外设
-	
+	/*AUXR初始值为0x01，存在bug导致串口1和串口2共用同一个波特率发生器*/
+	AUXR = 0x00;
 	/***********************************************************************/
     //以太网串口结构体初始化
     Init_ListQueue(&COM_UART1);
@@ -94,6 +96,12 @@ void systemInit(void)
         System_Parameter.WifiInitFlag = true; 
         /*存储到IAPFLASH*/
         ControlSave();
+    }
+    else
+    {/*解决WIfi模块平凡掉电后启动不上线*/
+       Wifi_Enable(false);
+       Delay_ms(1000);
+       Wifi_Enable(true);
     }
     /*看门狗初始化 */ 
 //	WDT_init();

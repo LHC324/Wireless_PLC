@@ -74,6 +74,14 @@ void ControlInit(void)
 	/*初始化临时副本*/
 	SYS_TEMP_PARA.WorkMode = System_Parameter.WorkMode;
 	SYS_TEMP_PARA.Ppistate = System_Parameter.Ppistate;
+	if (SYS_TEMP_PARA.Ppistate == 0)
+	{
+		Set_OtherPact();
+	}
+	else
+	{
+		Set_PpiPact();
+	}
 }
 
 void CommunicaInit(void)

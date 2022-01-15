@@ -10,7 +10,7 @@
 #include <absacc.h> //可直接操作内存地址
 
 /*屏保界面LOGO*/
-#define START_LOGO Kmust_Image
+#define START_LOGO PowerGrid_Image//Kmust_Image
 /**********************布尔变量定义**********************/
 #define true 1
 #define false 0
