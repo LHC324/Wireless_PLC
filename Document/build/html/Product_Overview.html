@@ -1,0 +1,308 @@
+
+<!DOCTYPE html>
+
+<html lang="zh_CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>产品概述 &#8212; 无线PLC V1.0.2 文档</title>
+    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/insipid.css" />
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/translations.js"></script>
+    <script defer src="_static/insipid.js"></script>
+    <script defer src="_static/insipid-sidebar.js"></script>
+    <link rel="index" title="索引" href="genindex.html" />
+    <link rel="search" title="搜索" href="search.html" />
+    <link rel="next" title="操作指南" href="operation_guide.html" />
+    <link rel="prev" title="无线 PLC 使用说明书" href="index.html" />
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+  </head>
+  <body class="sidebar-visible">
+    <script type="text/javascript">
+        (function() {
+            var $body = $(document.body);
+            $body.addClass('js');
+            $body.addClass('sidebar-resizing');  // avoid transitions on load
+            $body.removeClass('sidebar-visible');
+            try {
+                var sidebar = localStorage.getItem('sphinx-sidebar');
+                if (sidebar === 'visible') {
+                    $body.addClass('sidebar-visible');
+                }
+                var sidebar_width = localStorage.getItem('sphinx-sidebar-width');
+                if (sidebar_width) {
+                    $(':root').css('--sidebar-width', sidebar_width);
+                }
+            } catch(e) {
+            }
+        })();
+    </script>
+    <header id="topbar-placeholder">
+      <div id="topbar">
+        <div id="titlebar">
+          <div class="buttons">
+            <button id="sidebar-button" type="button" aria-controls="sphinxsidebar" accesskey="M">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M16 132h416c8.837 0 16-7.163 16-16V76c0-8.837-7.163-16-16-16H16C7.163 60 0 67.163 0 76v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16z"/></svg>
+            </button>
+            <button id="search-button" type="button" title="搜索" aria-label="搜索" aria-expanded="false" aria-controls="search-form" accesskey="S">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M505 442.7L405.3 343c-4.5-4.5-10.6-7-17-7H372c27.6-35.3 44-79.7 44-128C416 93.1 322.9 0 208 0S0 93.1 0 208s93.1 208 208 208c48.3 0 92.7-16.4 128-44v16.3c0 6.4 2.5 12.5 7 17l99.7 99.7c9.4 9.4 24.6 9.4 33.9 0l28.3-28.3c9.4-9.4 9.4-24.6.1-34zM208 336c-70.7 0-128-57.2-128-128 0-70.7 57.2-128 128-128 70.7 0 128 57.2 128 128 0 70.7-57.2 128-128 128z"/></svg>
+            </button>
+          </div>
+          <div class="title">
+            <a class="parent" href="index.html" accesskey="U">无线PLC V1.0.2 文档</a>
+            <a class="top" href="#">产品概述</a>
+          </div>
+          <div class="buttons">
+            <button id="fullscreen-button" type="button" aria-hidden="true">
+              <span class="enable">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M212.686 315.314L120 408l32.922 31.029c15.12 15.12 4.412 40.971-16.97 40.971h-112C10.697 480 0 469.255 0 456V344c0-21.382 25.803-32.09 40.922-16.971L72 360l92.686-92.686c6.248-6.248 16.379-6.248 22.627 0l25.373 25.373c6.249 6.248 6.249 16.378 0 22.627zm22.628-118.628L328 104l-32.922-31.029C279.958 57.851 290.666 32 312.048 32h112C437.303 32 448 42.745 448 56v112c0 21.382-25.803 32.09-40.922 16.971L376 152l-92.686 92.686c-6.248 6.248-16.379 6.248-22.627 0l-25.373-25.373c-6.249-6.248-6.249-16.378 0-22.627z"/></svg>
+              </span>
+              <span class="disable">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M4.686 427.314L104 328l-32.922-31.029C55.958 281.851 66.666 256 88.048 256h112C213.303 256 224 266.745 224 280v112c0 21.382-25.803 32.09-40.922 16.971L152 376l-99.314 99.314c-6.248 6.248-16.379 6.248-22.627 0L4.686 449.941c-6.248-6.248-6.248-16.379 0-22.627zM443.314 84.686L344 184l32.922 31.029c15.12 15.12 4.412 40.971-16.97 40.971h-112C234.697 256 224 245.255 224 232V120c0-21.382 25.803-32.09 40.922-16.971L296 136l99.314-99.314c6.248-6.248 16.379-6.248 22.627 0l25.373 25.373c6.248 6.248 6.248 16.379 0 22.627z"/></svg>
+              </span>
+            </button>
+          </div>
+        </div>
+        <div id="searchbox" role="search">
+          <form id="search-form" class="search" style="display: none" action="search.html" method="get">
+            <input type="search" name="q" placeholder="搜索 ..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+            <button>转向</button>
+          </form>
+        </div>
+      </div>
+    </header>
+    <nav>
+      <a href="index.html" class="nav-icon previous" title="上一页:&#13;无线 PLC 使用说明书" aria-label="上一个主题" accesskey="P" tabindex="-1">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M31.7 239l136-136c9.4-9.4 24.6-9.4 33.9 0l22.6 22.6c9.4 9.4 9.4 24.6 0 33.9L127.9 256l96.4 96.4c9.4 9.4 9.4 24.6 0 33.9L201.7 409c-9.4 9.4-24.6 9.4-33.9 0l-136-136c-9.5-9.4-9.5-24.6-.1-34z"/></svg>
+      </a>
+      <a href="operation_guide.html" class="nav-icon next" title="下一页:&#13;操作指南" aria-label="下一个主题" accesskey="N" tabindex="-1">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M224.3 273l-136 136c-9.4 9.4-24.6 9.4-33.9 0l-22.6-22.6c-9.4-9.4-9.4-24.6 0-33.9l96.4-96.4-96.4-96.4c-9.4-9.4-9.4-24.6 0-33.9L54.3 103c9.4-9.4 24.6-9.4 33.9 0l136 136c9.5 9.4 9.5 24.6.1 34z"/></svg>
+      </a>
+    </nav>
+
+    <nav class="relbar">
+      <a class="previous" href="index.html" aria-label="上一个主题" >
+        <div class="icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M257.5 445.1l-22.2 22.2c-9.4 9.4-24.6 9.4-33.9 0L7 273c-9.4-9.4-9.4-24.6 0-33.9L201.4 44.7c9.4-9.4 24.6-9.4 33.9 0l22.2 22.2c9.5 9.5 9.3 25-.4 34.3L136.6 216H424c13.3 0 24 10.7 24 24v32c0 13.3-10.7 24-24 24H136.6l120.5 114.8c9.8 9.3 10 24.8.4 34.3z"/></svg>
+        </div>
+        <div class="title">
+          <span class="text">
+            <span class="direction">上一页</span>
+            无线 PLC 使用说明书
+          </span>
+        </div>
+      </a>
+      <a class="next" href="operation_guide.html" aria-label="下一个主题" >
+        <div class="title">
+          <span class="text">
+            <span class="direction">下一页</span>
+            操作指南
+          </span>
+        </div>
+        <div class="icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M190.5 66.9l22.2-22.2c9.4-9.4 24.6-9.4 33.9 0L441 239c9.4 9.4 9.4 24.6 0 33.9L246.6 467.3c-9.4 9.4-24.6 9.4-33.9 0l-22.2-22.2c-9.5-9.5-9.3-25 .4-34.3L311.4 296H24c-13.3 0-24-10.7-24-24v-32c0-13.3 10.7-24 24-24h287.4L190.9 101.2c-9.8-9.3-10-24.8-.4-34.3z"/></svg>
+        </div>
+      </a>
+    </nav>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+<div class="section" id="id1">
+<h1>产品概述<a class="headerlink" href="#id1" title="永久链接至标题">¶</a></h1>
+<p>WLC-1210系列是一种可编程序逻辑控制器(Micro PLC)。它能够控制各种设备以满足自动化控制需求。
+WLC-1210的用户程序中包括了位逻辑、计数器、定时器、复杂数学运算以及与其它智能模块通讯等指令内容，从而使它能够监视输入状态，改变输出状态以达到控制目的。紧凑的结构、灵活的配置和强 大的指令集使 <strong>WLC-1210</strong> 成为各种控制应用的理想解决方案。</p>
+<div class="figure align-center" id="id4">
+<a class="reference internal image-reference" href="_images/指示图.jpg"><img alt="NULL" src="_images/指示图.jpg" style="width: 477.6px; height: 317.6px;" /></a>
+<p class="caption"><span class="caption-text">图2.1.1  WLC-1210系列PLC的外部结构</span><a class="headerlink" href="#id4" title="永久链接至图片">¶</a></p>
+</div>
+<div class="section" id="wlc-1210">
+<h2>WLC-1210的外部结构<a class="headerlink" href="#wlc-1210" title="永久链接至标题">¶</a></h2>
+<p>WLC-1210将微处理器、集成电源、输入电路和输出电路集为一体，从而形成了一个功能强大的Micro PLC。参见图2.1.1。在下载了程序之后，WLC-1210将保留所需的逻辑，用于监控应用程序中的输入输出设备。</p>
+<p><strong>1、输入端子</strong></p>
+<p>输入端子是外部输入信号与PLC连接的接线端子，位于底部端盖下面。此外，外部端盖下面还有输入公共端子。输入端子工作电压为直流24V。</p>
+<div class="figure align-center" id="id5">
+<a class="reference internal image-reference" href="_images/输入端子.jpg"><img alt="NULL" src="_images/输入端子.jpg" style="width: 409.70000000000005px; height: 80.10000000000001px;" /></a>
+<p class="caption"><span class="caption-text">图2.1.2  WLC-1210系列 PLC的输入端子</span><a class="headerlink" href="#id5" title="永久链接至图片">¶</a></p>
+</div>
+<p><strong>2、输出端子</strong></p>
+<p>输出端子是外部负载与PLC连接的接线端子，位于顶部端盖下面。此外，顶部端盖下面还有输出公共端子和PLC工作电源端子，电源为直流24V。</p>
+<div class="figure align-center" id="id6">
+<a class="reference internal image-reference" href="_images/输出端子.jpg"><img alt="NULL" src="_images/输出端子.jpg" style="width: 421.70000000000005px; height: 91.30000000000001px;" /></a>
+<p class="caption"><span class="caption-text">图2.1.3  WLC-1210系列PLC的输出端子</span><a class="headerlink" href="#id6" title="永久链接至图片">¶</a></p>
+</div>
+<p><strong>3、输入状态指示灯（LED）</strong></p>
+<p>输入状态指示灯用于显示是否有输入控制信号接入PLC。当指示灯亮时，表示有控制信号接入PLC；当指示灯不亮时，表示没有控制信号接入PLC。</p>
+<div class="figure align-center" id="id7">
+<a class="reference internal image-reference" href="_images/输入状态指示灯.jpg"><img alt="NULL" src="_images/输入状态指示灯.jpg" style="width: 216.29999999999998px; height: 198.29999999999998px;" /></a>
+<p class="caption"><span class="caption-text">图2.1.4  WLC-1210系列PLC的输入状态指示灯</span><a class="headerlink" href="#id7" title="永久链接至图片">¶</a></p>
+</div>
+<p><strong>4、输出状态指示灯（LED）</strong></p>
+<p>输出状态指示灯用于显示是否有输出信号驱动执行设备。当指示灯亮时，表示有输出信号驱动外部设备；当指示灯不亮时，表示没有输出信号驱动外部设备。</p>
+<div class="figure align-center" id="id8">
+<a class="reference internal image-reference" href="_images/输出状态指示灯.jpg"><img alt="NULL" src="_images/输出状态指示灯.jpg" style="width: 289.5px; height: 188.7px;" /></a>
+<p class="caption"><span class="caption-text">图2.1.5  WLC-1210系列PLC的输出状态指示灯</span><a class="headerlink" href="#id8" title="永久链接至图片">¶</a></p>
+</div>
+<p><strong>5、CPU状态指示灯（LED）</strong></p>
+<p>CPU状态指示灯有RUN、STOP、ERROR三个，其中RUN、STOP指示灯用于显示当前工作状态。当RUN指示灯亮时，表示运行状态；当STOP指示灯亮时，表示停止状态；当ERROR指示灯亮时，表示系统故障，PLC停止工作。</p>
+<div class="figure align-center" id="id9">
+<a class="reference internal image-reference" href="_images/CPU状态指示灯.jpg"><img alt="NULL" src="_images/CPU状态指示灯.jpg" style="width: 204.29999999999998px; height: 75.89999999999999px;" /></a>
+<p class="caption"><span class="caption-text">图2.1.6  WLC-1210系列PLC的CPU状态指示灯</span><a class="headerlink" href="#id9" title="永久链接至图片">¶</a></p>
+</div>
+<p><strong>6、扩展接口</strong></p>
+<p>扩展接口包括485通信接口（485A,485B）、电压输出端口AVo（AVo:0-10V）、电流输出端口AIo（4-20mA）、两个输入VIN0、VIN2。</p>
+<div class="figure align-center" id="id10">
+<a class="reference internal image-reference" href="_images/扩展接口.jpg"><img alt="NULL" src="_images/扩展接口.jpg" style="width: 96.75px; height: 187.35px;" /></a>
+<p class="caption"><span class="caption-text">图2.1.7  WLC-1210系列PLC的扩展接口</span><a class="headerlink" href="#id10" title="永久链接至图片">¶</a></p>
+</div>
+<p><strong>7、通信接口</strong></p>
+<p>通信接口PORT0支持PPI、MODBUS通信协议，有自由方式通信能力，通过通信电缆实现PLC与编程器之间、PLC与计算机之间、PLC与PLC之间、PLC与其他设备之间的通信。</p>
+<div class="figure align-center" id="id11">
+<a class="reference internal image-reference" href="_images/通信接口.jpg"><img alt="NULL" src="_images/通信接口.jpg" style="width: 47.1px; height: 101.7px;" /></a>
+<p class="caption"><span class="caption-text">图2.1.8  WLC-1210系列PLC的通信接口</span><a class="headerlink" href="#id11" title="永久链接至图片">¶</a></p>
+</div>
+</div>
+<div class="section" id="id2">
+<h2>WLC-1210的安装<a class="headerlink" href="#id2" title="永久链接至标题">¶</a></h2>
+<p>可以在一个面板或标准DIN导轨上安装WLC-1210,WLC-1210可采用水平或垂直方式安装。</p>
+<div class="admonition note">
+<p class="admonition-title">注解</p>
+<ul class="simple">
+<li><p>WLC-1210 PLC是开放式控制器。它要求在外壳、机柜或电气控制室中安装WLC-1210。只有授权人员才能进入壳、机柜或电气控制室。</p></li>
+<li><p>不遵守这些安装要求会导致人员死亡或重伤，和/或损坏设备。</p></li>
+<li><p>当安装WLC-1210 PLC时始终遵守这些要求。</p></li>
+</ul>
+</div>
+<p><strong>1、将WLC-1210与热源、高电压和电子噪声隔开</strong></p>
+<ul class="simple">
+<li><p>按照惯例,在安装元器件时，总是把产生高电压和高电子噪声设备与诸如WLC-1210这样的低压、逻辑型的设备分隔开。</p></li>
+<li><p>在控制柜背板上安排WLC-1210时，应区分发热装置并把电子器件安排在控制柜中温度较低的区域内。电子器件在高温环境下工作会缩短其无故障时间。</p></li>
+<li><p>还要考虑面板中设备的布线。避免将低压信号和通讯电缆与交流供电线和高能量、开关频率很高的直流线路布置在一个线槽中。</p></li>
+</ul>
+<p><strong>2、先决条件</strong></p>
+<ul class="simple">
+<li><p>在安装和拆卸任何电气设备之前，必须确认该设备的电源已断开。同样，也要确保与该设备关联的设备供电已被切断。</p></li>
+<li><p>试图在带电情况下安装或拆卸WLC-1210及其相关设备有可能导致触电或者设备误动作。</p></li>
+</ul>
+<p><strong>3、WLC-1210的外部结构与接线</strong></p>
+<div class="figure align-center" id="id12">
+<a class="reference internal image-reference" href="_images/外部结构与接线图.jpg"><img alt="NULL" src="_images/外部结构与接线图.jpg" style="width: 617.4px; height: 350.4px;" /></a>
+<p class="caption"><span class="caption-text">图2.2.1  WLC-1210系列PLC的外部结构与接线图</span><a class="headerlink" href="#id12" title="永久链接至图片">¶</a></p>
+</div>
+<p>图2.2.1是WLC-1210的外部接线图。在PLC编程中，外部接线图也是其重要的组成部分。</p>
+<ul class="simple">
+<li><p>① 输入端子：WLC-1210共有12点输入，端子编号采用8进制。输入端子只有一组，I0.0-I1.3,其公共端为COM。输入端工作电压为直流24V。</p></li>
+</ul>
+<div class="figure align-center" id="id13">
+<a class="reference internal image-reference" href="_images/输入接线图.jpg"><img alt="NULL" src="_images/输入接线图.jpg" style="width: 671.0px; height: 192.5px;" /></a>
+<p class="caption"><span class="caption-text">图2.2.2  WLC-1210系列PLC的输入接线图</span><a class="headerlink" href="#id13" title="永久链接至图片">¶</a></p>
+</div>
+<ul class="simple">
+<li><p>② 输出端子：WLC-1210共有10点输出，端子编号也采用8进制。输出端子共分为3组，Q0.0-Q0.2为第一组，公共端CM1；Q0.3-Q0.6为第二组，公共端CM2；Q0.7-Q1.1为第三组，公共端CM3。根据负载性质不同，其输出回路电源支持交流和直流。</p></li>
+</ul>
+<div class="figure align-center" id="id14">
+<a class="reference internal image-reference" href="_images/输出接线图.jpg"><img alt="NULL" src="_images/输出接线图.jpg" style="width: 589.0px; height: 192.0px;" /></a>
+<p class="caption"><span class="caption-text">图2.2.3  WLC-1210系列PLC的输出接线图</span><a class="headerlink" href="#id14" title="永久链接至图片">¶</a></p>
+</div>
+<ul class="simple">
+<li><p>③ 扩展端口：扩展接口包括485通信接口（485A,485B）、电压输出端口AVo（AVo:0-10V）、电流输出端口AIo（4-20mA）、两个输入VIN0、VIN2。</p></li>
+</ul>
+<div class="figure align-center" id="id15">
+<a class="reference internal image-reference" href="_images/扩展端口接线图.jpg"><img alt="NULL" src="_images/扩展端口接线图.jpg" style="width: 215.55px; height: 180.9px;" /></a>
+<p class="caption"><span class="caption-text">图2.2.4  WLC-1210系列PLC的扩展端口接线图</span><a class="headerlink" href="#id15" title="永久链接至图片">¶</a></p>
+</div>
+<ul class="simple">
+<li><p>④ 电源接线：24V直流电源接入。</p></li>
+</ul>
+<div class="figure align-center" id="id16">
+<a class="reference internal image-reference" href="_images/电源接线图.jpg"><img alt="NULL" src="_images/电源接线图.jpg" style="width: 81.5px; height: 188.5px;" /></a>
+<p class="caption"><span class="caption-text">图2.2.5  WLC-1210系列PLC的电源接线图</span><a class="headerlink" href="#id16" title="永久链接至图片">¶</a></p>
+</div>
+</div>
+<div class="section" id="id3">
+<h2>WLC-1210的软件使用说明<a class="headerlink" href="#id3" title="永久链接至标题">¶</a></h2>
+<p>WLC-1210是全兼容西门子S7-200系列CPU224XP的物联网PLC，使用STEP7–Micro/WIN编程软件。PLC类型选择CPU 224XP，如下图所示。</p>
+<div class="figure align-center" id="id17">
+<a class="reference internal image-reference" href="_images/STEP7选择PLC类型.jpg"><img alt="NULL" src="_images/STEP7选择PLC类型.jpg" style="width: 750.7500000000001px; height: 401.50000000000006px;" /></a>
+<p class="caption"><span class="caption-text">图2.2.6  STEP7–Micro/WIN 选择PLC类型</span><a class="headerlink" href="#id17" title="永久链接至图片">¶</a></p>
+</div>
+<p>其余详细内容，请参考西门子S7-200编程手册。</p>
+</div>
+</div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+    <nav class="relbar">
+      <a class="previous" href="index.html" aria-label="上一个主题" >
+        <div class="icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M257.5 445.1l-22.2 22.2c-9.4 9.4-24.6 9.4-33.9 0L7 273c-9.4-9.4-9.4-24.6 0-33.9L201.4 44.7c9.4-9.4 24.6-9.4 33.9 0l22.2 22.2c9.5 9.5 9.3 25-.4 34.3L136.6 216H424c13.3 0 24 10.7 24 24v32c0 13.3-10.7 24-24 24H136.6l120.5 114.8c9.8 9.3 10 24.8.4 34.3z"/></svg>
+        </div>
+        <div class="title">
+          <span class="text">
+            <span class="direction">上一页</span>
+            无线 PLC 使用说明书
+          </span>
+        </div>
+      </a>
+      <a class="next" href="operation_guide.html" aria-label="下一个主题" >
+        <div class="title">
+          <span class="text">
+            <span class="direction">下一页</span>
+            操作指南
+          </span>
+        </div>
+        <div class="icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M190.5 66.9l22.2-22.2c9.4-9.4 24.6-9.4 33.9 0L441 239c9.4 9.4 9.4 24.6 0 33.9L246.6 467.3c-9.4 9.4-24.6 9.4-33.9 0l-22.2-22.2c-9.5-9.5-9.3-25 .4-34.3L311.4 296H24c-13.3 0-24-10.7-24-24v-32c0-13.3 10.7-24 24-24h287.4L190.9 101.2c-9.8-9.3-10-24.8-.4-34.3z"/></svg>
+        </div>
+      </a>
+    </nav>
+
+
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+
+          <div class="sidebar-resize-handle"></div>
+
+<h3><a href="index.html">目录</a></h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">产品概述</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#wlc-1210">WLC-1210的外部结构</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id2">WLC-1210的安装</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id3">WLC-1210的软件使用说明</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="operation_guide.html">操作指南</a></li>
+</ul>
+
+<hr class="docutils" />
+<ul>
+  <li class="toctree-l1"><a class="reference internal" href="genindex.html" accesskey="I">总目录</a></li>
+</ul>
+<div id="ethical-ad-placement"></div>
+        </div>
+      </div>
+    <footer role="contentinfo">
+      &#169; 版权所有 2022, LHC@云南兆富科技有限公司.
+      Created using <a class="reference external" href="https://www.sphinx-doc.org/">Sphinx</a> 4.1.1.
+      <a class="reference external" href="https://insipid-sphinx-theme.readthedocs.io/">Insipid Theme</a>.
+<a class="reference internal" href="_sources/Product_Overview.rst.txt" rel="nofollow">显示源代码</a>.
+    </footer>
+    <div class="sidebar-resize-handle"></div>
+    <div id="overlay"></div>
+  </body>
+</html>

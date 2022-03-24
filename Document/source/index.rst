@@ -12,7 +12,7 @@
 
 .. figure:: ../source/picture/01_开机界面.jpg
     :align: center
-    :scale: 50%
+    :scale: 40%
     :alt: NULL
     
 
@@ -25,8 +25,9 @@
    :maxdepth: 2
    :caption: Contents:
 
+   Product_Overview
    operation_guide
-
+   
 
 
 Indices and tables

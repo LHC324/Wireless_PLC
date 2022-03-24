@@ -1,177 +1,119 @@
 
-
 <!DOCTYPE html>
-<html class="writer-html5" lang="cn" >
-<head>
-  <meta charset="utf-8" />
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>操作指南 &mdash; 无线PLC V1.0.0 documentation</title>
-  
 
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+<html lang="zh_CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>操作指南 &#8212; 无线PLC V1.0.2 文档</title>
+    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/insipid.css" />
 
-  
-  
-
-  
-  
-
-  
-
-  
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-
-    
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="无线 PLC 使用说明书" href="index.html" /> 
-</head>
-
-<body class="wy-body-for-nav">
-
-   
-  <div class="wy-grid-for-nav">
-    
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search" >
-          
-
-          
-            <a href="index.html" class="icon icon-home"> 无线PLC
-          
-
-          
-          </a>
-
-          
-            
-            
-          
-
-          
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
-</div>
-
-          
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/translations.js"></script>
+    <script defer src="_static/insipid.js"></script>
+    <script defer src="_static/insipid-sidebar.js"></script>
+    <link rel="index" title="索引" href="genindex.html" />
+    <link rel="search" title="搜索" href="search.html" />
+    <link rel="prev" title="产品概述" href="Product_Overview.html" />
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+  </head>
+  <body class="sidebar-visible">
+    <script type="text/javascript">
+        (function() {
+            var $body = $(document.body);
+            $body.addClass('js');
+            $body.addClass('sidebar-resizing');  // avoid transitions on load
+            $body.removeClass('sidebar-visible');
+            try {
+                var sidebar = localStorage.getItem('sphinx-sidebar');
+                if (sidebar === 'visible') {
+                    $body.addClass('sidebar-visible');
+                }
+                var sidebar_width = localStorage.getItem('sphinx-sidebar-width');
+                if (sidebar_width) {
+                    $(':root').css('--sidebar-width', sidebar_width);
+                }
+            } catch(e) {
+            }
+        })();
+    </script>
+    <header id="topbar-placeholder">
+      <div id="topbar">
+        <div id="titlebar">
+          <div class="buttons">
+            <button id="sidebar-button" type="button" aria-controls="sphinxsidebar" accesskey="M">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M16 132h416c8.837 0 16-7.163 16-16V76c0-8.837-7.163-16-16-16H16C7.163 60 0 67.163 0 76v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16z"/></svg>
+            </button>
+            <button id="search-button" type="button" title="搜索" aria-label="搜索" aria-expanded="false" aria-controls="search-form" accesskey="S">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M505 442.7L405.3 343c-4.5-4.5-10.6-7-17-7H372c27.6-35.3 44-79.7 44-128C416 93.1 322.9 0 208 0S0 93.1 0 208s93.1 208 208 208c48.3 0 92.7-16.4 128-44v16.3c0 6.4 2.5 12.5 7 17l99.7 99.7c9.4 9.4 24.6 9.4 33.9 0l28.3-28.3c9.4-9.4 9.4-24.6.1-34zM208 336c-70.7 0-128-57.2-128-128 0-70.7 57.2-128 128-128 70.7 0 128 57.2 128 128 0 70.7-57.2 128-128 128z"/></svg>
+            </button>
+          </div>
+          <div class="title">
+            <a class="parent" href="index.html" accesskey="U">无线PLC V1.0.2 文档</a>
+            <a class="top" href="#">操作指南</a>
+          </div>
+          <div class="buttons">
+            <button id="fullscreen-button" type="button" aria-hidden="true">
+              <span class="enable">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M212.686 315.314L120 408l32.922 31.029c15.12 15.12 4.412 40.971-16.97 40.971h-112C10.697 480 0 469.255 0 456V344c0-21.382 25.803-32.09 40.922-16.971L72 360l92.686-92.686c6.248-6.248 16.379-6.248 22.627 0l25.373 25.373c6.249 6.248 6.249 16.378 0 22.627zm22.628-118.628L328 104l-32.922-31.029C279.958 57.851 290.666 32 312.048 32h112C437.303 32 448 42.745 448 56v112c0 21.382-25.803 32.09-40.922 16.971L376 152l-92.686 92.686c-6.248 6.248-16.379 6.248-22.627 0l-25.373-25.373c-6.249-6.248-6.249-16.378 0-22.627z"/></svg>
+              </span>
+              <span class="disable">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M4.686 427.314L104 328l-32.922-31.029C55.958 281.851 66.666 256 88.048 256h112C213.303 256 224 266.745 224 280v112c0 21.382-25.803 32.09-40.922 16.971L152 376l-99.314 99.314c-6.248 6.248-16.379 6.248-22.627 0L4.686 449.941c-6.248-6.248-6.248-16.379 0-22.627zM443.314 84.686L344 184l32.922 31.029c15.12 15.12 4.412 40.971-16.97 40.971h-112C234.697 256 224 245.255 224 232V120c0-21.382 25.803-32.09 40.922-16.971L296 136l99.314-99.314c6.248-6.248 16.379-6.248 22.627 0l25.373 25.373c6.248 6.248 6.248 16.379 0 22.627z"/></svg>
+              </span>
+            </button>
+          </div>
         </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">操作指南</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#id2">上电开机</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#plc">PLC运行参数配置</a></li>
-</ul>
-</li>
-</ul>
-
-            
-          
+        <div id="searchbox" role="search">
+          <form id="search-form" class="search" style="display: none" action="search.html" method="get">
+            <input type="search" name="q" placeholder="搜索 ..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+            <button>转向</button>
+          </form>
         </div>
-        
       </div>
+    </header>
+    <nav>
+      <a href="Product_Overview.html" class="nav-icon previous" title="上一页:&#13;产品概述" aria-label="上一个主题" accesskey="P" tabindex="-1">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M31.7 239l136-136c9.4-9.4 24.6-9.4 33.9 0l22.6 22.6c9.4 9.4 9.4 24.6 0 33.9L127.9 256l96.4 96.4c9.4 9.4 9.4 24.6 0 33.9L201.7 409c-9.4 9.4-24.6 9.4-33.9 0l-136-136c-9.5-9.4-9.5-24.6-.1-34z"/></svg>
+      </a>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+    <nav class="relbar">
+      <a class="previous" href="Product_Overview.html" aria-label="上一个主题" >
+        <div class="icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M257.5 445.1l-22.2 22.2c-9.4 9.4-24.6 9.4-33.9 0L7 273c-9.4-9.4-9.4-24.6 0-33.9L201.4 44.7c9.4-9.4 24.6-9.4 33.9 0l22.2 22.2c9.5 9.5 9.3 25-.4 34.3L136.6 216H424c13.3 0 24 10.7 24 24v32c0 13.3-10.7 24-24 24H136.6l120.5 114.8c9.8 9.3 10 24.8.4 34.3z"/></svg>
+        </div>
+        <div class="title">
+          <span class="text">
+            <span class="direction">上一页</span>
+            产品概述
+          </span>
+        </div>
+      </a>
+    </nav>
 
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">无线PLC</a>
-        
-      </nav>
-
-
-      <div class="wy-nav-content">
-        
-        <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
-  <ul class="wy-breadcrumbs">
-    
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-        
-      <li>操作指南</li>
-    
-    
-      <li class="wy-breadcrumbs-aside">
-        
-          
-            <a href="_sources/operation_guide.rst.txt" rel="nofollow"> View page source</a>
-          
-        
-      </li>
-    
-  </ul>
-
-  
-  <hr/>
-</div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
             
-  <div class="section" id="id1">
-<h1>操作指南<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="id1">
+<h1>操作指南<a class="headerlink" href="#id1" title="永久链接至标题">¶</a></h1>
 <div class="section" id="id2">
-<h2>上电开机<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<h2>上电开机<a class="headerlink" href="#id2" title="永久链接至标题">¶</a></h2>
 <div class="figure align-center" id="id3">
 <a class="reference internal image-reference" href="_images/01_开机界面.jpg"><img alt="NULL" src="_images/01_开机界面.jpg" style="width: 479.5px; height: 333.0px;" /></a>
-<p class="caption"><span class="caption-text">图 1.1.1 开机界面</span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
+<p class="caption"><span class="caption-text">图 1.1.1 开机界面</span><a class="headerlink" href="#id3" title="永久链接至图片">¶</a></p>
 </div>
 <p>在右上角接入 <strong>24V</strong> 直流电源后，<code class="docutils literal notranslate"><span class="pre">POWER</span></code> 灯将会亮起，表示供电正常，您将会看到以上界面。</p>
 </div>
 <div class="section" id="plc">
-<h2>PLC运行参数配置<a class="headerlink" href="#plc" title="Permalink to this headline">¶</a></h2>
+<h2>PLC运行参数配置<a class="headerlink" href="#plc" title="永久链接至标题">¶</a></h2>
 <ul class="simple">
 <li><p>在对PLC进行编程之前，我们需要对PLC运行时一些必要的系统参数进行设置，设置步骤如下：</p></li>
 </ul>
@@ -184,23 +126,23 @@
 </ul>
 <div class="figure align-center" id="id4">
 <a class="reference internal image-reference" href="_images/13_密码输入界面.jpg"><img alt="NULL" src="_images/13_密码输入界面.jpg" style="width: 466.0px; height: 322.0px;" /></a>
-<p class="caption"><span class="caption-text">图 1.2.1 密码输入界面</span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
+<p class="caption"><span class="caption-text">图 1.2.1 密码输入界面</span><a class="headerlink" href="#id4" title="永久链接至图片">¶</a></p>
 </div>
 <div class="figure align-center" id="id5">
 <a class="reference internal image-reference" href="_images/02_主菜单1.jpg"><img alt="NULL" src="_images/02_主菜单1.jpg" style="width: 450.5px; height: 315.5px;" /></a>
-<p class="caption"><span class="caption-text">图 1.2.2 菜单界面1</span><a class="headerlink" href="#id5" title="Permalink to this image">¶</a></p>
+<p class="caption"><span class="caption-text">图 1.2.2 菜单界面1</span><a class="headerlink" href="#id5" title="永久链接至图片">¶</a></p>
 </div>
 <p><strong>2、设置PLC运行状态</strong></p>
 <div class="figure align-center" id="id6">
 <a class="reference internal image-reference" href="_images/06_PLC启动.jpg"><img alt="NULL" src="_images/06_PLC启动.jpg" style="width: 464.0px; height: 316.5px;" /></a>
-<p class="caption"><span class="caption-text">图 1.3.1 PLC启动</span><a class="headerlink" href="#id6" title="Permalink to this image">¶</a></p>
+<p class="caption"><span class="caption-text">图 1.3.1 PLC启动</span><a class="headerlink" href="#id6" title="永久链接至图片">¶</a></p>
 </div>
 <ul class="simple">
 <li><p>在 <strong>图 1.2.2 菜单界面1</strong> 中选中 <code class="docutils literal notranslate"><span class="pre">启停开关</span></code> 后连续按下 <strong>2</strong> 次 <code class="docutils literal notranslate"><span class="pre">ENTER</span></code> 就会看到 <strong>图 1.3.1 PLC启动</strong> 界面，
 此时如果 <code class="docutils literal notranslate"><span class="pre">RUN</span></code> 灯亮起，则说明PLC启动成功，否则PLC <code class="docutils literal notranslate"><span class="pre">故障</span></code>。</p></li>
 </ul>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
+<p class="admonition-title">注解</p>
 <ul class="simple">
 <li><p>PLC未能成功启动的原因可能如下：</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">RUN</span></code> 指示灯故障，导致启动成功，但是状态指示灯没有亮起。</p></li>
@@ -214,27 +156,27 @@
 </ul>
 <div class="figure align-center" id="id7">
 <a class="reference internal image-reference" href="_images/05_PLC停止.jpg"><img alt="NULL" src="_images/05_PLC停止.jpg" style="width: 455.5px; height: 321.5px;" /></a>
-<p class="caption"><span class="caption-text">图 1.3.2 PLC停止</span><a class="headerlink" href="#id7" title="Permalink to this image">¶</a></p>
+<p class="caption"><span class="caption-text">图 1.3.2 PLC停止</span><a class="headerlink" href="#id7" title="永久链接至图片">¶</a></p>
 </div>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
+<p class="admonition-title">注解</p>
 <ul class="simple">
 <li><p>PLC处于停止状态时，PLC的程序块可能不会正常工作！</p></li>
-<li><p>您在没有对PLC的 <code class="docutils literal notranslate"><span class="pre">Port0</span></code> 和 <code class="docutils literal notranslate"><span class="pre">Port1</span></code> 做其他通信初始化时，并且菜单项 <code class="docutils literal notranslate"><span class="pre">通信协议</span></code> 处于 <code class="docutils literal notranslate"><span class="pre">PPI_P``时</span>
-<span class="pre">默认的</span> <span class="pre">``PPI</span></code> 协议将不会收到影响，处于启用状态。</p></li>
+<li><p>您在没有对PLC的 <code class="docutils literal notranslate"><span class="pre">Port0</span></code> 和 <code class="docutils literal notranslate"><span class="pre">Port1</span></code> 做其他通信初始化时，并且菜单项 <code class="docutils literal notranslate"><span class="pre">通信协议</span></code> 处于 <code class="docutils literal notranslate"><span class="pre">PPI_P</span></code> 时
+默认的 <code class="docutils literal notranslate"><span class="pre">PPI</span></code> 协议将不会受到影响，处于启用状态。</p></li>
 </ul>
 </div>
 <p><strong>3、设置通信方式</strong></p>
 <p>在 <strong>图 1.2.2 菜单界面1</strong> 中选中 <code class="docutils literal notranslate"><span class="pre">通信方式</span></code> 后按下 <code class="docutils literal notranslate"><span class="pre">ENTER</span></code> 将会进入如下界面：</p>
 <div class="figure align-center" id="id8">
 <a class="reference internal image-reference" href="_images/07_通信方式_打开.jpg"><img alt="NULL" src="_images/07_通信方式_打开.jpg" style="width: 449.0px; height: 311.0px;" /></a>
-<p class="caption"><span class="caption-text">图 1.4.1 打开无线模块</span><a class="headerlink" href="#id8" title="Permalink to this image">¶</a></p>
+<p class="caption"><span class="caption-text">图 1.4.1 打开无线模块</span><a class="headerlink" href="#id8" title="永久链接至图片">¶</a></p>
 </div>
 <ul class="simple">
 <li><p><strong>无线模块</strong> 即我们内部的WIFI模块，默认该硬件模块处于启用状态。</p></li>
 </ul>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
+<p class="admonition-title">注解</p>
 <ul class="simple">
 <li><p>WIFI模块处于启用状态并且接入指定路由设备，连接至云端后，可以看到 <code class="docutils literal notranslate"><span class="pre">NET</span></code> 和 <code class="docutils literal notranslate"><span class="pre">WAN</span></code> 指示灯将会亮起。</p></li>
 </ul>
@@ -242,10 +184,10 @@
 <p>在 <strong>图 1.4.1 打开无线模块</strong> 选择 <code class="docutils literal notranslate"><span class="pre">关闭无线模块</span></code>， 则会得到如下界面：</p>
 <div class="figure align-center" id="id9">
 <a class="reference internal image-reference" href="_images/08_通信方式_关闭.jpg"><img alt="NULL" src="_images/08_通信方式_关闭.jpg" style="width: 401.5px; height: 279.0px;" /></a>
-<p class="caption"><span class="caption-text">图 1.4.2 关闭无线模块</span><a class="headerlink" href="#id9" title="Permalink to this image">¶</a></p>
+<p class="caption"><span class="caption-text">图 1.4.2 关闭无线模块</span><a class="headerlink" href="#id9" title="永久链接至图片">¶</a></p>
 </div>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
+<p class="admonition-title">注解</p>
 <ul class="simple">
 <li><p>关闭无线模块后，WIIF模块处于禁用状态，PLC的功耗将会降低，可以看到 <code class="docutils literal notranslate"><span class="pre">NET</span></code> 和 <code class="docutils literal notranslate"><span class="pre">WAN</span></code> 指示灯熄灭。</p></li>
 </ul>
@@ -253,7 +195,7 @@
 <p><strong>4、设置工作模式</strong></p>
 <p>工作模式主要针对的是在使用 <strong>外部扩展口</strong> 进行通讯时，实际的PLC硬件口 <strong>PORT0</strong> (内部网络)的工作模式。</p>
 <table class="colwidths-given docutils align-default" id="id10">
-<caption><span class="caption-text">表1.1.1 PLC作为SAVLE</span><a class="headerlink" href="#id10" title="Permalink to this table">¶</a></caption>
+<caption><span class="caption-text">表1.1.1 PLC作为SAVLE</span><a class="headerlink" href="#id10" title="永久链接至表格">¶</a></caption>
 <colgroup>
 <col style="width: 11%" />
 <col style="width: 22%" />
@@ -292,10 +234,10 @@
 </table>
 <div class="figure align-center" id="id11">
 <a class="reference internal image-reference" href="_images/09_工作模式_从机.jpg"><img alt="NULL" src="_images/09_工作模式_从机.jpg" style="width: 432.0px; height: 285.0px;" /></a>
-<p class="caption"><span class="caption-text">图 1.5.1 PLC作Savle</span><a class="headerlink" href="#id11" title="Permalink to this image">¶</a></p>
+<p class="caption"><span class="caption-text">图 1.5.1 PLC作Savle</span><a class="headerlink" href="#id11" title="永久链接至图片">¶</a></p>
 </div>
 <table class="colwidths-given docutils align-default" id="id12">
-<caption><span class="caption-text">表1.1.2 PLC作为MASTER</span><a class="headerlink" href="#id12" title="Permalink to this table">¶</a></caption>
+<caption><span class="caption-text">表1.1.2 PLC作为MASTER</span><a class="headerlink" href="#id12" title="永久链接至表格">¶</a></caption>
 <colgroup>
 <col style="width: 11%" />
 <col style="width: 22%" />
@@ -334,10 +276,10 @@
 </table>
 <div class="figure align-center" id="id13">
 <a class="reference internal image-reference" href="_images/10_工作模式_主机.jpg"><img alt="NULL" src="_images/10_工作模式_主机.jpg" style="width: 410.0px; height: 282.5px;" /></a>
-<p class="caption"><span class="caption-text">图 1.5.2 PLC作Mster</span><a class="headerlink" href="#id13" title="Permalink to this image">¶</a></p>
+<p class="caption"><span class="caption-text">图 1.5.2 PLC作Mster</span><a class="headerlink" href="#id13" title="永久链接至图片">¶</a></p>
 </div>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
+<p class="admonition-title">注解</p>
 <ul class="simple">
 <li><p>对于PLC作为 <strong>Master</strong> 时，目前对应关系仅开放了 <strong>表1.1.2</strong> 中第三钟模式。</p></li>
 </ul>
@@ -345,7 +287,7 @@
 <p><strong>5、设置通讯协议</strong></p>
 <p>通讯协议主要针对的是在使用 <strong>外部扩展口</strong> 进行通讯时，扩展口默认走的是PLC的 <strong>PPI协议</strong>。</p>
 <table class="colwidths-given docutils align-default" id="id14">
-<caption><span class="caption-text">表1.1.3 协议说明</span><a class="headerlink" href="#id14" title="Permalink to this table">¶</a></caption>
+<caption><span class="caption-text">表1.1.3 协议说明</span><a class="headerlink" href="#id14" title="永久链接至表格">¶</a></caption>
 <colgroup>
 <col style="width: 17%" />
 <col style="width: 50%" />
@@ -370,28 +312,28 @@
 </table>
 <div class="figure align-center" id="id15">
 <a class="reference internal image-reference" href="_images/11_扩展协议PPI.jpg"><img alt="NULL" src="_images/11_扩展协议PPI.jpg" style="width: 400.0px; height: 281.0px;" /></a>
-<p class="caption"><span class="caption-text">图 1.6.1 扩展协议PPI</span><a class="headerlink" href="#id15" title="Permalink to this image">¶</a></p>
+<p class="caption"><span class="caption-text">图 1.6.1 扩展协议PPI</span><a class="headerlink" href="#id15" title="永久链接至图片">¶</a></p>
 </div>
 <div class="figure align-center" id="id16">
 <a class="reference internal image-reference" href="_images/12_扩展协议other.jpg"><img alt="NULL" src="_images/12_扩展协议other.jpg" style="width: 383.5px; height: 264.5px;" /></a>
-<p class="caption"><span class="caption-text">图 1.6.2 扩展协议other</span><a class="headerlink" href="#id16" title="Permalink to this image">¶</a></p>
+<p class="caption"><span class="caption-text">图 1.6.2 扩展协议other</span><a class="headerlink" href="#id16" title="永久链接至图片">¶</a></p>
 </div>
 <p><strong>6、密码修改设置</strong></p>
 <p>密码修改界面，主要用于锁定参数设置菜单，在首次设置新密码或者二次修改密码时使用。</p>
 <div class="figure align-center" id="id17">
 <a class="reference internal image-reference" href="_images/14_密码修改界面1.jpg"><img alt="NULL" src="_images/14_密码修改界面1.jpg" style="width: 379.5px; height: 260.0px;" /></a>
-<p class="caption"><span class="caption-text">图 1.7.1 密码修改界面</span><a class="headerlink" href="#id17" title="Permalink to this image">¶</a></p>
+<p class="caption"><span class="caption-text">图 1.7.1 密码修改界面</span><a class="headerlink" href="#id17" title="永久链接至图片">¶</a></p>
 </div>
 <div class="figure align-center" id="id18">
 <a class="reference internal image-reference" href="_images/15_密码输入界面2.jpg"><img alt="NULL" src="_images/15_密码输入界面2.jpg" style="width: 424.5px; height: 299.0px;" /></a>
-<p class="caption"><span class="caption-text">图 1.7.2 新密码输入</span><a class="headerlink" href="#id18" title="Permalink to this image">¶</a></p>
+<p class="caption"><span class="caption-text">图 1.7.2 新密码输入</span><a class="headerlink" href="#id18" title="永久链接至图片">¶</a></p>
 </div>
 <div class="figure align-center" id="id19">
 <a class="reference internal image-reference" href="_images/16_密码输入界面3.jpg"><img alt="NULL" src="_images/16_密码输入界面3.jpg" style="width: 414.0px; height: 284.5px;" /></a>
-<p class="caption"><span class="caption-text">图 1.7.3 新密码确认</span><a class="headerlink" href="#id19" title="Permalink to this image">¶</a></p>
+<p class="caption"><span class="caption-text">图 1.7.3 新密码确认</span><a class="headerlink" href="#id19" title="永久链接至图片">¶</a></p>
 </div>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
+<p class="admonition-title">注解</p>
 <ul class="simple">
 <li><p>和输入密码界面操作一致，同样需要对输入的每位密码通过 <code class="docutils literal notranslate"><span class="pre">MENU</span></code> 进行确认，输入完毕后按下 <code class="docutils literal notranslate"><span class="pre">ENTER</span></code> 进行存储。</p></li>
 </ul>
@@ -400,27 +342,27 @@
 <p>配合 <strong>4、工作模式</strong> 来使用，详细配置请看以上章节4。</p>
 <div class="figure align-center" id="id20">
 <a class="reference internal image-reference" href="_images/17_波特率设置1.jpg"><img alt="NULL" src="_images/17_波特率设置1.jpg" style="width: 430.5px; height: 301.0px;" /></a>
-<p class="caption"><span class="caption-text">图 1.8.1 波特率设置1</span><a class="headerlink" href="#id20" title="Permalink to this image">¶</a></p>
+<p class="caption"><span class="caption-text">图 1.8.1 波特率设置1</span><a class="headerlink" href="#id20" title="永久链接至图片">¶</a></p>
 </div>
 <div class="figure align-center" id="id21">
 <a class="reference internal image-reference" href="_images/18_波特率设置2.jpg"><img alt="NULL" src="_images/18_波特率设置2.jpg" style="width: 422.5px; height: 292.5px;" /></a>
-<p class="caption"><span class="caption-text">图 1.8.2 波特率设置2</span><a class="headerlink" href="#id21" title="Permalink to this image">¶</a></p>
+<p class="caption"><span class="caption-text">图 1.8.2 波特率设置2</span><a class="headerlink" href="#id21" title="永久链接至图片">¶</a></p>
 </div>
 <div class="figure align-center" id="id22">
 <a class="reference internal image-reference" href="_images/19_波特率设置3.jpg"><img alt="NULL" src="_images/19_波特率设置3.jpg" style="width: 423.0px; height: 294.5px;" /></a>
-<p class="caption"><span class="caption-text">图 1.8.3 波特率设置1</span><a class="headerlink" href="#id22" title="Permalink to this image">¶</a></p>
+<p class="caption"><span class="caption-text">图 1.8.3 波特率设置3</span><a class="headerlink" href="#id22" title="永久链接至图片">¶</a></p>
 </div>
 <p><strong>8、本机热点设置</strong></p>
 <p>本机热点主要表现的是每台PLC的WIFI模块对外发射的 <strong>AP_ID</strong>, 为每台PLC的唯一设备序列号标识。
 通过Web端配网接口输入目标路由器账号和密码，就可以连接到云端与PLC进行数据交互。</p>
 <div class="figure align-center" id="id23">
 <a class="reference internal image-reference" href="_images/20_本机热点.jpg"><img alt="NULL" src="_images/20_本机热点.jpg" style="width: 490.5px; height: 343.0px;" /></a>
-<p class="caption"><span class="caption-text">图 1.9.1 新密码确认</span><a class="headerlink" href="#id23" title="Permalink to this image">¶</a></p>
+<p class="caption"><span class="caption-text">图 1.9.1 本机热点设置</span><a class="headerlink" href="#id23" title="永久链接至图片">¶</a></p>
 </div>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
+<p class="admonition-title">注解</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">热点</span></code> 的可以在配完网络后可以进行关闭，来降低设备功耗。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">热点</span></code> 可以在配完网络后可以进行关闭，来降低设备功耗。</p></li>
 </ul>
 </div>
 <p><strong>9、恢复出厂设置</strong></p>
@@ -428,10 +370,10 @@
 在当前界面连续2次按下 <code class="docutils literal notranslate"><span class="pre">ENTER</span></code> 后将会触发功能。</p>
 <div class="figure align-center" id="id24">
 <a class="reference internal image-reference" href="_images/21_恢复出厂设置.jpg"><img alt="NULL" src="_images/21_恢复出厂设置.jpg" style="width: 481.5px; height: 335.5px;" /></a>
-<p class="caption"><span class="caption-text">图 1.10.1 波特率设置1</span><a class="headerlink" href="#id24" title="Permalink to this image">¶</a></p>
+<p class="caption"><span class="caption-text">图 1.10.1 恢复出厂设置</span><a class="headerlink" href="#id24" title="永久链接至图片">¶</a></p>
 </div>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
+<p class="admonition-title">注解</p>
 <ul class="simple">
 <li><p>恢复出厂设置后，所有参数将会重置，包括但不限于：</p></li>
 <li><p>①PLC启停状态。</p></li>
@@ -442,54 +384,90 @@
 <li><p>⑥PLC热点名称及用户自定义路由账号、密码。（云端账号和连接不会丢失）</p></li>
 </ul>
 </div>
+<p><strong>10、无线网络配置步骤</strong></p>
+<ul class="simple">
+<li><p>首先打开需要连接无线网络的PLC，找到本机热点界面，查看本机的序列号标识。</p></li>
+</ul>
+<div class="figure align-center" id="id25">
+<a class="reference internal image-reference" href="_images/本机热点序列号识别.jpg"><img alt="NULL" src="_images/本机热点序列号识别.jpg" style="width: 511.79999999999995px; height: 383.7px;" /></a>
+<p class="caption"><span class="caption-text">图 1.11.1 本机热点序列号标识</span><a class="headerlink" href="#id25" title="永久链接至图片">¶</a></p>
+</div>
+<ul class="simple">
+<li><p>其次用手机或有连接无线网功能的电脑连接对应本机热点，如下图 <strong>PLC27_AP</strong>:</p></li>
+</ul>
+<div class="figure align-center" id="id26">
+<a class="reference internal image-reference" href="_images/连接WIFI.jpg"><img alt="NULL" src="_images/连接WIFI.jpg" style="width: 224.5px; height: 363.0px;" /></a>
+<p class="caption"><span class="caption-text">图 1.11.2 连接WIFI</span><a class="headerlink" href="#id26" title="永久链接至图片">¶</a></p>
+</div>
+<ul class="simple">
+<li><p>然后根据 <strong>配网地址10.10.100.254/index_cn.html</strong> ,使用电脑浏览器或手机浏览器访问此地址，默认登录密码如下图所示,用户名和密码皆为 <strong>admin</strong></p></li>
+</ul>
+<div class="figure align-center" id="id27">
+<a class="reference internal image-reference" href="_images/默认登录密码.jpg"><img alt="NULL" src="_images/默认登录密码.jpg" style="width: 255.0px; height: 172.5px;" /></a>
+<p class="caption"><span class="caption-text">图 1.11.3 默认登录密码</span><a class="headerlink" href="#id27" title="永久链接至图片">¶</a></p>
+</div>
+<ul class="simple">
+<li><p>最后进入配置界面后点击 <strong>WIFI参数</strong> (其它参数请勿修改，否则后果自负点击)，找到 <strong>STA</strong> 参数设置 ，点击 <strong>搜索</strong> 找到需要连接的网络名称，输入密码后点击保存，至此完成该台PLC网络配置。</p></li>
+</ul>
+<div class="figure align-center" id="id28">
+<a class="reference internal image-reference" href="_images/配置界面.jpg"><img alt="NULL" src="_images/配置界面.jpg" style="width: 523.0px; height: 440.0px;" /></a>
+<p class="caption"><span class="caption-text">图 1.11.4 配置界面</span><a class="headerlink" href="#id28" title="永久链接至图片">¶</a></p>
+</div>
 </div>
 </div>
 
-
-           </div>
-           
+            <div class="clearer"></div>
           </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="index.html" class="btn btn-neutral float-left" title="无线 PLC 使用说明书" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-    </div>
-
-  <hr/>
-
-  <div role="contentinfo">
-    <p>
-        &#169; Copyright 2022, LHC@云南兆富科技有限公司.
-
-    </p>
-  </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
-
-</footer>
         </div>
       </div>
+      <div class="clearer"></div>
+    </div>
 
-    </section>
+    <nav class="relbar">
+      <a class="previous" href="Product_Overview.html" aria-label="上一个主题" >
+        <div class="icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M257.5 445.1l-22.2 22.2c-9.4 9.4-24.6 9.4-33.9 0L7 273c-9.4-9.4-9.4-24.6 0-33.9L201.4 44.7c9.4-9.4 24.6-9.4 33.9 0l22.2 22.2c9.5 9.5 9.3 25-.4 34.3L136.6 216H424c13.3 0 24 10.7 24 24v32c0 13.3-10.7 24-24 24H136.6l120.5 114.8c9.8 9.3 10 24.8.4 34.3z"/></svg>
+        </div>
+        <div class="title">
+          <span class="text">
+            <span class="direction">上一页</span>
+            产品概述
+          </span>
+        </div>
+      </a>
+    </nav>
 
-  </div>
-  
 
-  <script type="text/javascript">
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
-      });
-  </script>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
 
-  
-  
-    
-   
+          <div class="sidebar-resize-handle"></div>
 
-</body>
+<h3><a href="index.html">目录</a></h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Product_Overview.html">产品概述</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">操作指南</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#id2">上电开机</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#plc">PLC运行参数配置</a></li>
+</ul>
+</li>
+</ul>
+
+<hr class="docutils" />
+<ul>
+  <li class="toctree-l1"><a class="reference internal" href="genindex.html" accesskey="I">总目录</a></li>
+</ul>
+<div id="ethical-ad-placement"></div>
+        </div>
+      </div>
+    <footer role="contentinfo">
+      &#169; 版权所有 2022, LHC@云南兆富科技有限公司.
+      Created using <a class="reference external" href="https://www.sphinx-doc.org/">Sphinx</a> 4.1.1.
+      <a class="reference external" href="https://insipid-sphinx-theme.readthedocs.io/">Insipid Theme</a>.
+<a class="reference internal" href="_sources/operation_guide.rst.txt" rel="nofollow">显示源代码</a>.
+    </footer>
+    <div class="sidebar-resize-handle"></div>
+    <div id="overlay"></div>
+  </body>
 </html>
