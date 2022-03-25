@@ -4,6 +4,6 @@
     "restructuredtext.updateDelay": 1000,
     "restructuredtext.sphinxBuildPath": "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Python\\Python37\\Scripts\\sphinx-build.exe",
     "restructuredtext.confPath": "${workspaceFolder}\\source",
-    "esbonio.sphinx.confDir": "${workspaceFolder}\\source",
+    "esbonio.sphinx.confDir": "g:\\STC_Workers\\PLC\\Wireless_Plc\\Document\\source",
     "esbonio.sphinx.buildDir": "${workspaceRoot}/build"
 }
