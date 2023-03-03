@@ -21,8 +21,13 @@
 	} while (0);
 
 /*置位目标串口接收帧标志*/
-// //#define SET_FRAME(COM_UARTx) (COM_UARTx.OverTime ? (COM_UARTx.OverTime--):(COM_UARTx.Frame_Flag = true))
-#define SET_FRAME(_COM_UARTx) (_COM_UARTx.LNode[_COM_UARTx.Wptr].OverTime ? (_COM_UARTx.LNode[_COM_UARTx.Wptr].OverTime--) : ((_COM_UARTx.LNode[_COM_UARTx.Wptr].Frame_Flag = true), (_COM_UARTx.Wptr = ((_COM_UARTx.Wptr + 1U) % MAX_NODE)), (_COM_UARTx.LNode[_COM_UARTx.Wptr].Timer_Flag = false)))
+
+#define SET_FRAME(_COM_UARTx) \
+	(_COM_UARTx.LNode[_COM_UARTx.Wptr].OverTime ? \
+	(_COM_UARTx.LNode[_COM_UARTx.Wptr].OverTime--) : \
+	((_COM_UARTx.LNode[_COM_UARTx.Wptr].Frame_Flag = true), \
+ 	(_COM_UARTx.Wptr = ((++_COM_UARTx.Wptr) & (MAX_NODE - 1))), \
+ 	(_COM_UARTx.LNode[_COM_UARTx.Wptr].Timer_Flag = false)))
 
 typedef enum
 {

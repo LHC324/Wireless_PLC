@@ -16,13 +16,19 @@
 #define false 0
 /**********************布尔变量定义**********************/
 #define EXTERNAL_CRYSTAL 0 //使用外部晶振
+/*软件看门狗*/
+#define USING_WDT 1 
+/*使用仿真模式*/
+#define USING_SIMULATE 0
 #define USE_PRINTF_DEBUG 0 //调试是否启用串口
 
+/*port0使用你单缓冲区*/
+#define USING_PORT0_SINGLE 1
 #define COUNTMAX 65536U
 /*(1/FOSC)*count =times(us)->count = time*FOSC/1000(ms)*/
 #define FOSC  27000000UL// 11059200UL
 /*1ms(时钟频率越高，所能产生的时间越小)*/
-#define TIMES 10U
+#define TIMES 5U //(最慢超时帧2400：4.14ms/byte)
 /*定时器模式选择*/
 #define TIMER_MODE 12U
 /*定时器分频系数，默认为一分频*/
@@ -110,9 +116,18 @@ extern SYSTEM_PARAMETER System_Parameter;
 #define RS485_ID 0x02
 
 // 通信结构体用常量
-#define MAX_SIZE 64    // 缓冲区长度
-#define MAX_SILENCE 1   // 两个字符最大间隔时间，MAX_SILENCE * 定时器周期，若定时器10ms，则静默时间为：10 * 10 = 100ms  #define	MAX_SILENCE
-#define T_PLC_ANSWER 20 // PLC应答超时定时器，要求PLC在200ms内应答  #define	T_PLC_ANSWER	20
+#if USING_PORT0_SINGLE
+/*缓冲区长度*/ 
+#define MAX_SIZE 128
+#define PORT0_MAX_SIZE 256
+#else
+/*缓冲区长度*/ 
+#define MAX_SIZE 64  
+#endif
+/* 两个字符最大间隔时间，MAX_SILENCE * 定时器周期，若定时器10ms，则静默时间为：10 * 10 = 100ms*/  
+#define MAX_SILENCE 1  
+/*PLC应答超时定时器，要求PLC在200ms内应答*/
+#define T_PLC_ANSWER 20 
 
 typedef enum
 {
@@ -128,12 +143,20 @@ typedef enum
 #define COM_UART1 Uart_LinkList[0]
 #define COM_UART2 Uart_LinkList[1]
 #define COM_UART3 Uart_LinkList[2]
+#if !USING_PORT0_SINGLE
 #define COM_UART4 Uart_LinkList[3]
+#else
+#define COM_UART4 Uart_Port0
+#endif
 
 /*定义当前链队条数*/
+#if !USING_PORT0_SINGLE
 #define MAX_LQUEUE 4U
-/*定义每条链表最大节点数*/
-#define MAX_NODE 24U // 20
+#else
+#define MAX_LQUEUE 3U
+#endif
+/*定义每条链表最大节点数:必须是2的幂次方*/
+#define MAX_NODE 16U // 20
 /*定义循环值*/
 //#define LOOP(x) (COM_UART##x.Wptr + 1U) % MAX_NODE)
 /*判断环形队列为空处理方式1*/
@@ -150,14 +173,14 @@ typedef enum
 /*链队数据结构*/
 typedef struct
 {
-    volatile SEL_CHANNEL Source_Channel;     /*数据起源通道*/
-    volatile SEL_CHANNEL Target_Channel;     /*数据交付通道*/
-    volatile uint8_t Frame_Flag;          /*帧标志*/
-    volatile uint8_t Timer_Flag;          /*打开定时器标志*/
+    volatile SEL_CHANNEL Source_Channel;   /*数据起源通道*/
+    volatile SEL_CHANNEL Target_Channel;  /*数据交付通道*/
+    volatile uint8_t Frame_Flag : 1;      /*帧标志*/
+    volatile uint8_t Timer_Flag : 1;      /*打开定时器标志*/
     volatile uint8_t Rx_Buffer[MAX_SIZE]; /*数据接收缓冲区*/
-    volatile uint16_t Rx_Length;          /*数据接收长度*/
-    volatile uint16_t OverTime;           /*目标设备响应超时时间*/
-    // uint8_t Next;                   /*指向下一个节点*/
+    volatile uint16_t Rx_Length : 9;      /*数据接收长度*/
+    volatile uint16_t OverTime : 6;       /*目标设备响应超时时间*/
+    // uint8_t Next;                      /*指向下一个节点*/
 } Uart_Queu;
 
 typedef struct
@@ -169,8 +192,25 @@ typedef struct
     // uint8_t Buffer_Size;
 } Uart_List;
 
+#if USING_PORT0_SINGLE
+/*port0端口数据单独处理*/
+typedef struct
+{
+    volatile SEL_CHANNEL Source_Channel;     /*数据起源通道*/
+    volatile SEL_CHANNEL Target_Channel;     /*数据交付通道*/
+    volatile uint8_t Frame_Flag;             /*帧标志*/
+    // volatile uint8_t Timer_Flag;             /*打开定时器标志*/
+    uint8_t Rx_Buffer[256];                  /*数据接收缓冲区*/
+    volatile uint16_t Rx_Length;             /*数据接收长度*/
+    volatile uint16_t OverTime;              /*目标设备响应超时时间*/
+} Uart_List_X;
+#endif
+
 /*声明链队*/
 extern Uart_List xdata Uart_LinkList[MAX_LQUEUE];
+#if USING_PORT0_SINGLE
+extern Uart_List_X Uart_Port0;
+#endif
 
 typedef struct
 {
@@ -181,7 +221,7 @@ typedef struct
 } ComData_Handle;
 
 /***********************************多串口通讯***********************************/
-extern uint8_t xdata mempool[5U * 1024];
+// extern uint8_t xdata mempool[5U * 1024];
 /***********************************函数声明***********************************/
 void Init_All(void);
 bit CheckIap_Flash(void);

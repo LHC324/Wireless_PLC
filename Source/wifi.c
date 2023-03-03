@@ -34,7 +34,7 @@ const AT_Command code Wifi_Cmd[] =
 	{"AT+HEARTDT=7777772E796E7061782E636F6D\r\n", "+OK", 200U, NULL},   
 	/*SSID和密码不能程序输入，需要在现场根据用户方的WIFI设置通过WEB方式修改*/
 	/*设置WIFI登录SSID，密码*/ 
-	{"AT+WSTA=union,*!ynzfkj20091215!*\r\n", "+OK", 200U, NULL}, 
+	{"AT+WSTA=LHC,66666666\r\n", "+OK", 200U, NULL}, 
 	/*透传云设置*/       
 	{"AT+REGENA=CLOUD,FIRST\r\n", "+OK", 200U, NULL},
 	/*设置STOCKA参数*/

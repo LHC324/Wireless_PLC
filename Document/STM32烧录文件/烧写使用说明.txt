@@ -1,0 +1,11 @@
+M95512R烧录在存储器M95512内，  ——  EZP_XPro 编程器
+https://item.taobao.com/item.htm?spm=a1z09.2.0.0.lS9qM6&id=39239453212&_u=f1p5uee87d5f
+
+STM32文件烧录在主芯片内。      —— SWD下载
+https://item.taobao.com/item.htm?spm=a1z09.2.0.0.lS9qM6&id=22102735443&_u=f1p5uee8b8f1
+
+
+25AA512和M95512R芯片程序通用
+
+:020000040000FA
+:020000040800F2

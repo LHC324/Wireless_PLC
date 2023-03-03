@@ -1,0 +1,14 @@
+将CPU RS 485 接口由自由口模式切换到PPI模式:
+https://www.ad.siemens.com.cn/productportal/prods/s7-200-smart-portal/200smarttop/Microwin/Getting_started/485_mode_swithch/RS485_mode_switch.html
+
+PPI协议：
+https://blog.csdn.net/qq_26093511/article/details/53886046
+
+与RS485接口的西门子触摸屏的通信：
+https://www.ad.siemens.com.cn/productportal/Prods/s7-200-smart-portal/200SmartTop/HMI/hmi_485.html
+
+S7-200 SMART 通信端口以及连接方式：
+https://www.ad.siemens.com.cn/productportal/prods/s7-200-smart-portal/200smarttop/communication/Port/Connect.htm
+
+西门子官网PPI相关问题：
+https://www.ad.siemens.com.cn/productportal/prods/s7-200-portal/micropower2013/smart%20sms/017.html

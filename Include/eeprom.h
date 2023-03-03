@@ -14,7 +14,7 @@
 #define WT_1M           0x87
 
 /**
- * @brief	ÅäÖÃSTC8µ¥Æ¬»úEEPROMµÄµÈ´ıÊ±¼ä
+ * @brief	é…ç½®STC8å•ç‰‡æœºEEPROMçš„ç­‰å¾…æ—¶é—´
  * @details	
  * @param	None
  * @retval	None
@@ -22,7 +22,7 @@
 static void IapConfigWaitTime();
 
 /**
- * @brief	¹Ø±Õiap¹¦ÄÜ
+ * @brief	å…³é—­iapåŠŸèƒ½
  * @details	
  * @param	None
  * @retval	None
@@ -30,41 +30,41 @@ static void IapConfigWaitTime();
 extern void IapIdle();
 
 /**
- * @brief	´ÓiapµÄe2promÖĞ¶Á³öÒ»¸ö×Ö½ÚÊı¾İ
+ * @brief	ä»iapçš„e2promä¸­è¯»å‡ºä¸€ä¸ªå­—èŠ‚æ•°æ®
  * @details	
- * @param	addr: Ö¸¶¨µØÖ·
+ * @param	addr: æŒ‡å®šåœ°å€
  * @retval	None
  */
-extern char IapRead(char addr);
+extern char IapRead(short addr);
 
 /**
- * @brief	ÔÚiapµÄe2promµÄÖ¸¶¨µØÖ·Ğ´ÈëÒ»¸ö×Ö½ÚÊı¾İ
+ * @brief	åœ¨iapçš„e2promçš„æŒ‡å®šåœ°å€å†™å…¥ä¸€ä¸ªå­—èŠ‚æ•°æ®
  * @details	
- * @param	addr: Ö¸¶¨µØÖ·, dat: Êı¾İ
+ * @param	addr: æŒ‡å®šåœ°å€, dat: æ•°æ®
  * @retval	None
  */
 extern void IapProgram(unsigned short addr, unsigned char dat);
 
 /**
- * @brief	²Á³ıÖ¸¶¨µØÖ·µÄÄÚÈİ
- * @details	²Á³ıÃ¿´Î°´ÕÕ512B½øĞĞ£¬½öÌá¹©Ê×µØÖ·¼´¿É
- * @param	addr:ÆğÊ¼µØÖ·
+ * @brief	æ“¦é™¤æŒ‡å®šåœ°å€çš„å†…å®¹
+ * @details	æ“¦é™¤æ¯æ¬¡æŒ‰ç…§512Bè¿›è¡Œï¼Œä»…æä¾›é¦–åœ°å€å³å¯
+ * @param	addr:èµ·å§‹åœ°å€
  * @retval	None
  */
 extern void IapErase(unsigned short addr);
 
 /**
- * @brief	ÔÚÖ¸¶¨µØÖ·Ğ´Èë¶à¸ö×Ö½ÚÊı¾İ
- * @details	Ğ´Êı¾İÒ»°ãÇë°´ÕÕÒ»¸öÉÈÇøÒ»¸öÉÈÇøµÄÀ´Ğ´£¬²»È»ÔÚ²Á³ıÊı¾İµÄÊ±ºò»áÔì³ÉÊı¾İ¶ªÊ§£»Ò»¸öÉÈÇøµÄ´óĞ¡ÊÇ 512×Ö½Ú
- * @param	addr:¿ªÊ¼µØÖ·, *Str: Ö¸Ïò×Ö½ÚÊı¾İÖ¸Õë, Len:³¤¶È
+ * @brief	åœ¨æŒ‡å®šåœ°å€å†™å…¥å¤šä¸ªå­—èŠ‚æ•°æ®
+ * @details	å†™æ•°æ®ä¸€èˆ¬è¯·æŒ‰ç…§ä¸€ä¸ªæ‰‡åŒºä¸€ä¸ªæ‰‡åŒºçš„æ¥å†™ï¼Œä¸ç„¶åœ¨æ“¦é™¤æ•°æ®çš„æ—¶å€™ä¼šé€ æˆæ•°æ®ä¸¢å¤±ï¼›ä¸€ä¸ªæ‰‡åŒºçš„å¤§å°æ˜¯ 512å­—èŠ‚
+ * @param	addr:å¼€å§‹åœ°å€, *Str: æŒ‡å‘å­—èŠ‚æ•°æ®æŒ‡é’ˆ, Len:é•¿åº¦
  * @retval	None
  */
 extern void IapWrite_Buff(uint16_t Addr,const uint8_t *Str,uint8_t Len);
 
 /**
- * @brief	´ÓÖ¸¶¨µØÖ·¶ÁÈ¡¶à¸ö×Ö½ÚÊı¾İ
+ * @brief	ä»æŒ‡å®šåœ°å€è¯»å–å¤šä¸ªå­—èŠ‚æ•°æ®
  * @details	
- * @param	addr:¿ªÊ¼µØÖ·, *Str: Ö¸ÏòÄ¿±ê»º³åÇøÖ¸Õë, Len:³¤¶È
+ * @param	addr:å¼€å§‹åœ°å€, *Str: æŒ‡å‘ç›®æ ‡ç¼“å†²åŒºæŒ‡é’ˆ, Len:é•¿åº¦
  * @retval	None
  */
 extern void IapRead_Buff(uint16_t Addr,uint8_t *Str,uint8_t Len);

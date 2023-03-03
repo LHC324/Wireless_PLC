@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.0.0   MAIN                                                              01/15/2022 12:19:57 PAGE 1   
+C51 COMPILER V9.60.0.0   MAIN                                                              03/03/2023 11:28:22 PAGE 1   
 
 
 C51 COMPILER V9.60.0.0, COMPILATION OF MODULE MAIN
@@ -39,96 +39,103 @@ line level    source
   28   1              /*注意传递的是数组名地址*/
   29   1          // init_mempool (mempool, sizeof(mempool)); 
   30   1          systemInit(); //系统初始化
-  31   1      
-  32   1          while(1)
-  33   1          {   /*按键*/
-  34   2                      KeyEvent(); 
-  35   2                      /*多串口数据处理*/
-  36   2                      Uart_Handle();
-  37   2                      /*ModBus接收数据处理*/
-  38   2      //        mdRTU_Handler();
-  39   2          }
-  40   1      }
-  41          
-  42          void systemInit(void)
-  43          {
-  44   1          Init_All(); //初始化外设
-  45   1              /*AUXR初始值为0x01，存在bug导致串口1和串口2共用同一个波特率发生器*/
-  46   1              AUXR = 0x00;
-  47   1              /***********************************************************************/
-  48   1          //以太网串口结构体初始化
-  49   1          Init_ListQueue(&COM_UART1);
-  50   1              memset(&COM_UART1,  0, sizeof(COM_UART1));
-  51   1              
-  52   1              // 4G串口结构体初始化
-  53   1          Init_ListQueue(&COM_UART2);
-C51 COMPILER V9.60.0.0   MAIN                                                              01/15/2022 12:19:57 PAGE 2   
+  31   1      #if USING_WDT
+  32   1          WDT_CONTR = 0x27; //使能看门狗，复位时间约为4s
+  33   1      #endif
+  34   1          while(1)
+  35   1          {   /*按键*/
+  36   2                      KeyEvent(); 
+  37   2                      /*多串口数据处理*/
+  38   2                      Uart_Handle();
+  39   2                      /*ModBus接收数据处理*/
+  40   2      //        mdRTU_Handler();
+  41   2      #if USING_WDT
+  42   2              WDT_CONTR |= 0x10; //喂狗
+  43   2      #endif
+  44   2          }
+  45   1      }
+  46          
+  47          void systemInit(void)
+  48          {
+  49   1          Init_All(); //初始化外设
+  50   1              /*AUXR初始值为0x01，存在bug导致串口1和串口2共用同一个波特率发生器*/
+  51   1              AUXR = 0x00;
+  52   1              /***********************************************************************/
+  53   1          //以太网串口结构体初始化
+C51 COMPILER V9.60.0.0   MAIN                                                              03/03/2023 11:28:22 PAGE 2   
 
-  54   1              memset(&COM_UART2, 0, sizeof(COM_UART2));
-  55   1              
-  56   1              // RS485串口结构体初始化
-  57   1          Init_ListQueue(&COM_UART3);
-  58   1              memset(&COM_UART3, 0, sizeof(COM_UART3));
-  59   1              
-  60   1              // PLC串口结构体初始化
-  61   1          Init_ListQueue(&COM_UART4);
-  62   1              memset(&COM_UART4, 0, sizeof(COM_UART4));
-  63   1      
-  64   1              /***********************************************************************/
-  65   1              /*液晶屏初始化*/
-  66   1          initial_lcd();  
-  67   1          /*系统参数存储区初始化*/
-  68   1          Iap_Flash_Iinit();
-  69   1          /*以下为系统滴答定时器的初始化（10ms （不建议更改））*/      
-  70   1          Timer0_Init();
-  71   1          PublicTimer16.MenuDly16.Timer16Flag = false;
-  72   1          // /*控件变量初始化,放在串口3初始化之前*/
-  73   1          // ControlInit();   
-  74   1          /*STC程序下载/printf/以太网*/
-  75   1          Uart1_Init(); 
-  76   1          /*4G模块*/
-  77   1          Uart2_Init(); 
-  78   1          /*RS485*/
-  79   1          Uart3_Init(); 
-  80   1          /*PLC*/
-  81   1          Uart4_Init(); 
-  82   1          /*串口3的485使能引脚，初始化为接收状态*/
-  83   1          USART3_EN = 0; 
-  84   1          /*控件变量初始化,放在串口3初始化之前*/
-  85   1          ControlInit();
-  86   1          /*打开全局中断*/
-  87   1          OPEN_GLOBAL_OUTAGE(); 
-  88   1              /*初始化Modbus协议栈*/
-  89   1      //      ModbusInit();
-  90   1          /*显示界面初始化*/ 
-  91   1          LcdShowInit();
-  92   1          if(System_Parameter.WifiInitFlag == false)
-  93   1          {
-  94   2              /*初始化WIIF模块*/
-  95   2              Wifi_Init(); 
-  96   2              System_Parameter.WifiInitFlag = true; 
-  97   2              /*存储到IAPFLASH*/
-  98   2              ControlSave();
-  99   2          }
- 100   1          else
- 101   1          {/*解决WIfi模块平凡掉电后启动不上线*/
- 102   2             Wifi_Enable(false);
- 103   2             Delay_ms(1000);
- 104   2             Wifi_Enable(true);
- 105   2          }
- 106   1          /*看门狗初始化 */ 
- 107   1      //      WDT_init();
- 108   1      }
- 109          
- 110          /************************************外设初始化************************************/
- 111          void  Init_All(void)
- 112          {
- 113   1          GPIO_InitTypeDef GPIO_InitStruct;
- 114   1      
- 115   1      //    #ifdef EXTERNAL_CRYSTAL //只要有宏名，就成立
-C51 COMPILER V9.60.0.0   MAIN                                                              01/15/2022 12:19:57 PAGE 3   
+  54   1          // Init_ListQueue(&COM_UART1);
+  55   1              memset(&COM_UART1,  0, sizeof(COM_UART1));
+  56   1              
+  57   1              // 4G串口结构体初始化
+  58   1          // Init_ListQueue(&COM_UART2);
+  59   1              memset(&COM_UART2, 0, sizeof(COM_UART2));
+  60   1              
+  61   1              // RS485串口结构体初始化
+  62   1          // Init_ListQueue(&COM_UART3);
+  63   1              memset(&COM_UART3, 0, sizeof(COM_UART3));
+  64   1              
+  65   1              // PLC串口结构体初始化
+  66   1          // Init_ListQueue(&COM_UART4);
+  67   1              memset(&COM_UART4, 0, sizeof(COM_UART4));
+  68   1      
+  69   1              /***********************************************************************/
+  70   1              /*液晶屏初始化*/
+  71   1          initial_lcd();  
+  72   1          /*系统参数存储区初始化*/
+  73   1          Iap_Flash_Iinit();
+  74   1          /*以下为系统滴答定时器的初始化（10ms （不建议更改））*/      
+  75   1          Timer0_Init();
+  76   1          PublicTimer16.MenuDly16.Timer16Flag = false;
+  77   1          // /*控件变量初始化,放在串口3初始化之前*/
+  78   1          // ControlInit();   
+  79   1      #if !USING_SIMULATE
+  80   1          /*STC程序下载/printf/以太网*/
+  81   1          Uart1_Init(); 
+  82   1      #endif
+  83   1          /*4G模块*/
+  84   1          Uart2_Init(); 
+  85   1          /*RS485*/
+  86   1          Uart3_Init(); 
+  87   1          /*PLC*/
+  88   1          Uart4_Init(); 
+  89   1          /*串口3的485使能引脚，初始化为接收状态*/
+  90   1          USART3_EN = 0; 
+  91   1          /*控件变量初始化,放在串口3初始化之前*/
+  92   1          ControlInit();
+  93   1          /*打开全局中断*/
+  94   1          OPEN_GLOBAL_OUTAGE(); 
+  95   1              /*初始化Modbus协议栈*/
+  96   1      //      ModbusInit();
+  97   1          /*显示界面初始化*/ 
+  98   1          LcdShowInit();
+  99   1          if(System_Parameter.WifiInitFlag == false)
+ 100   1          {
+ 101   2              /*初始化WIIF模块*/
+ 102   2              Wifi_Init(); 
+ 103   2              System_Parameter.WifiInitFlag = true; 
+ 104   2              /*存储到IAPFLASH*/
+ 105   2              ControlSave();
+ 106   2          }
+ 107   1          else
+ 108   1          {/*解决WIfi模块平凡掉电后启动不上线*/
+ 109   2             Wifi_Enable(false);
+ 110   2             Delay_ms(1000);
+ 111   2             Wifi_Enable(true);
+ 112   2          }
+ 113   1          /*看门狗初始化 */ 
+ 114   1      //      WDT_init();
+ 115   1      }
+C51 COMPILER V9.60.0.0   MAIN                                                              03/03/2023 11:28:22 PAGE 3   
 
- 116   1              #if EXTERNAL_CRYSTAL
+ 116          
+ 117          /************************************外设初始化************************************/
+ 118          void  Init_All(void)
+ 119          {
+ 120   1          GPIO_InitTypeDef GPIO_InitStruct;
+ 121   1      
+ 122   1      //    #ifdef EXTERNAL_CRYSTAL //只要有宏名，就成立
+ 123   1              #if EXTERNAL_CRYSTAL
                   P_SW2 = 0x80;
                   XOSCCR = 0xC0;
                   /*启动外部晶振20MHz*/
@@ -139,106 +146,106 @@ line level    source
                   CKSEL = 0x01;                    
                   P_SW2 = 0x00;
                   #endif
- 127   1      //  P_SW1 = 0xC0; //串口1切换到P4.3、4.4(P0.2、0.3)
- 128   1      //      P_SW2 |= 0x01; //串口2切换到P4.0、4.2(P1.0、1.1)（新板子引脚问题）
- 129   1      
- 130   1          //手册提示，串口1、2、3、4的发送引脚必须设置为强挽输出
- 131   1              /*P0.x引脚输出方式*/
- 132   1          /*设置P0.0、P0.2为准双向口*/
- 133   1              GPIO_InitStruct.Mode = GPIO_PullUp;
- 134   1          GPIO_InitStruct.Pin  = GPIO_Pin_0 | GPIO_Pin_2;
- 135   1          GPIO_Inilize(GPIO_P0, &GPIO_InitStruct);
- 136   1          /*设置P0.1为强挽输出 、设置P0.3为强挽输出*/
- 137   1              GPIO_InitStruct.Mode = GPIO_OUT_PP;
- 138   1          GPIO_InitStruct.Pin  = GPIO_Pin_1 | GPIO_Pin_3;
- 139   1          GPIO_Inilize(GPIO_P0, &GPIO_InitStruct);
- 140   1      
- 141   1              /*P1.x引脚输出方式*/
- 142   1          /*设置P1.0为准双向口*/
- 143   1              GPIO_InitStruct.Mode = GPIO_PullUp;
- 144   1          GPIO_InitStruct.Pin  = GPIO_Pin_0;
- 145   1          GPIO_Inilize(GPIO_P1, &GPIO_InitStruct);
- 146   1          /*设置P1.1、P1.4、 P1.5为强挽输出*/
- 147   1              GPIO_InitStruct.Mode = GPIO_OUT_PP;
- 148   1          GPIO_InitStruct.Pin  = GPIO_Pin_1 | GPIO_Pin_4 | GPIO_Pin_5;
- 149   1          GPIO_Inilize(GPIO_P1, &GPIO_InitStruct);
- 150   1      
- 151   1          /*P2.x引脚输出方式*/
- 152   1          /*按键相关P2.2、P2.3、P2.4、P2.5、P2.6为高阻态*/
- 153   1          GPIO_InitStruct.Mode = GPIO_HighZ;
- 154   1          GPIO_InitStruct.Pin  = GPIO_Pin_2 | GPIO_Pin_3 | GPIO_Pin_4 | GPIO_Pin_5 | GPIO_Pin_6;
- 155   1          GPIO_Inilize(GPIO_P2, &GPIO_InitStruct);
- 156   1      
- 157   1              /*P3.x引脚输出方式*/
- 158   1          /*设置P3.0为准双向口*/
- 159   1              GPIO_InitStruct.Mode = GPIO_PullUp;
- 160   1          GPIO_InitStruct.Pin  = GPIO_Pin_0;
- 161   1          GPIO_Inilize(GPIO_P3, &GPIO_InitStruct);
- 162   1      
- 163   1          /*设置P3.1为强挽输出*/
- 164   1              GPIO_InitStruct.Mode = GPIO_OUT_PP;
- 165   1          GPIO_InitStruct.Pin  = GPIO_Pin_1;
- 166   1          GPIO_Inilize(GPIO_P3, &GPIO_InitStruct);
- 167   1          
- 168   1      }
- 169          /************************************外设初始化************************************/
- 170          
- 171          
- 172          /************************************检查IAP区FLASH内容************************************/
- 173          bit CheckIap_Flash(void)
- 174          {
- 175   1          uint16_t CRC = 0;
- 176   1      
- 177   1              /*读取存储区数据*/
-C51 COMPILER V9.60.0.0   MAIN                                                              01/15/2022 12:19:57 PAGE 4   
+ 134   1      //  P_SW1 = 0xC0; //串口1切换到P4.3、4.4(P0.2、0.3)
+ 135   1      //      P_SW2 |= 0x01; //串口2切换到P4.0、4.2(P1.0、1.1)（新板子引脚问题）
+ 136   1      
+ 137   1          //手册提示，串口1、2、3、4的发送引脚必须设置为强挽输出
+ 138   1              /*P0.x引脚输出方式*/
+ 139   1          /*设置P0.0、P0.2为准双向口*/
+ 140   1              GPIO_InitStruct.Mode = GPIO_PullUp;
+ 141   1          GPIO_InitStruct.Pin  = GPIO_Pin_0 | GPIO_Pin_2;
+ 142   1          GPIO_Inilize(GPIO_P0, &GPIO_InitStruct);
+ 143   1          /*设置P0.1为强挽输出 、设置P0.3为强挽输出*/
+ 144   1              GPIO_InitStruct.Mode = GPIO_OUT_PP;
+ 145   1          GPIO_InitStruct.Pin  = GPIO_Pin_1 | GPIO_Pin_3;
+ 146   1          GPIO_Inilize(GPIO_P0, &GPIO_InitStruct);
+ 147   1      
+ 148   1              /*P1.x引脚输出方式*/
+ 149   1          /*设置P1.0为准双向口*/
+ 150   1              GPIO_InitStruct.Mode = GPIO_PullUp;
+ 151   1          GPIO_InitStruct.Pin  = GPIO_Pin_0;
+ 152   1          GPIO_Inilize(GPIO_P1, &GPIO_InitStruct);
+ 153   1          /*设置P1.1、P1.4、 P1.5为强挽输出*/
+ 154   1              GPIO_InitStruct.Mode = GPIO_OUT_PP;
+ 155   1          GPIO_InitStruct.Pin  = GPIO_Pin_1 | GPIO_Pin_4 | GPIO_Pin_5;
+ 156   1          GPIO_Inilize(GPIO_P1, &GPIO_InitStruct);
+ 157   1      
+ 158   1          /*P2.x引脚输出方式*/
+ 159   1          /*按键相关P2.2、P2.3、P2.4、P2.5、P2.6为高阻态*/
+ 160   1          GPIO_InitStruct.Mode = GPIO_HighZ;
+ 161   1          GPIO_InitStruct.Pin  = GPIO_Pin_2 | GPIO_Pin_3 | GPIO_Pin_4 | GPIO_Pin_5 | GPIO_Pin_6;
+ 162   1          GPIO_Inilize(GPIO_P2, &GPIO_InitStruct);
+ 163   1      
+ 164   1              /*P3.x引脚输出方式*/
+ 165   1          /*设置P3.0为准双向口*/
+ 166   1              GPIO_InitStruct.Mode = GPIO_PullUp;
+ 167   1          GPIO_InitStruct.Pin  = GPIO_Pin_0;
+ 168   1          GPIO_Inilize(GPIO_P3, &GPIO_InitStruct);
+ 169   1      
+ 170   1          /*设置P3.1为强挽输出*/
+ 171   1              GPIO_InitStruct.Mode = GPIO_OUT_PP;
+ 172   1          GPIO_InitStruct.Pin  = GPIO_Pin_1;
+ 173   1          GPIO_Inilize(GPIO_P3, &GPIO_InitStruct);
+ 174   1          
+ 175   1      }
+ 176          /************************************外设初始化************************************/
+ 177          
+C51 COMPILER V9.60.0.0   MAIN                                                              03/03/2023 11:28:22 PAGE 4   
 
- 178   1              IapRead_Buff(START_SAVEADDRESS, &System_Parameter.PSWNext.PassWordbuff[0], (sizeof(System_Parameter) - (s
+ 178          
+ 179          /************************************检查IAP区FLASH内容************************************/
+ 180          bit CheckIap_Flash(void)
+ 181          {
+ 182   1          uint16_t CRC = 0;
+ 183   1      
+ 184   1              /*读取存储区数据*/
+ 185   1              IapRead_Buff(START_SAVEADDRESS, &System_Parameter.PSWNext.PassWordbuff[0], (sizeof(System_Parameter) - (s
              -izeof(PASSWORDSTRUCT) - 4U))); 
- 179   1              /*计算CRC校验码*/
- 180   1              CRC = getCrc16(&System_Parameter.PSWNext.PassWordbuff[0], (sizeof(System_Parameter) - (sizeof(PASSWORDSTR
+ 186   1              /*计算CRC校验码*/
+ 187   1              CRC = getCrc16(&System_Parameter.PSWNext.PassWordbuff[0], (sizeof(System_Parameter) - (sizeof(PASSWORDSTR
              -UCT) - 4U) - 2U), 0xffff);   
- 181   1              /*比较当前校验码和存储区校验码是否匹配*/
- 182   1              if(CRC == System_Parameter.CRC16)
- 183   1              {
- 184   2                      return true;
- 185   2              }
- 186   1              return false;
- 187   1      }
- 188          
- 189          
- 190          void Iap_Flash_Iinit(void)
- 191          {   /*检查eeprom参数是否正确*/
- 192   1          if(CheckIap_Flash())  
- 193   1          {
- 194   2              GUI_String(14, 31, "parameters are correct !", EN_5_8);
- 195   2              Delay_ms(1000);
- 196   2          }
- 197   1          else
- 198   1          {
- 199   2              GUI_String(19, 31, "parameters error !", EN_5_8);
- 200   2              Delay_ms(500);
- 201   2              GUI_String(19, 31, "restore parameters...", EN_5_8);
- 202   2                      
- 203   2                      /*每次写之前必须进行擦除操作：擦除每次按照512B进行(0x00-0x0200)*/
- 204   2              IapErase(START_SAVEADDRESS); 
- 205   2                      /*把默认参数拷贝到当前数据结构*/
- 206   2                      memcpy(&System_Parameter.PSWNext.PassWordbuff[0], DEFAULT_SYSTEM_PARAMETER, (sizeof(System_Parameter) - 
+ 188   1              /*比较当前校验码和存储区校验码是否匹配*/
+ 189   1              if(CRC == System_Parameter.CRC16)
+ 190   1              {
+ 191   2                      return true;
+ 192   2              }
+ 193   1              return false;
+ 194   1      }
+ 195          
+ 196          
+ 197          void Iap_Flash_Iinit(void)
+ 198          {   /*检查eeprom参数是否正确*/
+ 199   1          if(CheckIap_Flash())  
+ 200   1          {
+ 201   2              GUI_String(14, 31, "parameters are correct !", EN_5_8);
+ 202   2              Delay_ms(1000);
+ 203   2          }
+ 204   1          else
+ 205   1          {
+ 206   2              GUI_String(19, 31, "parameters error !", EN_5_8);
+ 207   2              Delay_ms(500);
+ 208   2              GUI_String(19, 31, "restore parameters...", EN_5_8);
+ 209   2                      
+ 210   2                      /*每次写之前必须进行擦除操作：擦除每次按照512B进行(0x00-0x0200)*/
+ 211   2              IapErase(START_SAVEADDRESS); 
+ 212   2                      /*把默认参数拷贝到当前数据结构*/
+ 213   2                      memcpy(&System_Parameter.PSWNext.PassWordbuff[0], DEFAULT_SYSTEM_PARAMETER, (sizeof(System_Parameter) - 
              -(sizeof(PASSWORDSTRUCT) - 4U))); 
- 207   2                      /*把数据进行存储*/
- 208   2              IapWrite_Buff(START_SAVEADDRESS, &System_Parameter.PSWNext.PassWordbuff[0], (sizeof(System_Paramet
+ 214   2                      /*把数据进行存储*/
+ 215   2              IapWrite_Buff(START_SAVEADDRESS, &System_Parameter.PSWNext.PassWordbuff[0], (sizeof(System_Paramet
              -er) - (sizeof(PASSWORDSTRUCT) - 4U))); //去掉一个字节的index
- 209   2      
- 210   2              Delay_ms(1000);
- 211   2              clear_screen();
- 212   2              GUI_String(49, 31, "successfully !", EN_5_8);
- 213   2              Delay_ms(500);
- 214   2          }
- 215   1      }
- 216          /************************************检查IAP区FLASH内容************************************/
+ 216   2      
+ 217   2              Delay_ms(1000);
+ 218   2              clear_screen();
+ 219   2              GUI_String(49, 31, "successfully !", EN_5_8);
+ 220   2              Delay_ms(500);
+ 221   2          }
+ 222   1      }
+ 223          /************************************检查IAP区FLASH内容************************************/
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =    481    ----
+   CODE SIZE        =    457    ----
    CONSTANT SIZE    =     99    ----
    XDATA SIZE       =     20       2
    PDATA SIZE       =   ----    ----

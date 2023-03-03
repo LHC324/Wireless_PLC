@@ -20,7 +20,10 @@
         "stdio.h": "c",
         "STDIO.H": "cpp",
         "intrins.h": "c",
-        "STDLIB.H": "cpp"
+        "STDLIB.H": "cpp",
+        "pfunc.h": "c",
+        "mdrtuslave.h": "c",
+        "eeprom.h": "c"
     },
     "C_Cpp.errorSquiggles": "Disabled"
 }

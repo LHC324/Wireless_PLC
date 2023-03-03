@@ -62,31 +62,55 @@ void TIM_Base_MspInit(TIM_HandleTypeDef *const tim_baseHandle)
 	}
 }
 
-/**/
+#define CHECK_UART_FRAME(_ID) 							   \
+do									     				   \
+{									                       \
+	if(COM_UART##_ID.LNode[COM_UART##_ID.Wptr].Timer_Flag) \
+	SET_FRAME(COM_UART##_ID);	                           \
+} while (0)
+
 /**
  * @brief	定时器0的中断服务函数
  * @details	
  * @param	None
  * @retval	None
  */
-void Timer0_ISR() interrupt 1 using 1
+void Timer0_ISR() interrupt 1 using 0
 {
 	/*软件定时器*/
 	// systemTimer();
 	SET_SOFTTIMER_FLAG(PublicTimer16);
 
-	if(COM_UART1.LNode[COM_UART1.Wptr].Timer_Flag)
-		/*以太网串口接收字符间隔超时处理*/
-		SET_FRAME(COM_UART1);
-	if(COM_UART2.LNode[COM_UART2.Wptr].Timer_Flag)
-		/*4G/WiFi串口接收字符间隔超时处理*/
-		SET_FRAME(COM_UART2);
-	if(COM_UART3.LNode[COM_UART3.Wptr].Timer_Flag)
-		/*RS485串口接收字符间隔超时处理*/
-		SET_FRAME(COM_UART3);
-	if(COM_UART4.LNode[COM_UART4.Wptr].Timer_Flag)
-		/*PLC串口接收字符间隔超时处理*/
-		SET_FRAME(COM_UART4);
+	// if(COM_UART1.LNode[COM_UART1.Wptr].Timer_Flag)
+	// 	/*以太网串口接收字符间隔超时处理*/
+	// 	SET_FRAME(COM_UART1);
+	// if(COM_UART2.LNode[COM_UART2.Wptr].Timer_Flag)
+	// 	/*4G/WiFi串口接收字符间隔超时处理*/
+	// 	SET_FRAME(COM_UART2);
+	// if(COM_UART3.LNode[COM_UART3.Wptr].Timer_Flag)
+	// 	/*RS485串口接收字符间隔超时处理*/
+	// 	SET_FRAME(COM_UART3);
+	// if(COM_UART4.LNode[COM_UART4.Wptr].Timer_Flag)
+	// 	/*PLC串口接收字符间隔超时处理*/
+	// 	SET_FRAME(COM_UART4);
+
+	CHECK_UART_FRAME(1); /*以太网串口接收字符间隔超时处理*/
+	CHECK_UART_FRAME(2); /*4G/WiFi串口接收字符间隔超时处理*/
+	CHECK_UART_FRAME(3); /*RS485串口接收字符间隔超时处理*/
+#if !USING_PORT0_SINGLE
+	CHECK_UART_FRAME(4); /*PLC串口接收字符间隔超时处理*/
+#else
+//	if (!COM_UART4.Timer_Flag)
+//		return;
+	if (COM_UART4.OverTime)
+	{
+		if (!--COM_UART4.OverTime)
+			COM_UART4.Frame_Flag = true;
+	}
+	// COM_UART4.Timer_Flag = false;
+
+					
+#endif
 }
 
 
@@ -103,14 +127,14 @@ void Delay_ms(unsigned short time)
 }
 
 /*禁止编译器优化该模块*/
-// #pragma OPTIMIZE(0)
+#pragma OPTIMIZE(0)
 
-void Delay1ms()		//@11.0592.000MHz
+void Delay1ms()		//@27MHz
 {
     unsigned char i, j;
 
     i = 11;
-    j = 190;
+    j = 300;
 
     do
     {

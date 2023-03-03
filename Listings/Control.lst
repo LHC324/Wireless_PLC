@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.0.0   CONTROL                                                           01/15/2022 12:19:57 PAGE 1   
+C51 COMPILER V9.60.0.0   CONTROL                                                           03/03/2023 11:28:22 PAGE 1   
 
 
 C51 COMPILER V9.60.0.0, COMPILATION OF MODULE CONTROL
@@ -62,7 +62,7 @@ line level    source
   52          {
   53                  {"Ethernet"},
   54                  {"WIFI/4G"},
-C51 COMPILER V9.60.0.0   CONTROL                                                           01/15/2022 12:19:57 PAGE 2   
+C51 COMPILER V9.60.0.0   CONTROL                                                           03/03/2023 11:28:22 PAGE 2   
 
   55                  {"RS485"}
   56          };
@@ -126,7 +126,7 @@ line level    source
  114           */
  115          uint8_t PassWordInput(uint8_t operation, SYSTEM_PARAMETER *Password) //密码输入
  116          {
-C51 COMPILER V9.60.0.0   CONTROL                                                           01/15/2022 12:19:57 PAGE 3   
+C51 COMPILER V9.60.0.0   CONTROL                                                           03/03/2023 11:28:22 PAGE 3   
 
  117   1              /*解决初始时密码错乱*/
  118   1              if (Password->PSWNext.PassWordbuff[Password->PSWNext.Index] == 0xFF)
@@ -190,7 +190,7 @@ line level    source
  176          //}
  177          
  178          /*屏保显示页面*/
-C51 COMPILER V9.60.0.0   CONTROL                                                           01/15/2022 12:19:57 PAGE 4   
+C51 COMPILER V9.60.0.0   CONTROL                                                           03/03/2023 11:28:22 PAGE 4   
 
  179          void ScreensaverUiShow(void)
  180          {
@@ -254,7 +254,7 @@ line level    source
  237   1      
  238   1              GUI_String(30, 10, "关闭无线模块", CH_12_12);
  239   1              GUI_String(30, 40, "打开无线模块", CH_12_12);
-C51 COMPILER V9.60.0.0   CONTROL                                                           01/15/2022 12:19:57 PAGE 5   
+C51 COMPILER V9.60.0.0   CONTROL                                                           03/03/2023 11:28:22 PAGE 5   
 
  240   1      }
  241          
@@ -318,7 +318,7 @@ line level    source
  299          {
  300   1              clear_screen();
  301   1              GUI_String(10,10,"热点", CH_12_12);
-C51 COMPILER V9.60.0.0   CONTROL                                                           01/15/2022 12:19:57 PAGE 6   
+C51 COMPILER V9.60.0.0   CONTROL                                                           03/03/2023 11:28:22 PAGE 6   
 
  302   1              GUI_String(115,10,Aplist[System_Parameter.Apstate].pstring,CH_12_12);
  303   1              GUI_Lattice(149,13,5,8,IconRight);
@@ -382,7 +382,7 @@ line level    source
  361   1      }
  362          
  363          /**
-C51 COMPILER V9.60.0.0   CONTROL                                                           01/15/2022 12:19:57 PAGE 7   
+C51 COMPILER V9.60.0.0   CONTROL                                                           03/03/2023 11:28:22 PAGE 7   
 
  364           * @brief       系统数据存储到EEPROM
  365           * @details     存储数据前为了防止中断打断数据的存储，因该关闭全局中断
@@ -406,7 +406,7 @@ line level    source
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
    CODE SIZE        =   1428    ----
-   CONSTANT SIZE    =    304    ----
+   CONSTANT SIZE    =    298    ----
    XDATA SIZE       =    170      49
    PDATA SIZE       =   ----    ----
    DATA SIZE        =   ----    ----

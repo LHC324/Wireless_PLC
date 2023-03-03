@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.0.0   MENU                                                              01/15/2022 12:19:57 PAGE 1   
+C51 COMPILER V9.60.0.0   MENU                                                              03/03/2023 11:28:23 PAGE 1   
 
 
 C51 COMPILER V9.60.0.0, COMPILATION OF MODULE MENU
@@ -62,7 +62,7 @@ line level    source
   52                  {KEY_ENTER, MENU_STATE, KeyMenu_Enter},
   53                  {KEY_CANCEL, MENU_STATE, KeyMenu_Cancel},
   54                  {KEY_MENU, MENU_STATE, KeyMenu_Menu},
-C51 COMPILER V9.60.0.0   MENU                                                              01/15/2022 12:19:57 PAGE 2   
+C51 COMPILER V9.60.0.0   MENU                                                              03/03/2023 11:28:23 PAGE 2   
 
   55                  /*CONTROL状态*/
   56                  {KEY_UP, CONTROL_STATE, KeyControl_Up},
@@ -126,7 +126,7 @@ line level    source
  114   1      #if USE_PRINTF_DEBUG
                   uint8_t temp = strncmp(System_Parameter.PSWNext.PassWordbuff, "\xFF\xFF\xFF\xFF", PASSWORDBITS);
               #endif
-C51 COMPILER V9.60.0.0   MENU                                                              01/15/2022 12:19:57 PAGE 3   
+C51 COMPILER V9.60.0.0   MENU                                                              03/03/2023 11:28:23 PAGE 3   
 
  117   1          if (Ui_Status.Widget == CONTROL_PASSWORD)
  118   1          {
@@ -181,7 +181,7 @@ line level    source
  166   3              Ui_Status.Widget = CONTROL_PASSWORD;
  167   3              LcdShow(&PassWordInputUIShow);
  168   3              /*无操作返回定时器开启*/
- 169   3              PublicTimer16.MenuDly16.Timer16Count = T_60S;
+ 169   3              PublicTimer16.MenuDly16.Timer16Count = NONE_KEY_TIMEOUT();
  170   3          }
  171   2          break;
  172   2          case CONTROL_PASSWORD:
@@ -190,7 +190,7 @@ line level    source
  175   3          }
  176   2          break;
  177   2          default:
-C51 COMPILER V9.60.0.0   MENU                                                              01/15/2022 12:19:57 PAGE 4   
+C51 COMPILER V9.60.0.0   MENU                                                              03/03/2023 11:28:23 PAGE 4   
 
  178   2              break;
  179   2          }
@@ -254,7 +254,7 @@ line level    source
  237   1          M_Show[MAIN_MENU].Option_Index = LoopIndex(UPWORD, M_Show[MAIN_MENU].Option_Index, OptionlistSize);
  238   1      
  239   1          if (M_Show[MAIN_MENU].Option_Index == (OptionlistSize - 1)) //索引逻辑
-C51 COMPILER V9.60.0.0   MENU                                                              01/15/2022 12:19:57 PAGE 5   
+C51 COMPILER V9.60.0.0   MENU                                                              03/03/2023 11:28:23 PAGE 5   
 
  240   1          {
  241   2              M_Show[MAIN_MENU].Finger_Index = 2;
@@ -318,7 +318,7 @@ line level    source
  298   1          if (M_Show[MAIN_MENU].Option_Index == 0) //索引逻辑
  299   1          {
  300   2              M_Show[MAIN_MENU].Finger_Index = 0;
-C51 COMPILER V9.60.0.0   MENU                                                              01/15/2022 12:19:57 PAGE 6   
+C51 COMPILER V9.60.0.0   MENU                                                              03/03/2023 11:28:23 PAGE 6   
 
  301   2          }
  302   1      
@@ -382,7 +382,7 @@ line level    source
  360   2              return false;
  361   2          }
  362   1          return true;
-C51 COMPILER V9.60.0.0   MENU                                                              01/15/2022 12:19:57 PAGE 7   
+C51 COMPILER V9.60.0.0   MENU                                                              03/03/2023 11:28:23 PAGE 7   
 
  363   1      }
  364          
@@ -446,7 +446,7 @@ line level    source
  420   2          case CONTROL_PLCPOWER:
  421   2          {
  422   3              System_Parameter.PlcState ^= 1;
-C51 COMPILER V9.60.0.0   MENU                                                              01/15/2022 12:19:57 PAGE 8   
+C51 COMPILER V9.60.0.0   MENU                                                              03/03/2023 11:28:23 PAGE 8   
 
  423   3              RUNKEY = System_Parameter.PlcState;
  424   3              ControlSave();           //存盘开关量
@@ -510,7 +510,7 @@ line level    source
  482   3              GUI_String(70, 22, "修改成功", CH_12_12); //显示修改结果
  483   3              Delay_ms(500);
  484   3              /*返回菜单界面*/
-C51 COMPILER V9.60.0.0   MENU                                                              01/15/2022 12:19:57 PAGE 9   
+C51 COMPILER V9.60.0.0   MENU                                                              03/03/2023 11:28:23 PAGE 9   
 
  485   3              Ui_Status.Ui = MENU_STATE;
  486   3              LcdShow(RefreshMenuDisp); //刷新显示
@@ -574,7 +574,7 @@ line level    source
  542   3              Delay_ms(500);
  543   3              /*返回菜单界面*/
  544   3              Ui_Status.Ui = MENU_STATE;
-C51 COMPILER V9.60.0.0   MENU                                                              01/15/2022 12:19:57 PAGE 10  
+C51 COMPILER V9.60.0.0   MENU                                                              03/03/2023 11:28:23 PAGE 10  
 
  545   3              LcdShow(RefreshMenuDisp); //刷新显示
  546   3              break;
@@ -638,7 +638,7 @@ line level    source
  604   3          }
  605   2      
  606   2          case CONTROL_BAUDSETTING:
-C51 COMPILER V9.60.0.0   MENU                                                              01/15/2022 12:19:57 PAGE 11  
+C51 COMPILER V9.60.0.0   MENU                                                              03/03/2023 11:28:23 PAGE 11  
 
  607   2          {
  608   3              // BaudWillIndex = BaudIndex; //如果没有确定,直接返回，则恢复当前状态索引
@@ -702,7 +702,7 @@ line level    source
  666   2          break;
  667   2      
  668   2          case CONTROL_BAUDSETTING:
-C51 COMPILER V9.60.0.0   MENU                                                              01/15/2022 12:19:57 PAGE 12  
+C51 COMPILER V9.60.0.0   MENU                                                              03/03/2023 11:28:23 PAGE 12  
 
  669   2          {
  670   3              /*箭头索引减小*/
@@ -766,7 +766,7 @@ line level    source
               #endif
  728   1      }
  729          
-C51 COMPILER V9.60.0.0   MENU                                                              01/15/2022 12:19:57 PAGE 13  
+C51 COMPILER V9.60.0.0   MENU                                                              03/03/2023 11:28:23 PAGE 13  
 
  730          void KeyControl_Down(void) //控件状态--Down
  731          {
@@ -830,7 +830,7 @@ line level    source
  788   4              }
  789   3              /*刷新当前选项卡*/
  790   3              LcdShow(RefreshBaudDisp);
-C51 COMPILER V9.60.0.0   MENU                                                              01/15/2022 12:19:57 PAGE 14  
+C51 COMPILER V9.60.0.0   MENU                                                              03/03/2023 11:28:23 PAGE 14  
 
  791   3              M_Show[SEC0_MENU].OptionNow = &Optionlist1[M_Show[SEC0_MENU].Option_Index]; //赋值当前选项
  792   3          }
@@ -894,7 +894,7 @@ line level    source
              -);
  847   3              GUI_String(105, 31, Baudlist[System_Parameter.BaudIndex[3]].pstring, EN_5_8);
  848   3          }
-C51 COMPILER V9.60.0.0   MENU                                                              01/15/2022 12:19:57 PAGE 15  
+C51 COMPILER V9.60.0.0   MENU                                                              03/03/2023 11:28:23 PAGE 15  
 
  849   2          break;
  850   2          default:
@@ -958,7 +958,7 @@ line level    source
  908   3              /*修改成功后返回*/
  909   3              KeyBaud_Cancel();
  910   3          }
-C51 COMPILER V9.60.0.0   MENU                                                              01/15/2022 12:19:57 PAGE 16  
+C51 COMPILER V9.60.0.0   MENU                                                              03/03/2023 11:28:23 PAGE 16  
 
  911   2          break;
  912   2          case CONTROL_BAUD2:
@@ -1022,7 +1022,7 @@ line level    source
  970          /*波特率控件状态--Menue*/
  971          void KeyBaud_Menu(void)
  972          {
-C51 COMPILER V9.60.0.0   MENU                                                              01/15/2022 12:19:57 PAGE 17  
+C51 COMPILER V9.60.0.0   MENU                                                              03/03/2023 11:28:23 PAGE 17  
 
  973   1      #if USE_PRINTF_DEBUG
                   printf("KeyBaud_Menu\r\n");
@@ -1086,7 +1086,7 @@ line level    source
 1032   2              if (PublicTimer16.MenuDly16.Timer16Flag)
 1033   2              {
 1034   3                  PublicTimer16.MenuDly16.Timer16Flag = false;
-C51 COMPILER V9.60.0.0   MENU                                                              01/15/2022 12:19:57 PAGE 18  
+C51 COMPILER V9.60.0.0   MENU                                                              03/03/2023 11:28:23 PAGE 18  
 
 1035   3                  Ui_Status.Ui = MAIN_STATE;
 1036   3                  Ui_Status.Widget = CONTROL_SCREENSAVE;
@@ -1097,7 +1097,7 @@ line level    source
 1041   2          }
 1042   1          else
 1043   1          {
-1044   2              PublicTimer16.MenuDly16.Timer16Count = T_60S;
+1044   2              PublicTimer16.MenuDly16.Timer16Count = NONE_KEY_TIMEOUT();
 1045   2          }
 1046   1      }
 

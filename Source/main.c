@@ -14,7 +14,8 @@
 #include "wifi.h"
 
 /*系统参数*/
-SYSTEM_PARAMETER System_Parameter = {0, false, false, "\xFF\xFF\xFF\xFF", "\x08\x08\x02\x08", 0x01, 0x01, 0x00, 0x00, 0x01, 0x02, 0x00, 0xF116};
+SYSTEM_PARAMETER System_Parameter = {0, false, false, "\xFF\xFF\xFF\xFF", "\x08\x08\x02\x08", 
+                                     0x01, 0x01, 0x00, 0x00, 0x01, 0x02, 0x00, 0xF116};
 
 static void systemInit(void);
 static void UsartHandle(void);
@@ -28,7 +29,9 @@ void main(void)
 	/*注意传递的是数组名地址*/
     // init_mempool (mempool, sizeof(mempool)); 
     systemInit(); //系统初始化
-
+#if USING_WDT
+    WDT_CONTR = 0x27; //使能看门狗，复位时间约为4s
+#endif
     while(1)
     {	/*按键*/
 		KeyEvent(); 
@@ -36,6 +39,9 @@ void main(void)
 		Uart_Handle();
 		/*ModBus接收数据处理*/
 //        mdRTU_Handler();
+#if USING_WDT
+        WDT_CONTR |= 0x10; //喂狗
+#endif
     }
 }
 
@@ -46,19 +52,19 @@ void systemInit(void)
 	AUXR = 0x00;
 	/***********************************************************************/
     //以太网串口结构体初始化
-    Init_ListQueue(&COM_UART1);
+    // Init_ListQueue(&COM_UART1);
 	memset(&COM_UART1,  0, sizeof(COM_UART1));
 	
 	// 4G串口结构体初始化
-    Init_ListQueue(&COM_UART2);
+    // Init_ListQueue(&COM_UART2);
 	memset(&COM_UART2, 0, sizeof(COM_UART2));
 	
 	// RS485串口结构体初始化
-    Init_ListQueue(&COM_UART3);
+    // Init_ListQueue(&COM_UART3);
 	memset(&COM_UART3, 0, sizeof(COM_UART3));
 	
 	// PLC串口结构体初始化
-    Init_ListQueue(&COM_UART4);
+    // Init_ListQueue(&COM_UART4);
 	memset(&COM_UART4, 0, sizeof(COM_UART4));
 
 	/***********************************************************************/
@@ -71,8 +77,10 @@ void systemInit(void)
     PublicTimer16.MenuDly16.Timer16Flag = false;
     // /*控件变量初始化,放在串口3初始化之前*/
     // ControlInit();	
+#if !USING_SIMULATE
     /*STC程序下载/printf/以太网*/
     Uart1_Init(); 
+#endif
     /*4G模块*/
     Uart2_Init(); 
     /*RS485*/

@@ -60,7 +60,7 @@ void IapIdle()
 * note：
 *
 **********************************************************/
-char IapRead(char addr)
+char IapRead(short addr)
 {
     char dat = 0x00;
 
@@ -94,8 +94,8 @@ void IapProgram(unsigned short addr, unsigned char dat)
 //    IAP_CONTR = WT_12M;//WT_24M;                //使能IAP
 	IapConfigWaitTime();
     IAP_CMD = 0x02;                                //设置IAP写命令
-    IAP_ADDRL = (unsigned char)addr;                           //设置IAP低地址
-    IAP_ADDRH = (unsigned char)addr >> 8;                      //设置IAP高地址
+    IAP_ADDRL = addr;                           //设置IAP低地址
+    IAP_ADDRH = addr >> 8;                      //设置IAP高地址
     IAP_DATA = dat;                             //写IAP数据
     IAP_TRIG = 0x5a;                            //写触发命令(0x5a)
     IAP_TRIG = 0xa5;                            //写触发命令(0xa5)
@@ -118,8 +118,8 @@ void IapErase(unsigned short addr)
 //    IAP_CONTR = WT_12M;//WT_24M;                         //使能IAP
 	IapConfigWaitTime();
     IAP_CMD = 0x03;                                //设置IAP擦除命令
-    IAP_ADDRL = (unsigned char)addr;                           //设置IAP低地址
-    IAP_ADDRH = (unsigned char)addr >> 8;                      //设置IAP高地址
+    IAP_ADDRL = addr;                           //设置IAP低地址
+    IAP_ADDRH = addr >> 8;                      //设置IAP高地址
     IAP_TRIG = 0x5a;                            //写触发命令(0x5a)
     IAP_TRIG = 0xa5;                            //写触发命令(0xa5)
     //_nop_();                                    //

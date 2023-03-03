@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.0.0   WIFI                                                              01/15/2022 12:19:58 PAGE 1   
+C51 COMPILER V9.60.0.0   WIFI                                                              03/03/2023 11:28:24 PAGE 1   
 
 
 C51 COMPILER V9.60.0.0, COMPILATION OF MODULE WIFI
@@ -44,7 +44,7 @@ line level    source
   34                  {"AT+HEARTDT=7777772E796E7061782E636F6D\r\n", "+OK", 200U, NULL},   
   35                  /*SSID和密码不能程序输入，需要在现场根据用户方的WIFI设置通过WEB方式修改*/
   36                  /*设置WIFI登录SSID，密码*/ 
-  37                  {"AT+WSTA=union,*!ynzfkj20091215!*\r\n", "+OK", 200U, NULL}, 
+  37                  {"AT+WSTA=LHC,66666666\r\n", "+OK", 200U, NULL}, 
   38                  /*透传云设置*/       
   39                  {"AT+REGENA=CLOUD,FIRST\r\n", "+OK", 200U, NULL},
   40                  /*设置STOCKA参数*/
@@ -62,7 +62,7 @@ line level    source
   52          };
   53          
   54          #define WIFI_CMDSIZE sizeof(Wifi_Cmd) / sizeof(AT_Command)
-C51 COMPILER V9.60.0.0   WIFI                                                              01/15/2022 12:19:58 PAGE 2   
+C51 COMPILER V9.60.0.0   WIFI                                                              03/03/2023 11:28:24 PAGE 2   
 
   55          
   56          /**
@@ -126,7 +126,7 @@ line level    source
  113   2                      Uartx_SendStr(&Uart2, str, strlen(str));
  114   2                      Delay_ms(times);
  115   2              }
-C51 COMPILER V9.60.0.0   WIFI                                                              01/15/2022 12:19:58 PAGE 3   
+C51 COMPILER V9.60.0.0   WIFI                                                              03/03/2023 11:28:24 PAGE 3   
 
  116   1      }
  117          
@@ -190,12 +190,12 @@ line level    source
  175   1              Exe_Appoint_Cmd(RESTART_CMD, 200);
  176   1      }
 
-C51 COMPILER V9.60.0.0   WIFI                                                              01/15/2022 12:19:58 PAGE 4   
+C51 COMPILER V9.60.0.0   WIFI                                                              03/03/2023 11:28:24 PAGE 4   
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
    CODE SIZE        =    303    ----
-   CONSTANT SIZE    =    433    ----
+   CONSTANT SIZE    =    415    ----
    XDATA SIZE       =   ----       7
    PDATA SIZE       =   ----    ----
    DATA SIZE        =   ----    ----

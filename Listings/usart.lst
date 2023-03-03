@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.0.0   USART                                                             01/15/2022 12:19:58 PAGE 1   
+C51 COMPILER V9.60.0.0   USART                                                             03/03/2023 11:28:23 PAGE 1   
 
 
 C51 COMPILER V9.60.0.0, COMPILATION OF MODULE USART
@@ -11,464 +11,405 @@ line level    source
    1          #include "usart.h"
    2          #include "Control.h"
    3          #include "systemTimer.h"
-   4          // #include "queue.h"
-   5          
-   6          /*********************************************************
-   7          * 函数名：
-   8          * 功能：
-   9          * 参数：
-  10          * 作者：
-  11          * note：
-  12                  同时使用多个串口的时候会出现数据传输错误的情况 建议在使用该板子与�
+   4          
+   5          /*********************************************************
+   6          * 函数名：
+   7          * 功能：
+   8          * 参数：
+   9          * 作者：
+  10          * note：
+  11                  同时使用多个串口的时候会出现数据传输错误的情况 建议在使用该板子与�
              -��他
-  13                  通讯模块建立通讯的时候使用1对1的建立连接的模式
-  14          
-  15                  解决了多串口同时数据传输错误问题 //2021/5/31
-  16          
-  17                  在切换串口的引脚输入时，建议将RX端初始化的时候给个0值 TX引脚手动给�
+  12                  通讯模块建立通讯的时候使用1对1的建立连接的模式
+  13          
+  14                  解决了多串口同时数据传输错误问题 //2021/5/31
+  15          
+  16                  在切换串口的引脚输入时，建议将RX端初始化的时候给个0值 TX引脚手动给�
              -�1值
-  18                  （基于STC单片机的特性）
-  19          
-  20          **********************************************************/
-  21          
-  22          Uart_HandleTypeDef Uart1; //串口1句柄
-  23          Uart_HandleTypeDef Uart2; //串口2句柄
-  24          Uart_HandleTypeDef Uart3; //串口3句柄
-  25          Uart_HandleTypeDef Uart4; //串口4句柄
-  26          
-  27          #define ISR_RECEIVE(current_uart, uart_id, src, dest)                                                     
-             -                            \
-  28              do                                                                                                    
-             -                            \
-  29              {                                                                                                     
-             -                            \
-  30                  current_uart.LNode[current_uart.Wptr].Timer_Flag = true;                                          
-             -                            \
-  31                  if (!current_uart.LNode[current_uart.Wptr].Frame_Flag)                                            
-             -                            \
-  32                  {                                                                                                 
-             -                            \
-  33                      current_uart.LNode[current_uart.Wptr].OverTime = MAX_SILENCE;                                 
-             -                            \
-  34                      if (current_uart.LNode[current_uart.Wptr].Rx_Length < MAX_SIZE)                               
-             -                            \
-  35                      {                                                                                             
-             -                            \
-  36                          current_uart.LNode[current_uart.Wptr].Rx_Buffer[current_uart.LNode[current_uart.Wptr].Rx_L
-             -ength++] = S##uart_id##BUF; \
-  37                          current_uart.LNode[current_uart.Wptr].Source_Channel = src;                               
-             -                            \
-  38                          current_uart.LNode[current_uart.Wptr].Target_Channel = dest;                              
-             -                            \
-  39                      }                                                                                             
-             -                            \
-C51 COMPILER V9.60.0.0   USART                                                             01/15/2022 12:19:58 PAGE 2   
+  17                  （基于STC单片机的特性）
+  18          
+  19          **********************************************************/
+  20          
+  21          Uart_HandleTypeDef Uart1; //串口1句柄
+  22          Uart_HandleTypeDef Uart2; //串口2句柄
+  23          Uart_HandleTypeDef Uart3; //串口3句柄
+  24          Uart_HandleTypeDef Uart4; //串口4句柄
+  25          
+  26          #define S1BUF SBUF
+  27          #define ISR_RECEIVE(_id, _src, _dest)                                            \
+  28              do {                                                                         \
+  29                  COM_UART##_id.LNode[COM_UART##_id.Wptr].Timer_Flag = true;               \
+  30                  if (!COM_UART##_id.LNode[COM_UART##_id.Wptr].Frame_Flag){                \
+  31                      COM_UART##_id.LNode[COM_UART##_id.Wptr].OverTime = MAX_SILENCE;      \
+  32                      if (COM_UART##_id.LNode[COM_UART##_id.Wptr].Rx_Length < MAX_SIZE) {  \
+  33                          COM_UART##_id.LNode[COM_UART##_id.Wptr].Rx_Buffer[COM_UART##_id. \
+  34                          LNode[COM_UART##_id.Wptr].Rx_Length++]  = S##_id##BUF;           \
+  35                          COM_UART##_id.LNode[COM_UART##_id.Wptr].Source_Channel = _src;   \
+  36                          COM_UART##_id.LNode[COM_UART##_id.Wptr].Target_Channel = _dest;  \
+  37                      }                                                                    \
+  38                  }                                                                        \
+  39              } while (0)
+  40          
+  41          /*定义一个当前发起请求通道变量*/
+  42          volatile  SEL_CHANNEL current_request_channel = CHANNEL_IDLE;
+  43          
+  44          /*********************************************************
+  45           * 函数名：void Uart_1Init(void)
+  46           * 功能：  串口1的初始化
+  47           * 参数：
+  48           * 作者：  LHC
+  49           * note：
+  50           *              使用的是定时器1作为波特率发生器,LAN口用
+  51           **********************************************************/
+  52          void Uart1_Init(void) //串口1选择定时器1作为波特率发生器
+C51 COMPILER V9.60.0.0   USART                                                             03/03/2023 11:28:23 PAGE 2   
 
-  40                  }                                                                                                 
-             -                            \
-  41              } while (0);
-  42          
-  43          /*定义一个当前发起请求通道变量*/
-  44          volatile  SEL_CHANNEL current_request_channel = CHANNEL_IDLE;
-  45          
-  46          /*********************************************************
-  47           * 函数名：void Uart_1Init(void)
-  48           * 功能：  串口1的初始化
-  49           * 参数：
-  50           * 作者：  LHC
-  51           * note：
-  52           *              使用的是定时器1作为波特率发生器,LAN口用
-  53           **********************************************************/
-  54          void Uart1_Init(void) //串口1选择定时器1作为波特率发生器
-  55          {
-  56   1          Uart1.Instance = UART1;
-  57   1          Uart1.Register_SCON = 0x50; //模式1，8位数据，可变波特率
-  58   1          Uart1.Uart_Mode = 0x00;     //定时器模式0，16bit自动重载
-  59   1          Uart1.Uart_Count = UART1_BRT;
-  60   1          Uart1.RunUart_Enable = true;
-  61   1          Uart1.Interrupt_Enable = true;
-  62   1          Uart1.Register_AUXR = 0x40;  //定时器1，1T模式
-  63   1          Uart1.Register_AUXR &= 0xFE; //波特率发生器选用定时器1，最好按照要求来
-  64   1      
-  65   1          Uart1.Uart_NVIC.Register_IP = 0xEF; // PS=0,PSH=0,串口1中断优先级为第0级，最低级
-  66   1          Uart1.Uart_NVIC.Register_IPH = 0xEF;
-  67   1      
-  68   1          Uart_Base_MspInit(&Uart1);
-  69   1      }
-  70          
-  71          /*********************************************************
-  72           * 函数名：void Uart1_ISR() interrupt 4 using 2
-  73           * 功能：  串口1的定时中断服务函数
-  74           * 参数：
-  75           * 作者：  LHC
-  76           * note：
-  77           *              使用的是定时器1作为波特率发生器,LAN口用
-  78           **********************************************************/
-  79          void Uart1_ISR() interrupt 4 using 2 //串口1的定时中断服务函数
-  80          {
-  81   1          /*发送中断标志*/
-  82   1          if (TI)
-  83   1          {
-  84   2              TI = 0;
-  85   2              /*发送完成，清除占用*/
-  86   2              Uart1.Uartx_busy = false;
-  87   2          }
-  88   1          /*接收中断标志*/
-  89   1          if (RI)
-  90   1          {
-  91   2              RI = 0;
-  92   2      
-  93   2              COM_UART1.LNode[COM_UART1.Wptr].Timer_Flag = true;
-  94   2              if (!COM_UART1.LNode[COM_UART1.Wptr].Frame_Flag)
-  95   2              {
-  96   3                  COM_UART1.LNode[COM_UART1.Wptr].OverTime = MAX_SILENCE;
-  97   3                  if (COM_UART1.LNode[COM_UART1.Wptr].Rx_Length < MAX_SIZE)
-  98   3                  {
-  99   4                      COM_UART1.LNode[COM_UART1.Wptr].Rx_Buffer[COM_UART1.LNode[COM_UART1.Wptr].Rx_Length++] = S
-             -BUF;
-C51 COMPILER V9.60.0.0   USART                                                             01/15/2022 12:19:58 PAGE 3   
+  53          {
+  54   1          Uart1.Instance = UART1;
+  55   1          Uart1.Register_SCON = 0x50; //模式1，8位数据，可变波特率
+  56   1          Uart1.Uart_Mode = 0x00;     //定时器模式0，16bit自动重载
+  57   1          Uart1.Uart_Count = UART1_BRT;
+  58   1          Uart1.RunUart_Enable = true;
+  59   1          Uart1.Interrupt_Enable = true;
+  60   1          Uart1.Register_AUXR = 0x40;  //定时器1，1T模式
+  61   1          Uart1.Register_AUXR &= 0xFE; //波特率发生器选用定时器1，最好按照要求来
+  62   1      
+  63   1          Uart1.Uart_NVIC.Register_IP = 0xEF; // PS=0,PSH=0,串口1中断优先级为第0级，最低级
+  64   1          Uart1.Uart_NVIC.Register_IPH = 0xEF;
+  65   1      
+  66   1          Uart_Base_MspInit(&Uart1);
+  67   1      }
+  68          
+  69          /*********************************************************
+  70           * 函数名：void Uart1_ISR() interrupt 4 using 3
+  71           * 功能：  串口1的定时中断服务函数
+  72           * 参数：
+  73           * 作者：  LHC
+  74           * note：
+  75           *              使用的是定时器1作为波特率发生器,LAN口用
+  76           **********************************************************/
+  77          void Uart1_ISR() interrupt 4 using 3 //串口1的定时中断服务函数
+  78          {
+  79   1          /*发送中断标志*/
+  80   1          if (TI)
+  81   1          {
+  82   2              TI = 0;
+  83   2              /*发送完成，清除占用*/
+  84   2              Uart1.Uartx_busy = false;
+  85   2          }
+  86   1          /*接收中断标志*/
+  87   1          if (RI)
+  88   1          {
+  89   2              RI = 0;
+  90   2      #if !USE_PRINTF_DEBUG
+  91   2              /*设置当前请求通道*/
+  92   2              current_request_channel = CHANNEL_LAN;
+  93   2              ISR_RECEIVE(1, CHANNEL_LAN, CHANNEL_PLC);
+  94   2      #endif
+  95   2          }
+  96   1      }
+  97          
+  98          /*********************************************************
+  99           * 函数名：void Uart_2Init(void)
+ 100           * 功能：  串口2的初始化
+ 101           * 参数：
+ 102           * 作者：  LHC
+ 103           * note：
+ 104           *              使用的是定时器2作为波特率发生器,485口用
+ 105           **********************************************************/
+ 106          void Uart2_Init(void) //串口2选择定时器2作为波特率发生器
+ 107          {
+ 108   1          Uart2.Instance = UART2;
+ 109   1          Uart2.Register_SCON = 0x10; //模式1，8位数据，可变波特率，开启串口2接收
+ 110   1          Uart2.Uart_Mode = 0x00;     //定时器模式0，16bit自动重载
+ 111   1          Uart2.Uart_Count = UART2_BRT;
+ 112   1          Uart2.RunUart_Enable = true;
+ 113   1          Uart2.Interrupt_Enable = 0x01;
+ 114   1          Uart2.Register_AUXR = 0x14;         //开启定时器2，1T模式
+C51 COMPILER V9.60.0.0   USART                                                             03/03/2023 11:28:23 PAGE 3   
 
- 100   4                      COM_UART1.LNode[COM_UART1.Wptr].Source_Channel = CHANNEL_LAN;
- 101   4                      COM_UART1.LNode[COM_UART1.Wptr].Target_Channel = CHANNEL_PLC;
- 102   4                  }
- 103   3              }
- 104   2              /*设置当前请求通道*/
- 105   2              current_request_channel = CHANNEL_LAN;
- 106   2              // ISR_RECEIVE(COM_UART1, ,CHANNEL_LAN, CHANNEL_PLC);
- 107   2          }
- 108   1      }
- 109          
- 110          /*********************************************************
- 111           * 函数名：void Uart_2Init(void)
- 112           * 功能：  串口2的初始化
- 113           * 参数：
- 114           * 作者：  LHC
- 115           * note：
- 116           *              使用的是定时器2作为波特率发生器,485口用
- 117           **********************************************************/
- 118          void Uart2_Init(void) //串口2选择定时器2作为波特率发生器
- 119          {
- 120   1          Uart2.Instance = UART2;
- 121   1          Uart2.Register_SCON = 0x10; //模式1，8位数据，可变波特率，开启串口2接收
- 122   1          Uart2.Uart_Mode = 0x00;     //定时器模式0，16bit自动重载
- 123   1          Uart2.Uart_Count = UART2_BRT;
- 124   1          Uart2.RunUart_Enable = true;
- 125   1          Uart2.Interrupt_Enable = 0x01;
- 126   1          Uart2.Register_AUXR = 0x14;         //开启定时器2，1T模式
- 127   1          Uart2.Uart_NVIC.Register_IP = 0xFE; // PS2=0,PS2H=0,串口2中断优先级为第0级
- 128   1          Uart2.Uart_NVIC.Register_IPH = 0xFE;
- 129   1      
- 130   1          Uart_Base_MspInit(&Uart2);
- 131   1      }
- 132          
- 133          /*********************************************************
- 134           * 函数名：void Uart2_ISR() interrupt 8 using 2
- 135           * 功能：  串口2中断函数
- 136           * 参数：
- 137           * 作者：  LHC
- 138           * note：
- 139           *              使用的是定时器2作为波特率发生器,4G口用
- 140           **********************************************************/
- 141          void Uart2_ISR() interrupt 8 using 2
- 142          {   /*发送中断*/
- 143   1          if (S2CON & S2TI)
- 144   1          {
- 145   2              S2CON &= ~S2TI;
- 146   2              /*发送完成，清除占用*/
- 147   2              Uart2.Uartx_busy = false;
- 148   2          }
- 149   1          /*接收中断*/
- 150   1          if (S2CON & S2RI)
- 151   1          {
- 152   2              S2CON &= ~S2RI;
- 153   2      
- 154   2              COM_UART2.LNode[COM_UART2.Wptr].Timer_Flag = true;
- 155   2              if (!COM_UART2.LNode[COM_UART2.Wptr].Frame_Flag)
- 156   2              {
- 157   3                  COM_UART2.LNode[COM_UART2.Wptr].OverTime = MAX_SILENCE;
- 158   3                  if (COM_UART2.LNode[COM_UART2.Wptr].Rx_Length < MAX_SIZE)
- 159   3                  {
- 160   4                      COM_UART2.LNode[COM_UART2.Wptr].Rx_Buffer[COM_UART2.LNode[COM_UART2.Wptr].Rx_Length++] = S
-             -2BUF;
-C51 COMPILER V9.60.0.0   USART                                                             01/15/2022 12:19:58 PAGE 4   
+ 115   1          Uart2.Uart_NVIC.Register_IP = 0xFE; // PS2=0,PS2H=0,串口2中断优先级为第0级
+ 116   1          Uart2.Uart_NVIC.Register_IPH = 0xFE;
+ 117   1      
+ 118   1          Uart_Base_MspInit(&Uart2);
+ 119   1      }
+ 120          
+ 121          /*********************************************************
+ 122           * 函数名：void Uart2_ISR() interrupt 8 using 3
+ 123           * 功能：  串口2中断函数
+ 124           * 参数：
+ 125           * 作者：  LHC
+ 126           * note：
+ 127           *              使用的是定时器2作为波特率发生器,4G口用
+ 128           **********************************************************/
+ 129          void Uart2_ISR() interrupt 8 using 3
+ 130          {   /*发送中断*/
+ 131   1          if (S2CON & S2TI)
+ 132   1          {
+ 133   2              S2CON &= ~S2TI;
+ 134   2              /*发送完成，清除占用*/
+ 135   2              Uart2.Uartx_busy = false;
+ 136   2          }
+ 137   1          /*接收中断*/
+ 138   1          if (S2CON & S2RI)
+ 139   1          {
+ 140   2              S2CON &= ~S2RI;
+ 141   2      
+ 142   2              /*设置当前请求通道*/
+ 143   2              current_request_channel = CHANNEL_WIFI;
+ 144   2              ISR_RECEIVE(2, CHANNEL_WIFI, CHANNEL_PLC);
+ 145   2          }
+ 146   1      }
+ 147          
+ 148          ///*********************************************************
+ 149          //* 函数名：void Uart_3Init(void)
+ 150          //* 功能：  串口3的初始化
+ 151          //* 参数：
+ 152          //* 作者：  LHC
+ 153          //* note：
+ 154          //*             使用的是定时器3作为波特率发生器,恩外部485转发
+ 155          //**********************************************************/
+ 156          void Uart3_Init(void) //串口3选择定时器3作为波特率发生器
+ 157          {
+ 158   1          Uart3.Instance = UART3;
+ 159   1          Uart3.Register_SCON = 0x50; //模式0，8位数据，可变波特率；定时器3，1T模式
+ 160   1              // Uart3.Register_SCON = 0xD0; //模式1，9位数据，可变波特率；定时器3，1T模式
+ 161   1          Uart3.Uart_Mode = 0x0A;     //打开定时器3，1T模式
+ 162   1          Uart3.Uart_Count = UART3_BRT;
+ 163   1          Uart3.Interrupt_Enable = 0x08;
+ 164   1      
+ 165   1          Uart_Base_MspInit(&Uart3);
+ 166   1      }
+ 167          
+ 168          /*********************************************************
+ 169           * 函数名：void Uart3_ISR() interrupt 17 using 2
+ 170           * 功能：  串口3中断函数
+ 171           * 参数：
+ 172           * 作者：  LHC
+ 173           * note：
+ 174           *              使用的是定时器3作为波特率发生器,RS485模块
+ 175           **********************************************************/
+ 176          void Uart3_ISR() interrupt 17 using 2
+C51 COMPILER V9.60.0.0   USART                                                             03/03/2023 11:28:23 PAGE 4   
 
- 161   4                      COM_UART2.LNode[COM_UART2.Wptr].Source_Channel = CHANNEL_WIFI;
- 162   4                      COM_UART2.LNode[COM_UART2.Wptr].Target_Channel = CHANNEL_PLC;
- 163   4                  }
- 164   3              }
- 165   2      
- 166   2              /*设置当前请求通道*/
- 167   2              current_request_channel = CHANNEL_WIFI;
- 168   2              // ISR_RECEIVE(COM_UART2, 2, CHANNEL_WIFI, CHANNEL_PLC);
- 169   2          }
- 170   1      }
- 171          
- 172          ///*********************************************************
- 173          //* 函数名：void Uart_3Init(void)
- 174          //* 功能：  串口3的初始化
- 175          //* 参数：
- 176          //* 作者：  LHC
- 177          //* note：
- 178          //*             使用的是定时器3作为波特率发生器,恩外部485转发
- 179          //**********************************************************/
- 180          void Uart3_Init(void) //串口3选择定时器3作为波特率发生器
- 181          {
- 182   1          Uart3.Instance = UART3;
- 183   1          Uart3.Register_SCON = 0x50; //模式0，8位数据，可变波特率；定时器3，1T模式
- 184   1              // Uart3.Register_SCON = 0xD0; //模式1，9位数据，可变波特率；定时器3，1T模式
- 185   1          Uart3.Uart_Mode = 0x0A;     //打开定时器3，1T模式
- 186   1          Uart3.Uart_Count = UART3_BRT;
- 187   1          Uart3.Interrupt_Enable = 0x08;
- 188   1      
- 189   1          Uart_Base_MspInit(&Uart3);
- 190   1      }
- 191          
- 192          /*********************************************************
- 193           * 函数名：void Uart3_ISR() interrupt 17 using 2
- 194           * 功能：  串口3中断函数
- 195           * 参数：
- 196           * 作者：  LHC
- 197           * note：
- 198           *              使用的是定时器3作为波特率发生器,RS485模块
- 199           **********************************************************/
- 200          void Uart3_ISR() interrupt 17 using 2
- 201          {
- 202   1          /*发送中断完成*/
- 203   1          if (S3CON & S3TI)
- 204   1          {
- 205   2              S3CON &= ~S3TI;
- 206   2              Uart3.Uartx_busy = false; //发送完成，清除占用
- 207   2          }
- 208   1          /*接收中断*/
- 209   1          if (S3CON & S3RI)
- 210   1          {
- 211   2              S3CON &= ~S3RI;
- 212   2      
- 213   2              COM_UART3.LNode[COM_UART3.Wptr].Timer_Flag = true;
- 214   2              if (!COM_UART3.LNode[COM_UART3.Wptr].Frame_Flag)
- 215   2              {
- 216   3                  COM_UART3.LNode[COM_UART3.Wptr].OverTime = MAX_SILENCE;
- 217   3                  if (COM_UART3.LNode[COM_UART3.Wptr].Rx_Length < MAX_SIZE)
- 218   3                  {
- 219   4                      COM_UART3.LNode[COM_UART3.Wptr].Rx_Buffer[COM_UART3.LNode[COM_UART3.Wptr].Rx_Length++] = S
-             -3BUF;
- 220   4                      COM_UART3.LNode[COM_UART3.Wptr].Source_Channel = CHANNEL_RS485;
- 221   4                      COM_UART3.LNode[COM_UART3.Wptr].Target_Channel = CHANNEL_PLC;
-C51 COMPILER V9.60.0.0   USART                                                             01/15/2022 12:19:58 PAGE 5   
+ 177          {
+ 178   1          /*发送中断完成*/
+ 179   1          if (S3CON & S3TI)
+ 180   1          {
+ 181   2              S3CON &= ~S3TI;
+ 182   2              Uart3.Uartx_busy = false; //发送完成，清除占用
+ 183   2          }
+ 184   1          /*接收中断*/
+ 185   1          if (S3CON & S3RI)
+ 186   1          {
+ 187   2              S3CON &= ~S3RI;
+ 188   2      
+ 189   2              /*设置当前请求通道*/
+ 190   2              current_request_channel = CHANNEL_RS485;
+ 191   2              ISR_RECEIVE(3, CHANNEL_RS485, CHANNEL_PLC);
+ 192   2          }
+ 193   1      }
+ 194          
+ 195          ///*********************************************************
+ 196          //* 函数名：void Uart_4Init(void)
+ 197          //* 功能：  串口4的初始化
+ 198          //* 参数：
+ 199          //* 作者：  LHC
+ 200          //* note：
+ 201          //*             使用的是定时器4作为波特率发生器,PLC口用
+ 202          //**********************************************************/
+ 203          void Uart4_Init(void) //串口4选择定时器4作为波特率发生器
+ 204          {
+ 205   1          Uart4.Instance = UART4;
+ 206   1          Uart4.Register_SCON = 0x50; //模式0，8位数据，可变波特率
+ 207   1              // Uart4.Register_SCON = 0xD0; //模式1，9位数据，可变波特率
+ 208   1          Uart4.Uart_Mode = 0xA0;     //定时器模式0，16bit自动重载;开启定时器4，1T模式
+ 209   1          Uart4.Uart_Count = UART4_BRT;
+ 210   1          Uart4.Interrupt_Enable = 0x10;
+ 211   1      
+ 212   1          Uart_Base_MspInit(&Uart4);
+ 213   1      }
+ 214          
+ 215          /*********************************************************
+ 216           * 函数名：void Uart4_Isr() interrupt 18 using 1
+ 217           * 功能：  串口4中断函数
+ 218           * 参数：
+ 219           * 作者：  LHC
+ 220           * note：
+ 221           *              使用的是定时器4作为波特率发生器,PLC口用
+ 222           **********************************************************/
+ 223          void Uart4_Isr() interrupt 18 using 1
+ 224          {                             /*发送中断*/
+ 225   1          // SEL_CHANNEL temp_channel = CHANNEL_RS485;
+ 226   1      
+ 227   1          if (S4CON & S4TI)
+ 228   1          {
+ 229   2              S4CON &= ~S4TI;
+ 230   2              /*发送完成，清除占用*/
+ 231   2              Uart4.Uartx_busy = false;
+ 232   2          }
+ 233   1          /*接收中断*/
+ 234   1          if (S4CON & S4RI)
+ 235   1          {
+ 236   2              S4CON &= ~S4RI;
+ 237   2      
+ 238   2              /*判断当前PLC是主动发送还是被动请求*/
+C51 COMPILER V9.60.0.0   USART                                                             03/03/2023 11:28:23 PAGE 5   
 
- 222   4                  }
- 223   3              }
- 224   2      
- 225   2              /*设置当前请求通道*/
- 226   2              current_request_channel = CHANNEL_RS485;
- 227   2              // ISR_RECEIVE(COM_UART3, 3, CHANNEL_RS485, CHANNEL_PLC);
- 228   2          }
- 229   1      }
- 230          
- 231          ///*********************************************************
- 232          //* 函数名：void Uart_4Init(void)
- 233          //* 功能：  串口4的初始化
- 234          //* 参数：
- 235          //* 作者：  LHC
- 236          //* note：
- 237          //*             使用的是定时器4作为波特率发生器,PLC口用
- 238          //**********************************************************/
- 239          void Uart4_Init(void) //串口4选择定时器4作为波特率发生器
- 240          {
- 241   1          Uart4.Instance = UART4;
- 242   1          Uart4.Register_SCON = 0x50; //模式0，8位数据，可变波特率
- 243   1              // Uart4.Register_SCON = 0xD0; //模式1，9位数据，可变波特率
- 244   1          Uart4.Uart_Mode = 0xA0;     //定时器模式0，16bit自动重载;开启定时器4，1T模式
- 245   1          Uart4.Uart_Count = UART4_BRT;
- 246   1          Uart4.Interrupt_Enable = 0x10;
- 247   1      
- 248   1          Uart_Base_MspInit(&Uart4);
- 249   1      }
- 250          
- 251          /*********************************************************
- 252           * 函数名：void Uart4_Isr() interrupt 18 using 1
- 253           * 功能：  串口4中断函数
- 254           * 参数：
- 255           * 作者：  LHC
- 256           * note：
- 257           *              使用的是定时器4作为波特率发生器,PLC口用
- 258           **********************************************************/
- 259          void Uart4_Isr() interrupt 18 using 2
- 260          {                             /*发送中断*/
- 261   1          // SEL_CHANNEL temp_channel = CHANNEL_RS485;
- 262   1      
- 263   1          if (S4CON & S4TI)
- 264   1          {
- 265   2              S4CON &= ~S4TI;
- 266   2              /*发送完成，清除占用*/
- 267   2              Uart4.Uartx_busy = false;
- 268   2          }
- 269   1          /*接收中断*/
- 270   1          if (S4CON & S4RI)
- 271   1          {
- 272   2              S4CON &= ~S4RI;
- 273   2      
- 274   2              COM_UART4.LNode[COM_UART4.Wptr].Timer_Flag = true;
- 275   2              if (!COM_UART4.LNode[COM_UART4.Wptr].Frame_Flag)
- 276   2              {
- 277   3                  COM_UART4.LNode[COM_UART4.Wptr].OverTime = MAX_SILENCE;
- 278   3                  if (COM_UART4.LNode[COM_UART4.Wptr].Rx_Length < MAX_SIZE)
- 279   3                  {
- 280   4                      COM_UART4.LNode[COM_UART4.Wptr].Rx_Buffer[COM_UART4.LNode[COM_UART4.Wptr].Rx_Length++] = S
-             -4BUF;
- 281   4                      COM_UART4.LNode[COM_UART4.Wptr].Source_Channel = CHANNEL_PLC;
- 282   4                      COM_UART4.LNode[COM_UART4.Wptr].Target_Channel = current_request_channel;
-C51 COMPILER V9.60.0.0   USART                                                             01/15/2022 12:19:58 PAGE 6   
-
- 283   4                  }
- 284   3              }
- 285   2      
- 286   2              /*判断当前PLC是主动发送还是被动请求*/
- 287   2              // if (current_request_channel != CHANNEL_IDLE)
- 288   2              // {
- 289   2              //     temp_channel = CHANNEL_RS485;
- 290   2              // }
- 291   2              // else
- 292   2              // {
- 293   2              //     temp_channel = current_request_channel;
- 294   2              // }
- 295   2              // ISR_RECEIVE(COM_UART4, 4, CHANNEL_PLC, CHANNEL_RS485);
- 296   2          }
- 297   1      }
- 298          
- 299          /**********************************公用函数************************/
- 300          
- 301          /*********************************************************
- 302           * 函数名：Uart_Base_MspInit(Uart_HandleTypeDef *uart_baseHandle)
- 303           * 功能：  所有串口底层初始化函数
- 304           * 参数：  Uart_HandleTypeDef *uart_baseHandle串口句柄
- 305           * 作者：  LHC
- 306           * note：
- 307           *              注意正确给出串口句柄
- 308           **********************************************************/
- 309          void Uart_Base_MspInit(Uart_HandleTypeDef *const uart_baseHandle)
- 310          {
- 311   1          if (uart_baseHandle->Instance == UART1)
- 312   1          {
- 313   2              SCON = uart_baseHandle->Register_SCON;
- 314   2              TMOD |= uart_baseHandle->Uart_Mode;
- 315   2              TL1 = uart_baseHandle->Uart_Count;
- 316   2              TH1 = uart_baseHandle->Uart_Count >> 8;
- 317   2              TR1 = uart_baseHandle->RunUart_Enable;
- 318   2              AUXR |= uart_baseHandle->Register_AUXR;
- 319   2              IP &= uart_baseHandle->Uart_NVIC.Register_IP;
- 320   2              IPH &= uart_baseHandle->Uart_NVIC.Register_IPH;
- 321   2      #if USEING_PRINTF //如果使用printf
+ 239   2              // if (current_request_channel != CHANNEL_IDLE)
+ 240   2              // {
+ 241   2              //     temp_channel = CHANNEL_RS485;
+ 242   2              // }
+ 243   2              // else
+ 244   2              // {
+ 245   2              //     temp_channel = current_request_channel;
+ 246   2              // }
+ 247   2      #if !USING_PORT0_SINGLE
+                      ISR_RECEIVE(4, CHANNEL_PLC, current_request_channel);
+              #else
+ 250   2              if (!COM_UART4.Frame_Flag)
+ 251   2              {
+ 252   3                  COM_UART4.OverTime = MAX_SILENCE;
+ 253   3                  if (COM_UART4.Rx_Length < 
+ 254   3                  sizeof(COM_UART4.Rx_Buffer)/ sizeof(COM_UART4.Rx_Buffer[0]))
+ 255   3                  {
+ 256   4                      COM_UART4.Rx_Buffer[COM_UART4.Rx_Length++] = S4BUF;
+ 257   4                      COM_UART4.Source_Channel = CHANNEL_PLC;
+ 258   4                      COM_UART4.Target_Channel = current_request_channel;
+ 259   4                  }
+ 260   3              }
+ 261   2      #endif
+ 262   2          }
+ 263   1      }
+ 264          
+ 265          /**********************************公用函数************************/
+ 266          
+ 267          /*********************************************************
+ 268           * 函数名：Uart_Base_MspInit(Uart_HandleTypeDef *uart_baseHandle)
+ 269           * 功能：  所有串口底层初始化函数
+ 270           * 参数：  Uart_HandleTypeDef *uart_baseHandle串口句柄
+ 271           * 作者：  LHC
+ 272           * note：
+ 273           *              注意正确给出串口句柄
+ 274           **********************************************************/
+ 275          void Uart_Base_MspInit(Uart_HandleTypeDef *const uart_baseHandle)
+ 276          {
+ 277   1          if (uart_baseHandle->Instance == UART1)
+ 278   1          {
+ 279   2              SCON = uart_baseHandle->Register_SCON;
+ 280   2              TMOD |= uart_baseHandle->Uart_Mode;
+ 281   2              TL1 = uart_baseHandle->Uart_Count;
+ 282   2              TH1 = uart_baseHandle->Uart_Count >> 8;
+ 283   2              TR1 = uart_baseHandle->RunUart_Enable;
+ 284   2              AUXR |= uart_baseHandle->Register_AUXR;
+ 285   2              IP &= uart_baseHandle->Uart_NVIC.Register_IP;
+ 286   2              IPH &= uart_baseHandle->Uart_NVIC.Register_IPH;
+ 287   2      #if USEING_PRINTF //如果使用printf
                       TI = 1;   //放到printf重定向
               #else
- 324   2              ES = uart_baseHandle->Interrupt_Enable; //串口1中断允许位
- 325   2      #endif
- 326   2          }
- 327   1          else if (uart_baseHandle->Instance == UART2)
- 328   1          {
- 329   2              S2CON = uart_baseHandle->Register_SCON;
- 330   2              TL2 = uart_baseHandle->Uart_Count;
- 331   2              TH2 = uart_baseHandle->Uart_Count >> 8;
- 332   2              AUXR |= uart_baseHandle->Register_AUXR;
- 333   2              IE2 |= uart_baseHandle->Interrupt_Enable; //串口2中断允许位
- 334   2              IP2 &= uart_baseHandle->Uart_NVIC.Register_IP;
- 335   2              IP2H &= uart_baseHandle->Uart_NVIC.Register_IPH;
+ 290   2              ES = uart_baseHandle->Interrupt_Enable; //串口1中断允许位
+ 291   2      #endif
+ 292   2          }
+ 293   1          else if (uart_baseHandle->Instance == UART2)
+ 294   1          {
+ 295   2              S2CON = uart_baseHandle->Register_SCON;
+ 296   2              TL2 = uart_baseHandle->Uart_Count;
+ 297   2              TH2 = uart_baseHandle->Uart_Count >> 8;
+ 298   2              AUXR |= uart_baseHandle->Register_AUXR;
+ 299   2              IE2 |= uart_baseHandle->Interrupt_Enable; //串口2中断允许位
+ 300   2              IP2 &= uart_baseHandle->Uart_NVIC.Register_IP;
+C51 COMPILER V9.60.0.0   USART                                                             03/03/2023 11:28:23 PAGE 6   
+
+ 301   2              IP2H &= uart_baseHandle->Uart_NVIC.Register_IPH;
+ 302   2          }
+ 303   1          else if (uart_baseHandle->Instance == UART3)
+ 304   1          {
+ 305   2              S3CON = uart_baseHandle->Register_SCON;
+ 306   2              T4T3M = uart_baseHandle->Uart_Mode;
+ 307   2              T3L = uart_baseHandle->Uart_Count;
+ 308   2              T3H = uart_baseHandle->Uart_Count >> 8;
+ 309   2              IE2 |= uart_baseHandle->Interrupt_Enable; //串口3中断允许位
+ 310   2          }
+ 311   1          else if (uart_baseHandle->Instance == UART4)
+ 312   1          {
+ 313   2              S4CON = uart_baseHandle->Register_SCON;
+ 314   2              T4T3M |= uart_baseHandle->Uart_Mode; //此处串口3和串口4共用
+ 315   2              T4L = uart_baseHandle->Uart_Count;
+ 316   2              T4H = uart_baseHandle->Uart_Count >> 8;
+ 317   2              IE2 |= uart_baseHandle->Interrupt_Enable; //串口4中断允许位
+ 318   2          }
+ 319   1      }
+ 320          
+ 321          /*********************************************************
+ 322           * 函数名：static void Busy_Await(Uart_HandleTypeDef * const Uart, uint16_t overtime)
+ 323           * 功能：  字节发送超时等待机制
+ 324           * 参数：  Uart_HandleTypeDef * const Uart;uint16_t overtime
+ 325           * 作者：  LHC
+ 326           * note：
+ 327           *
+ 328           **********************************************************/
+ 329          void Busy_Await(Uart_HandleTypeDef *const Uart, uint16_t overtime)
+ 330          {
+ 331   1      
+ 332   1          while (Uart->Uartx_busy) //等待发送完成：Uart->Uartx_busy清零
+ 333   1          {
+ 334   2              if (!(overtime--))
+ 335   2              break;
  336   2          }
- 337   1          else if (uart_baseHandle->Instance == UART3)
- 338   1          {
- 339   2              S3CON = uart_baseHandle->Register_SCON;
- 340   2              T4T3M = uart_baseHandle->Uart_Mode;
- 341   2              T3L = uart_baseHandle->Uart_Count;
- 342   2              T3H = uart_baseHandle->Uart_Count >> 8;
- 343   2              IE2 |= uart_baseHandle->Interrupt_Enable; //串口3中断允许位
- 344   2          }
-C51 COMPILER V9.60.0.0   USART                                                             01/15/2022 12:19:58 PAGE 7   
+ 337   1      
+ 338   1          Uart->Uartx_busy = true; //发送数据，把相应串口置忙
+ 339   1      }
+ 340          
+ 341          /*********************************************************
+ 342           * 函数名：Uartx_SendStr(Uart_HandleTypeDef *const Uart,uint8_t *p,uint8_t length)
+ 343           * 功能：  所有串口字符串发送函数
+ 344           * 参数：  Uart_HandleTypeDef *const Uart,uint8_t *p;uint8_t length
+ 345           * 作者：  LHC
+ 346           * note：
+ 347           *
+ 348           **********************************************************/
+ 349          void Uartx_SendStr(Uart_HandleTypeDef *const Uart, uint8_t *p, uint8_t length)
+ 350          {
+ 351   1          /*9bit奇偶校验：https://blog.csdn.net/lljss1980/article/details/112639188*/
+ 352   1              uint8_t psw_p = P;
+ 353   1              psw_p <<= 3U;
+ 354   1              
+ 355   1          while (length--)
+ 356   1          {
+ 357   2              Busy_Await(&(*Uart), UART_BYTE_SENDOVERTIME); //等待当前字节发送完成
+ 358   2              switch (Uart->Instance)
+ 359   2              {
+ 360   3              case UART1:
+ 361   3                  SBUF = *p++;
+ 362   3                  break;
+C51 COMPILER V9.60.0.0   USART                                                             03/03/2023 11:28:23 PAGE 7   
 
- 345   1          else if (uart_baseHandle->Instance == UART4)
- 346   1          {
- 347   2              S4CON = uart_baseHandle->Register_SCON;
- 348   2              T4T3M |= uart_baseHandle->Uart_Mode; //此处串口3和串口4共用
- 349   2              T4L = uart_baseHandle->Uart_Count;
- 350   2              T4H = uart_baseHandle->Uart_Count >> 8;
- 351   2              IE2 |= uart_baseHandle->Interrupt_Enable; //串口4中断允许位
- 352   2          }
- 353   1      }
- 354          
- 355          /*********************************************************
- 356           * 函数名：static void Busy_Await(Uart_HandleTypeDef * const Uart, uint16_t overtime)
- 357           * 功能：  字节发送超时等待机制
- 358           * 参数：  Uart_HandleTypeDef * const Uart;uint16_t overtime
- 359           * 作者：  LHC
- 360           * note：
- 361           *
- 362           **********************************************************/
- 363          void Busy_Await(Uart_HandleTypeDef *const Uart, uint16_t overtime)
- 364          {
- 365   1      
- 366   1          while (Uart->Uartx_busy) //等待发送完成：Uart->Uartx_busy清零
- 367   1          {
- 368   2              if (!(overtime--))
- 369   2                  break;
- 370   2          }
- 371   1      
- 372   1          Uart->Uartx_busy = true; //发送数据，把相应串口置忙
- 373   1      }
- 374          
- 375          /*********************************************************
- 376           * 函数名：Uartx_SendStr(Uart_HandleTypeDef *const Uart,uint8_t *p,uint8_t length)
- 377           * 功能：  所有串口字符串发送函数
- 378           * 参数：  Uart_HandleTypeDef *const Uart,uint8_t *p;uint8_t length
- 379           * 作者：  LHC
- 380           * note：
- 381           *
- 382           **********************************************************/
- 383          void Uartx_SendStr(Uart_HandleTypeDef *const Uart, uint8_t *p, uint8_t length)
- 384          {
- 385   1              uint8_t psw_p = P;
- 386   1              psw_p <<= 3U;
- 387   1              
- 388   1          while (length--)
- 389   1          {
- 390   2              Busy_Await(&(*Uart), UART_BYTE_SENDOVERTIME); //等待当前字节发送完成
- 391   2              switch (Uart->Instance)
- 392   2              {
- 393   3              case UART1:
- 394   3                  SBUF = *p++;
- 395   3                  break;
- 396   3              case UART2:
- 397   3                  S2BUF = *p++;
- 398   3                  break;
- 399   3              case UART3:
- 400   3                  // if (System_Parameter.Ppistate)
- 401   3                  {
- 402   4                      S3CON |= psw_p;
- 403   4                  }
- 404   3                  S3BUF = *p++;
- 405   3                  break;
- 406   3              case UART4:
-C51 COMPILER V9.60.0.0   USART                                                             01/15/2022 12:19:58 PAGE 8   
-
- 407   3                  // if (System_Parameter.Ppistate)
- 408   3                  {
- 409   4                      S4CON |= psw_p;
- 410   4                  }
- 411   3                  S4BUF = *p++;
- 412   3                  break;
- 413   3              default:
- 414   3                  break;
- 415   3              }
- 416   2          }
- 417   1      }
- 418          
- 419          /*********************************************************
- 420           * 函数名：char putchar(char str)
- 421           * 功能：  putchar重定向,被printf调用
- 422           * 参数：  char str，发送的字符串
- 423           * 作者：  LHC
- 424           * note：
- 425           *                使用printf函数将会占用1K 左右FLASH
- 426           **********************************************************/
- 427          #if (USEING_PRINTF)
+ 363   3              case UART2:
+ 364   3                  S2BUF = *p++;
+ 365   3                  break;
+ 366   3              case UART3:
+ 367   3                  S3CON |= psw_p;
+ 368   3                  S3BUF = *p++;
+ 369   3                  break;
+ 370   3              case UART4:
+ 371   3                  S4CON |= psw_p;
+ 372   3                  S4BUF = *p++;
+ 373   3                  break;
+ 374   3              default:
+ 375   3                  break;
+ 376   3              }
+ 377   2          }
+ 378   1      }
+ 379          
+ 380          /*********************************************************
+ 381           * 函数名：char putchar(char str)
+ 382           * 功能：  putchar重定向,被printf调用
+ 383           * 参数：  char str，发送的字符串
+ 384           * 作者：  LHC
+ 385           * note：
+ 386           *                使用printf函数将会占用1K 左右FLASH
+ 387           **********************************************************/
+ 388          #if (USEING_PRINTF)
               char putchar(char str)
               {
                   ES = 0; //关闭串口1中断
@@ -482,12 +423,12 @@ line level    source
                   return str;
               }
               #endif
- 441          
- 442          /**********************************公用函数************************/
+ 402          
+ 403          /**********************************公用函数************************/
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =   1236    ----
+   CODE SIZE        =   1226    ----
    CONSTANT SIZE    =   ----    ----
    XDATA SIZE       =     45       8
    PDATA SIZE       =   ----    ----

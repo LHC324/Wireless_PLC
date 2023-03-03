@@ -3,13 +3,13 @@
         {
             "name": "Target 1",
             "includePath": [
-                "g:\\STC_Workers\\PLC\\Wireless_Plc\\Include",
-                "g:\\STC_Workers\\PLC\\Wireless_Plc\\FreeModBus\\Inc",
+                "g:\\STC_Workers\\Multi_Function_PLC\\Include",
+                "g:\\STC_Workers\\Multi_Function_PLC\\FreeModBus\\Inc",
                 "C:\\Keil_v5\\C51\\INC",
-                "g:\\STC_Workers\\PLC\\Wireless_Plc\\Source",
-                "g:\\STC_Workers\\PLC\\Wireless_Plc\\STCLIB",
-                "g:\\STC_Workers\\PLC\\Wireless_Plc",
-                "g:\\STC_Workers\\PLC\\Wireless_Plc\\Readme"
+                "g:\\STC_Workers\\Multi_Function_PLC\\Source",
+                "g:\\STC_Workers\\Multi_Function_PLC\\STCLIB",
+                "g:\\STC_Workers\\Multi_Function_PLC",
+                "g:\\STC_Workers\\Multi_Function_PLC\\Readme"
             ],
             "defines": [
                 "__C51__",

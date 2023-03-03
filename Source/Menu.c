@@ -166,7 +166,7 @@ void KeyMain_Menu(void) //主界面状态--Menu
         Ui_Status.Widget = CONTROL_PASSWORD;
         LcdShow(&PassWordInputUIShow);
         /*无操作返回定时器开启*/
-        PublicTimer16.MenuDly16.Timer16Count = T_60S;
+        PublicTimer16.MenuDly16.Timer16Count = NONE_KEY_TIMEOUT();
     }
     break;
     case CONTROL_PASSWORD:
@@ -1041,6 +1041,6 @@ void LcdDly(KEY_e key)
     }
     else
     {
-        PublicTimer16.MenuDly16.Timer16Count = T_60S;
+        PublicTimer16.MenuDly16.Timer16Count = NONE_KEY_TIMEOUT();
     }
 }
